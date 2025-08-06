@@ -1,0 +1,170 @@
+# Filename: docker-compose.yml
+services:
+  # --- Databases & Cache ---
+  postgres-db:
+    image: postgres:14-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  mongo-db:
+    image: mongo:6.0
+    container_name: mongo-db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  # --- Backend Services (Node.js) ---
+  api-gateway:
+    container_name: api-gateway
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth-service
+      - user-service
+      - product-service
+      - expert-service
+      - ai-service
+      - recommendation-service
+    env_file: ./.env
+    volumes:
+      - ./services/api-gateway/src:/app/src # Hot-reloading
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres-db
+      - redis-cache
+    env_file: ./.env
+    volumes:
+      - ./services/auth-service/src:/app/src
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  user-service:
+    container_name: user-service
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres-db
+    env_file: ./.env
+    volumes:
+      - ./services/user-service/src:/app/src
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  product-service:
+    container_name: product-service
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo-db
+    env_file: ./.env
+    volumes:
+      - ./services/product-service/src:/app/src
+    networks:
+      - skincare-net
+    restart: unless-stopped
+      
+  expert-service:
+    container_name: expert-service
+    build:
+      context: ./services/expert-service
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    depends_on:
+      - postgres-db
+    env_file: ./.env
+    volumes:
+      - ./services/expert-service/src:/app/src
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  # --- Backend Services (Python) ---
+  ai-service:
+    container_name: ai-service
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: ./.env
+    volumes:
+      - ./services/ai-service/app:/app/app # Hot-reloading
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+  recommendation-service:
+    container_name: recommendation-service
+    build:
+      context: ./services/recommendation-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongo-db
+      - user-service
+    env_file: ./.env
+    volumes:
+      - ./services/recommendation-service/app:/app/app
+    networks:
+      - skincare-net
+    restart: unless-stopped
+
+# --- Volumes & Networks ---
+volumes:
+  postgres-data:
+    driver: local
+  mongo-data:
+    driver: local
+
+networks:
+  skincare-net:
+    driver: bridge
