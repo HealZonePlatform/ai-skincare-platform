@@ -19,7 +19,10 @@ export const errorHandler = (
     url: req.url,
     method: req.method,
     ip: req.ip,
-    userAgent: req.get('User-Agent')
+    userAgent: req.get('User-Agent'),
+    body: req.body,
+    params: req.params,
+    query: req.query
   });
 
   // Duplicate email error (PostgreSQL)
@@ -51,9 +54,32 @@ export const errorHandler = (
     return;
   }
 
+  // Redis connection error
+  if (error.message.includes('Redis')) {
+    responseUtil.serverError(res, 'Cache service unavailable');
+    return;
+  }
+
+  // Environment variable errors
+  if (error.message.includes('JWT') && error.message.includes('not defined')) {
+    console.error('❌ Critical: JWT environment variables not configured properly');
+    responseUtil.serverError(res, 'Authentication service misconfiguration');
+    return;
+  }
+
   // Default server error
   const statusCode = error.statusCode || 500;
   const message = statusCode === 500 ? 'Internal server error' : error.message;
   
-  responseUtil.error(res, message, process.env.NODE_ENV === 'development' ? error.message : undefined, statusCode);
+  responseUtil.error(
+    res, 
+    message, 
+    process.env.NODE_ENV === 'development' ? error.stack : undefined, 
+    statusCode
+  );
+};
+
+// 404 handler for undefined routes
+export const notFoundHandler = (req: Request, res: Response): void => {
+  responseUtil.notFound(res, `Route ${req.method} ${req.path} not found`);
 };

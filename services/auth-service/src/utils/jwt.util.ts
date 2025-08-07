@@ -1,93 +1,183 @@
 // src/utils/jwt.util.ts
 import jwt from 'jsonwebtoken';
+import { IUser } from '../interfaces/user.interface';
 import { ITokenPayload } from '../interfaces/auth.interface';
 
-class JWTUtil {
-  private accessTokenSecret: string;
-  private refreshTokenSecret: string;
-  private accessTokenExpiry: string;
-  private refreshTokenExpiry: string;
+/**
+ * Generate access token for user
+ */
+const generateAccessToken = (user: IUser): string => {
+  const accessTokenSecret = process.env.JWT_ACCESS_SECRET;
+  const accessTokenExpiresIn = process.env.JWT_ACCESS_EXPIRY; // Sử dụng EXPIRY thay vì EXPIRES_IN để consistent
 
-  constructor() {
-    this.accessTokenSecret = process.env.JWT_ACCESS_SECRET || 'access-secret';
-    this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || 'refresh-secret';
-    this.accessTokenExpiry = process.env.JWT_ACCESS_EXPIRY || '15m';
-    this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRY || '7d';
+  if (!accessTokenSecret || !accessTokenExpiresIn) {
+    throw new Error('JWT access token secret or expiration is not defined in environment variables.');
   }
 
-  /**
-   * Tạo access token
-   */
-  generateAccessToken(userId: string, email: string): string {
-    const payload: ITokenPayload = {
-      userId,
-      email,
-      type: 'access'
+  const payload = {
+    userId: user.id, // Sử dụng userId để consistent với ITokenPayload
+    email: user.email,
+    type: 'access'
+  };
+
+  return jwt.sign(payload, accessTokenSecret, {
+    expiresIn: accessTokenExpiresIn,
+    issuer: 'auth-service',
+    audience: 'ai-skincare-platform'
+  });
+};
+
+/**
+ * Generate refresh token for user
+ */
+const generateRefreshToken = (user: IUser): string => {
+  const refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
+  const refreshTokenExpiresIn = process.env.JWT_REFRESH_EXPIRY; // Sử dụng EXPIRY thay vì EXPIRES_IN
+
+  if (!refreshTokenSecret || !refreshTokenExpiresIn) {
+    throw new Error('JWT refresh token secret or expiration is not defined in environment variables.');
+  }
+
+  const payload = {
+    userId: user.id, // Sử dụng userId để consistent
+    email: user.email,
+    type: 'refresh'
+  };
+
+  return jwt.sign(payload, refreshTokenSecret, {
+    expiresIn: refreshTokenExpiresIn,
+    issuer: 'auth-service',
+    audience: 'ai-skincare-platform'
+  });
+};
+
+/**
+ * Verify JWT token
+ */
+const verifyToken = (token: string, secret: string) => {
+  try {
+    const decoded = jwt.verify(token, secret) as ITokenPayload;
+    return {
+      valid: true,
+      expired: false,
+      decoded,
     };
-
-    return jwt.sign(payload, this.accessTokenSecret, {
-      expiresIn: this.accessTokenExpiry,
-      issuer: 'auth-service',
-      audience: 'ai-skincare-platform'
-    });
-  }
-
-  /**
-   * Tạo refresh token
-   */
-  generateRefreshToken(userId: string, email: string): string {
-    const payload: ITokenPayload = {
-      userId,
-      email,
-      type: 'refresh'
+  } catch (error: any) {
+    return {
+      valid: false,
+      expired: error.message === 'jwt expired' || error.name === 'TokenExpiredError',
+      decoded: null,
     };
+  }
+};
 
-    return jwt.sign(payload, this.refreshTokenSecret, {
-      expiresIn: this.refreshTokenExpiry,
-      issuer: 'auth-service',
-      audience: 'ai-skincare-platform'
-    });
+/**
+ * Verify access token specifically
+ */
+const verifyAccessToken = (token: string): { valid: boolean; expired: boolean; decoded: ITokenPayload | null } => {
+  const accessTokenSecret = process.env.JWT_ACCESS_SECRET;
+  
+  if (!accessTokenSecret) {
+    throw new Error('JWT access token secret is not defined in environment variables.');
   }
 
-  /**
-   * Verify access token
-   */
-  verifyAccessToken(token: string): ITokenPayload | null {
-    try {
-      const decoded = jwt.verify(token, this.accessTokenSecret) as ITokenPayload;
-      if (decoded.type !== 'access') {
-        return null;
-      }
-      return decoded;
-    } catch (error) {
+  const result = verifyToken(token, accessTokenSecret);
+  
+  // Additional validation for access token type
+  if (result.valid && result.decoded && result.decoded.type !== 'access') {
+    return {
+      valid: false,
+      expired: false,
+      decoded: null
+    };
+  }
+
+  return result;
+};
+
+/**
+ * Verify refresh token specifically
+ */
+const verifyRefreshToken = (token: string): { valid: boolean; expired: boolean; decoded: ITokenPayload | null } => {
+  const refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
+  
+  if (!refreshTokenSecret) {
+    throw new Error('JWT refresh token secret is not defined in environment variables.');
+  }
+
+  const result = verifyToken(token, refreshTokenSecret);
+  
+  // Additional validation for refresh token type
+  if (result.valid && result.decoded && result.decoded.type !== 'refresh') {
+    return {
+      valid: false,
+      expired: false,
+      decoded: null
+    };
+  }
+
+  return result;
+};
+
+/**
+ * Extract token from Authorization header
+ */
+const extractTokenFromHeader = (authHeader: string | undefined): string | null => {
+  if (!authHeader) {
+    return null;
+  }
+
+  // Check if header starts with "Bearer "
+  if (!authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  // Extract token part after "Bearer "
+  const token = authHeader.substring(7).trim();
+  
+  // Validate token is not empty
+  if (!token) {
+    return null;
+  }
+
+  return token;
+};
+
+/**
+ * Decode token without verification (for debugging purposes)
+ */
+const decodeToken = (token: string): ITokenPayload | null => {
+  try {
+    const decoded = jwt.decode(token) as ITokenPayload;
+    
+    if (!decoded || typeof decoded === 'string') {
       return null;
     }
-  }
 
-  /**
-   * Verify refresh token
-   */
-  verifyRefreshToken(token: string): ITokenPayload | null {
-    try {
-      const decoded = jwt.verify(token, this.refreshTokenSecret) as ITokenPayload;
-      if (decoded.type !== 'refresh') {
-        return null;
-      }
-      return decoded;
-    } catch (error) {
-      return null;
-    }
+    return decoded;
+  } catch (error) {
+    console.error('Token decode failed:', error);
+    return null;
   }
+};
 
-  /**
-   * Lấy token từ header Authorization
-   */
-  extractTokenFromHeader(authHeader: string | undefined): string | null {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return null;
-    }
-    return authHeader.substring(7);
-  }
-}
+/**
+ * Generate both access and refresh tokens
+ */
+const generateTokens = (user: IUser): { accessToken: string; refreshToken: string } => {
+  return {
+    accessToken: generateAccessToken(user),
+    refreshToken: generateRefreshToken(user)
+  };
+};
 
-export default new JWTUtil();
+export {
+  generateAccessToken,
+  generateRefreshToken,
+  generateTokens,
+  verifyToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+  extractTokenFromHeader,
+  decodeToken
+};

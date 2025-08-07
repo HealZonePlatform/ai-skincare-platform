@@ -3,15 +3,15 @@ export interface IUser {
   id: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   phone?: string;
-  dateOfBirth?: Date;
-  skinType?: string;
-  isActive: boolean;
-  isVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  date_of_birth?: Date;
+  skin_type?: string;
+  is_active: boolean;
+  is_verified: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface IUserCreate {
@@ -26,4 +26,8 @@ export interface IUserCreate {
 export interface IUserLogin {
   email: string;
   password: string;
+}
+
+export interface IUserResponse extends Omit<IUser, 'password'> {
+  // User response without password field
 }

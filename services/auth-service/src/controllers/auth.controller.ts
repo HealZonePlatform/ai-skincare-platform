@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types';
 import authService from '../services/auth.service';
 import responseUtil from '../utils/response.util';
-import jwtUtil from '../utils/jwt.util';
+import { extractTokenFromHeader } from '../utils/jwt.util';
 
 class AuthController {
   /**
@@ -23,6 +23,10 @@ class AuthController {
         201
       );
     } catch (error: any) {
+      if (error.message === 'Email already exists') {
+        responseUtil.error(res, 'Email already exists', 'This email is already registered', 409);
+        return;
+      }
       next(error);
     }
   }
@@ -48,6 +52,10 @@ class AuthController {
         responseUtil.unauthorized(res, 'Invalid email or password');
         return;
       }
+      if (error.message === 'Account is deactivated') {
+        responseUtil.forbidden(res, 'Account is deactivated. Please contact support.');
+        return;
+      }
       next(error);
     }
   }
@@ -69,7 +77,11 @@ class AuthController {
         { tokens: newTokens }
       );
     } catch (error: any) {
-      responseUtil.unauthorized(res, 'Invalid or expired refresh token');
+      if (error.message.includes('Invalid refresh token') || error.message.includes('User not found')) {
+        responseUtil.unauthorized(res, 'Invalid or expired refresh token');
+        return;
+      }
+      next(error);
     }
   }
 
@@ -83,9 +95,14 @@ class AuthController {
       const user = req.user!;
       
       // Get access token from header
-      const accessToken = jwtUtil.extractTokenFromHeader(req.headers.authorization);
+      const accessToken = extractTokenFromHeader(req.headers.authorization);
       if (!accessToken) {
         responseUtil.error(res, 'Access token is required');
+        return;
+      }
+
+      if (!refreshToken) {
+        responseUtil.error(res, 'Refresh token is required');
         return;
       }
 
@@ -112,6 +129,19 @@ class AuthController {
     } catch (error: any) {
       next(error);
     }
+  }
+
+  /**
+   * Health check endpoint
+   * GET /api/v1/auth/health
+   */
+  async healthCheck(req: Request, res: Response): Promise<void> {
+    responseUtil.success(res, 'Auth service is healthy', {
+      timestamp: new Date().toISOString(),
+      service: 'auth-service',
+      version: process.env.npm_package_version || '1.0.0',
+      uptime: process.uptime()
+    });
   }
 }
 

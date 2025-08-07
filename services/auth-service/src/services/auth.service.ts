@@ -3,7 +3,7 @@ import { IUser, IUserCreate, IUserLogin } from '../interfaces/user.interface';
 import { IAuthResponse, IAuthTokens } from '../interfaces/auth.interface';
 import userModel from '../models/user.model';
 import passwordUtil from '../utils/password.util';
-import jwtUtil from '../utils/jwt.util';
+import { generateTokens, verifyRefreshToken, extractTokenFromHeader, decodeToken } from '../utils/jwt.util';
 import redisConfig from '../config/redis';
 
 class AuthService {
@@ -33,17 +33,29 @@ class AuthService {
         hashedPassword
       });
 
-      // Tạo tokens
-      const tokens = this.generateTokens(newUser.id, newUser.email);
+      // Tạo tokens sử dụng function mới
+      const tokens = generateTokens(newUser);
 
       // Lưu refresh token vào Redis
       await this.saveRefreshToken(newUser.id, tokens.refreshToken);
 
       // Remove password from response
-      const { password, ...userWithoutPassword } = newUser;
+      const userResponse = {
+        id: newUser.id,
+        email: newUser.email,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
+        phone: newUser.phone,
+        date_of_birth: newUser.date_of_birth,
+        skin_type: newUser.skin_type,
+        is_active: newUser.is_active,
+        is_verified: newUser.is_verified,
+        created_at: newUser.created_at,
+        updated_at: newUser.updated_at
+      };
 
       return {
-        user: userWithoutPassword,
+        user: userResponse,
         tokens
       };
     } catch (error) {
@@ -69,17 +81,34 @@ class AuthService {
         throw new Error('Invalid email or password');
       }
 
-      // Tạo tokens
-      const tokens = this.generateTokens(user.id, user.email);
+      // Kiểm tra account status
+      if (!user.is_active) {
+        throw new Error('Account is deactivated');
+      }
+
+      // Tạo tokens sử dụng function mới
+      const tokens = generateTokens(user);
 
       // Lưu refresh token vào Redis
       await this.saveRefreshToken(user.id, tokens.refreshToken);
 
       // Remove password from response
-      const { password, ...userWithoutPassword } = user;
+      const userResponse = {
+        id: user.id,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth,
+        skin_type: user.skin_type,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      };
 
       return {
-        user: userWithoutPassword,
+        user: userResponse,
         tokens
       };
     } catch (error) {
@@ -99,11 +128,23 @@ class AuthService {
         throw new Error('Invalid refresh token');
       }
 
+      // Verify user still exists and is active
+      const user = await userModel.findById(userId);
+      if (!user || !user.is_active) {
+        throw new Error('User not found or inactive');
+      }
+
+      // Verify refresh token signature
+      const tokenResult = verifyRefreshToken(oldRefreshToken);
+      if (!tokenResult.valid) {
+        throw new Error('Invalid refresh token signature');
+      }
+
       // Blacklist old refresh token
       await this.blacklistToken(oldRefreshToken);
 
       // Generate new tokens
-      const newTokens = this.generateTokens(userId, email);
+      const newTokens = generateTokens(user);
 
       // Save new refresh token
       await this.saveRefreshToken(userId, newTokens.refreshToken);
@@ -135,19 +176,6 @@ class AuthService {
   }
 
   /**
-   * Generate access and refresh tokens
-   */
-  private generateTokens(userId: string, email: string): IAuthTokens {
-    const accessToken = jwtUtil.generateAccessToken(userId, email);
-    const refreshToken = jwtUtil.generateRefreshToken(userId, email);
-
-    return {
-      accessToken,
-      refreshToken
-    };
-  }
-
-  /**
    * Save refresh token to Redis
    */
   private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
@@ -159,7 +187,19 @@ class AuthService {
    * Blacklist a token
    */
   private async blacklistToken(token: string): Promise<void> {
-    const tokenExpiry = 15 * 60; // 15 minutes for access token, can be longer for refresh
+    // Calculate appropriate expiry time based on token type
+    let tokenExpiry = 15 * 60; // 15 minutes default for access token
+    
+    try {
+      const decoded = decodeToken(token);
+      if (decoded?.type === 'refresh') {
+        tokenExpiry = 7 * 24 * 60 * 60; // 7 days for refresh token
+      }
+    } catch (error) {
+      // Use default expiry if decode fails
+      console.warn('Failed to decode token for blacklist expiry calculation');
+    }
+
     await redisConfig.set(`blacklist_${token}`, 'true', tokenExpiry);
   }
 }

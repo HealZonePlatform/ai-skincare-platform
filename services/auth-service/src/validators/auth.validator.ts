@@ -82,7 +82,7 @@ class AuthValidator {
   });
 
   /**
-   * Validate refresh token
+   * Validate refresh token request
    */
   validateRefreshToken = Joi.object({
     refreshToken: Joi.string()
@@ -91,6 +91,17 @@ class AuthValidator {
         'any.required': 'Refresh token is required'
       })
   });
+
+  /**
+   * Validate logout request
+   */
+  validateLogout = Joi.object({
+    refreshToken: Joi.string()
+      .required()
+      .messages({
+        'any.required': 'Refresh token is required for logout'
+      })
+  }).unknown(false); // Không cho phép fields không xác định
 }
 
 export default new AuthValidator();

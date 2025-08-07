@@ -1,9 +1,9 @@
 // src/middlewares/auth.middleware.ts
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../types';
-import jwtUtil from '../utils/jwt.util';
+import { verifyAccessToken, verifyRefreshToken, extractTokenFromHeader } from '../utils/jwt.util';
 import responseUtil from '../utils/response.util';
-import redisConfig from '../config/redis.ts';
+import redisConfig from '../config/redis';
 
 class AuthMiddleware {
   /**
@@ -11,7 +11,7 @@ class AuthMiddleware {
    */
   async verifyToken(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = jwtUtil.extractTokenFromHeader(req.headers.authorization);
+      const token = extractTokenFromHeader(req.headers.authorization);
       
       if (!token) {
         responseUtil.unauthorized(res, 'Access token is required');
@@ -25,16 +25,22 @@ class AuthMiddleware {
         return;
       }
 
-      const decoded = jwtUtil.verifyAccessToken(token);
-      if (!decoded) {
-        responseUtil.unauthorized(res, 'Invalid or expired access token');
+      const result = verifyAccessToken(token);
+      if (!result.valid) {
+        const message = result.expired ? 'Access token has expired' : 'Invalid access token';
+        responseUtil.unauthorized(res, message);
+        return;
+      }
+
+      if (!result.decoded) {
+        responseUtil.unauthorized(res, 'Invalid token payload');
         return;
       }
 
       // Attach user info to request
       req.user = {
-        userId: decoded.userId,
-        email: decoded.email
+        userId: result.decoded.userId,
+        email: result.decoded.email
       };
 
       next();
@@ -47,7 +53,7 @@ class AuthMiddleware {
   /**
    * Middleware để check refresh token
    */
-  async verifyRefreshToken(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  async verifyRefreshTokenMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { refreshToken } = req.body;
       
@@ -63,15 +69,21 @@ class AuthMiddleware {
         return;
       }
 
-      const decoded = jwtUtil.verifyRefreshToken(refreshToken);
-      if (!decoded) {
-        responseUtil.unauthorized(res, 'Invalid or expired refresh token');
+      const result = verifyRefreshToken(refreshToken);
+      if (!result.valid) {
+        const message = result.expired ? 'Refresh token has expired' : 'Invalid refresh token';
+        responseUtil.unauthorized(res, message);
+        return;
+      }
+
+      if (!result.decoded) {
+        responseUtil.unauthorized(res, 'Invalid refresh token payload');
         return;
       }
 
       req.user = {
-        userId: decoded.userId,
-        email: decoded.email
+        userId: result.decoded.userId,
+        email: result.decoded.email
       };
 
       next();

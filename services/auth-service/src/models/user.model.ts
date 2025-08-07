@@ -11,12 +11,40 @@ class UserModel {
    */
   async findByEmail(email: string): Promise<IUser | null> {
     const query = `
-      SELECT * FROM ${this.tableName} 
+      SELECT 
+        id, email, password, first_name, last_name, phone, 
+        date_of_birth, skin_type, is_active, is_verified, 
+        created_at, updated_at
+      FROM ${this.tableName} 
       WHERE email = $1 AND is_active = true
     `;
     
-    const result = await database.query(query, [email]);
-    return result.rows[0] || null;
+    try {
+      const result = await database.query(query, [email.toLowerCase()]);
+      if (result.rows.length === 0) {
+        return null;
+      }
+      
+      // Map database fields to interface
+      const user = result.rows[0];
+      return {
+        id: user.id,
+        email: user.email,
+        password: user.password,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth,
+        skin_type: user.skin_type,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      };
+    } catch (error) {
+      console.error('Error finding user by email:', error);
+      throw error;
+    }
   }
 
   /**
@@ -24,12 +52,39 @@ class UserModel {
    */
   async findById(id: string): Promise<IUser | null> {
     const query = `
-      SELECT * FROM ${this.tableName} 
+      SELECT 
+        id, email, password, first_name, last_name, phone, 
+        date_of_birth, skin_type, is_active, is_verified, 
+        created_at, updated_at
+      FROM ${this.tableName} 
       WHERE id = $1 AND is_active = true
     `;
     
-    const result = await database.query(query, [id]);
-    return result.rows[0] || null;
+    try {
+      const result = await database.query(query, [id]);
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const user = result.rows[0];
+      return {
+        id: user.id,
+        email: user.email,
+        password: user.password,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth,
+        skin_type: user.skin_type,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      };
+    } catch (error) {
+      console.error('Error finding user by ID:', error);
+      throw error;
+    }
   }
 
   /**
@@ -45,7 +100,9 @@ class UserModel {
         is_active, is_verified, created_at, updated_at
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      RETURNING *
+      RETURNING id, email, password, first_name, last_name, phone, 
+                date_of_birth, skin_type, is_active, is_verified, 
+                created_at, updated_at
     `;
 
     const values = [
@@ -62,21 +119,41 @@ class UserModel {
       now // updated_at
     ];
 
-    const result = await database.query(query, values);
-    return result.rows[0];
+    try {
+      const result = await database.query(query, values);
+      const user = result.rows[0];
+      
+      return {
+        id: user.id,
+        email: user.email,
+        password: user.password,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth,
+        skin_type: user.skin_type,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   /**
    * Cập nhật thông tin user
    */
-  async update(id: string, updateData: Partial<IUser>): Promise<IUser | null> {
+  async update(id: string, updateData: Partial<Omit<IUser, 'id' | 'created_at'>>): Promise<IUser | null> {
     const fields = [];
     const values = [];
     let paramCount = 1;
 
     // Build dynamic update query
     Object.entries(updateData).forEach(([key, value]) => {
-      if (value !== undefined) {
+      if (value !== undefined && key !== 'id' && key !== 'created_at') {
         fields.push(`${key} = $${paramCount}`);
         values.push(value);
         paramCount++;
@@ -99,11 +176,36 @@ class UserModel {
       UPDATE ${this.tableName}
       SET ${fields.join(', ')}
       WHERE id = $${paramCount}
-      RETURNING *
+      RETURNING id, email, password, first_name, last_name, phone, 
+                date_of_birth, skin_type, is_active, is_verified, 
+                created_at, updated_at
     `;
 
-    const result = await database.query(query, values);
-    return result.rows[0] || null;
+    try {
+      const result = await database.query(query, values);
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const user = result.rows[0];
+      return {
+        id: user.id,
+        email: user.email,
+        password: user.password,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        date_of_birth: user.date_of_birth,
+        skin_type: user.skin_type,
+        is_active: user.is_active,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+        updated_at: user.updated_at
+      };
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
   }
 
   /**
@@ -116,8 +218,13 @@ class UserModel {
       WHERE id = $2
     `;
 
-    const result = await database.query(query, [new Date(), id]);
-    return result.rowCount > 0;
+    try {
+      const result = await database.query(query, [new Date(), id]);
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
   }
 
   /**
@@ -130,8 +237,13 @@ class UserModel {
       WHERE id = $2
     `;
 
-    const result = await database.query(query, [new Date(), id]);
-    return result.rowCount > 0;
+    try {
+      const result = await database.query(query, [new Date(), id]);
+      return result.rowCount > 0;
+    } catch (error) {
+      console.error('Error verifying email:', error);
+      throw error;
+    }
   }
 }
 
