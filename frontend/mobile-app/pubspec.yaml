@@ -1,1 +1,13 @@
-# Flutter pubspec
+# pubspec.yaml
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.5         # Để quản lý state
+  dio: ^5.3.3              # Để gọi API
+  flutter_secure_storage: ^9.0.0 # Để lưu trữ token an toàn
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

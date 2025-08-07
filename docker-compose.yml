@@ -1,9 +1,11 @@
 # Filename: docker-compose.yml
+
 services:
   # --- Databases & Cache ---
   postgres-db:
-    image: postgres:14-alpine
+    image: postgres:13-alpine
     container_name: postgres-db
+    restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -11,10 +13,12 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      # Volume để lưu trữ dữ liệu PostgreSQL bền vững
       - postgres-data:/var/lib/postgresql/data
+      # Ánh xạ file init.sql để tự động chạy khi container được tạo lần đầu
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - skincare-net
-    restart: unless-stopped
 
   mongo-db:
     image: mongo:6.0
@@ -56,7 +60,7 @@ services:
       - recommendation-service
     env_file: ./.env
     volumes:
-      - ./services/api-gateway/src:/app/src # Hot-reloading
+      - ./services/api-gateway/src:/app/src
     networks:
       - skincare-net
     restart: unless-stopped
@@ -69,7 +73,7 @@ services:
     ports:
       - "3001:3001"
     depends_on:
-      - postgres-db
+      - postgres-db # Đảm bảo DB khởi động trước
       - redis-cache
     env_file: ./.env
     volumes:
@@ -86,7 +90,7 @@ services:
     ports:
       - "3002:3002"
     depends_on:
-      - postgres-db
+      - postgres-db # Đảm bảo DB khởi động trước
     env_file: ./.env
     volumes:
       - ./services/user-service/src:/app/src
@@ -102,7 +106,7 @@ services:
     ports:
       - "3003:3003"
     depends_on:
-      - mongo-db
+      - mongo-db # Đảm bảo DB khởi động trước
     env_file: ./.env
     volumes:
       - ./services/product-service/src:/app/src
@@ -118,7 +122,7 @@ services:
     ports:
       - "3004:3004"
     depends_on:
-      - postgres-db
+      - postgres-db # Đảm bảo DB khởi động trước
     env_file: ./.env
     volumes:
       - ./services/expert-service/src:/app/src
@@ -136,7 +140,7 @@ services:
       - "8000:8000"
     env_file: ./.env
     volumes:
-      - ./services/ai-service/app:/app/app # Hot-reloading
+      - ./services/ai-service/app:/app/app
     networks:
       - skincare-net
     restart: unless-stopped

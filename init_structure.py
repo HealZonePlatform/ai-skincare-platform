@@ -1,64 +1,40 @@
 import os
 
-base_path = "services/auth-service"
-
-folders = [
-    "src/config",
-    "src/controllers",
-    "src/services",
-    "src/routes",
-    "src/middlewares",
-    "src/models",
-    "src/interfaces",
-    "src/utils",
-    "src/validators",
-    "src/types",
-]
-
-files = {
-    "src/config/database.ts": "// Cấu hình kết nối database\n",
-    "src/config/redis.ts": "// Cấu hình Redis\n",
-
-    "src/controllers/auth.controller.ts": "// Xử lý request login/register\n",
-    "src/services/auth.service.ts": "// Logic xử lý xác thực\n",
-
-    "src/routes/auth.routes.ts": "// Định nghĩa router cho auth\n",
-
-    "src/middlewares/auth.middleware.ts": "// Middleware xác thực token\n",
-    "src/middlewares/validation.middleware.ts": "// Middleware validate dữ liệu\n",
-    "src/middlewares/error.middleware.ts": "// Middleware xử lý lỗi toàn cục\n",
-
-    "src/models/user.model.ts": "// Định nghĩa schema user\n",
-
-    "src/interfaces/auth.interface.ts": "// Interface cho auth\n",
-    "src/interfaces/user.interface.ts": "// Interface cho user\n",
-
-    "src/utils/jwt.util.ts": "// Hàm tạo và xác minh JWT\n",
-    "src/utils/password.util.ts": "// Mã hóa và so sánh mật khẩu\n",
-    "src/utils/response.util.ts": "// Format response\n",
-
-    "src/validators/auth.validator.ts": "// Validate dữ liệu đăng ký, đăng nhập\n",
-
-    "src/types/index.ts": "// Các custom type dùng toàn app\n",
-
-    "src/app.ts": "// Tạo app express\n",
-    "src/server.ts": "// Khởi chạy server\n",
-
-    ".env.example": "PORT=3000\nJWT_SECRET=your_jwt_secret\nMONGO_URI=mongodb://localhost:27017/yourdb\n",
-    ".gitignore": "node_modules/\ndist/\n.env\n",
-    "package.json": '{\n  "name": "auth-service",\n  "main": "dist/server.js"\n}\n',
-    "tsconfig.json": '{\n  "compilerOptions": {\n    "target": "ES6",\n    "module": "commonjs",\n    "outDir": "dist",\n    "strict": true,\n    "esModuleInterop": true\n  }\n}\n',
-    "README.md": "# Auth Service\n\nDịch vụ xác thực người dùng cho hệ thống AI Skincare Platform.\n",
+# Define the file structure
+file_structure = {
+    "lib": {
+        "api": ["auth_api_service.dart"],
+        "providers": ["auth_provider.dart"],
+        "screens": {
+            "auth": ["login_screen.dart", "register_screen.dart"],
+            "_files": ["home_screen.dart"]
+        },
+        "services": ["secure_storage_service.dart"],
+        "utils": ["api_constants.dart"],
+        "_files": ["main.dart"]
+    }
 }
 
-# Tạo thư mục
-for folder in folders:
-    os.makedirs(os.path.join(base_path, folder), exist_ok=True)
+# Helper function to create structure
+def create_structure(base_path, structure):
+    for key, value in structure.items():
+        if key == "_files":
+            for file in value:
+                file_path = os.path.join(base_path, file)
+                with open(file_path, "w") as f:
+                    f.write(f"// {file}\n")
+        else:
+            dir_path = os.path.join(base_path, key)
+            os.makedirs(dir_path, exist_ok=True)
+            if isinstance(value, dict):
+                create_structure(dir_path, value)
+            else:
+                for file in value:
+                    file_path = os.path.join(dir_path, file)
+                    with open(file_path, "w") as f:
+                        f.write(f"// {file}\n")
 
-# Tạo file
-for path, content in files.items():
-    full_path = os.path.join(base_path, path)
-    with open(full_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-print("✅ Auth-service đã được nâng cấp với cấu trúc chuẩn.")
+# Create the structure starting from current working directory
+base_directory = "frontend/mobile-app/"
+os.makedirs(base_directory, exist_ok=True)
+create_structure(base_directory, file_structure)
