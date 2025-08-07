@@ -12,6 +12,8 @@ export interface ITokenPayload {
   type: 'access' | 'refresh';
   iat?: number; // issued at
   exp?: number; // expires at
+  iss?: string; // issuer
+  aud?: string; // audience
 }
 
 export interface IAuthResponse {
@@ -23,8 +25,8 @@ export interface IRefreshTokenRequest {
   refreshToken: string;
 }
 
-export interface ITokenVerificationOptions {
-  algorithms?: string[];
-  issuer?: string;
-  audience?: string;
+export interface ITokenVerificationResult {
+  valid: boolean;
+  expired: boolean;
+  decoded: ITokenPayload | null;
 }

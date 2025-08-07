@@ -1,44 +1,47 @@
-# Filename: services/auth-service/Dockerfile
-
-# ---- Stage 1: Build ----
-# Stage này cài đặt tất cả dependencies, tạo ra package-lock.json nếu cần,
-# và biên dịch mã nguồn TypeScript thành JavaScript.
+# Dockerfile
 FROM node:18-alpine AS builder
 
+# Set working directory
 WORKDIR /app
 
-# Sao chép file package.json và package-lock.json (nếu có)
+# Copy package files
 COPY package*.json ./
 
-# Chạy 'npm install'. Lệnh này sẽ cài đặt tất cả dependencies (bao gồm dev)
-# và quan trọng là sẽ tạo/cập nhật file package-lock.json.
-RUN npm install
+# Install dependencies
+RUN npm ci --only=production
 
-# Sao chép toàn bộ mã nguồn còn lại của service
+# Copy source code
 COPY . .
 
-# Chạy lệnh build để biên dịch TypeScript
+# Build TypeScript
 RUN npm run build
 
-# ---- Stage 2: Production ----
-# Stage này tạo ra image cuối cùng, chỉ chứa những gì cần thiết để chạy.
-FROM node:18-alpine
+# Production stage
+FROM node:18-alpine AS production
 
 WORKDIR /app
 
-# Sao chép package.json VÀ package-lock.json đã được tạo/cập nhật từ stage builder.
-# Đây là bước quan trọng để đảm bảo stage production có lockfile chính xác.
-COPY --from=builder /app/package*.json ./
+# Copy package files and install production dependencies
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Chạy 'npm install --omit=dev'. Lệnh này sẽ đọc package-lock.json
-# và chỉ cài đặt các dependencies cần thiết cho production một cách nhất quán.
-RUN npm install --omit=dev
-
-# Sao chép thư mục 'dist' đã được biên dịch từ stage 'builder'
+# Copy built application
 COPY --from=builder /app/dist ./dist
 
-# Expose port mà ứng dụng sẽ lắng nghe
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nodejs -u 1001
+
+# Change ownership
+RUN chown -R nodejs:nodejs /app
+USER nodejs
+
+# Expose port
 EXPOSE 3001
 
-# Lệnh để khởi động ứng dụng
-CMD [ "node", "dist/app.js" ]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start application
+CMD ["node", "dist/server.js"]
