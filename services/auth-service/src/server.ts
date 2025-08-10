@@ -17,20 +17,29 @@ class Server {
 
   public async start(): Promise<void> {
     try {
-      // Test database connection
-      await database.query('SELECT 1');
-      console.log('✅ Database connection verified');
+      console.log('🚀 Starting Auth Service...');
+      
+      // ✅ Wait for database and Redis with proper error handling
+      console.log('🔍 Checking database connection...');
+      const dbHealthy = await database.healthCheck(); // ✅ Bây giờ method này đã tồn tại
+      if (!dbHealthy) {
+        throw new Error('Database health check failed');
+      }
+      
+      console.log('🔍 Checking Redis connection...');
+      const redisHealthy = await redisConfig.healthCheck();
+      if (!redisHealthy) {
+        throw new Error('Redis health check failed');
+      }
 
-      // Test Redis connection
-      await redisConfig.set('test', 'connection');
-      await redisConfig.del('test');
-      console.log('✅ Redis connection verified');
+      console.log('✅ All dependencies are healthy');
 
       // Start server
-      this.app.app.listen(this.port, () => {
+      this.app.app.listen(this.port, '0.0.0.0', () => {
         console.log(`🚀 Auth Service running on port ${this.port}`);
         console.log(`🔗 Health check: http://localhost:${this.port}/health`);
         console.log(`🔐 Auth API: http://localhost:${this.port}/api/v1/auth`);
+        console.log(`📊 Environment: ${process.env.NODE_ENV}`);
       });
 
       // Graceful shutdown

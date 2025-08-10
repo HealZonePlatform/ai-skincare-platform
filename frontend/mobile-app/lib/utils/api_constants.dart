@@ -7,7 +7,7 @@ class ApiConstants {
   // sẽ không thể kết nối đến máy tính của bạn qua địa chỉ đó.
   // Bạn có thể tìm IP của mình bằng lệnh `ipconfig` (Windows) hoặc `ifconfig` (macOS/Linux).
   static const String _localIp = 'YOUR_LOCAL_IP'; 
-  static const String baseUrl = 'http://$_localIp:3001/api/v1';
+  static const String baseUrl = 'http://192.168.56.1:3001/api/v1';
   
   static const String registerUrl = '$baseUrl/auth/register';
   static const String loginUrl = '$baseUrl/auth/login';

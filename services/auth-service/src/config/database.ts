@@ -9,25 +9,48 @@ class Database {
       user: process.env.DB_USER || 'postgres',
       host: process.env.DB_HOST || 'localhost',
       database: process.env.DB_NAME || 'ai_skincare',
-      password: process.env.DB_PASSWORD || 'password',
+      password: process.env.DB_PASSWORD || 'postgres123',
       port: parseInt(process.env.DB_PORT || '5432'),
       max: 20,
+      min: 2,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
+      connectionTimeoutMillis: 10000,
+      // SSL configuration for Docker
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
 
-    // Test connection
-    this.testConnection();
+    // Test connection với retry logic
+    this.testConnectionWithRetry();
   }
 
-  private async testConnection(): Promise<void> {
-    try {
-      const client = await this.pool.connect();
-      console.log('✅ Database connected successfully');
-      client.release();
-    } catch (error) {
-      console.error('❌ Database connection failed:', error);
+  private async testConnectionWithRetry(maxRetries: number = 5): Promise<void> {
+    let retries = 0;
+    
+    while (retries < maxRetries) {
+      try {
+        const client = await this.pool.connect();
+        console.log('✅ Database connected successfully');
+        client.release();
+        return;
+      } catch (error) {
+        retries++;
+        console.log(`❌ Database connection attempt ${retries}/${maxRetries} failed:`, error);
+        
+        if (retries === maxRetries) {
+          console.error('💥 All database connection attempts failed');
+          throw error;
+        }
+        
+        // Wait before retry (exponential backoff)
+        const waitTime = Math.pow(2, retries) * 1000;
+        console.log(`⏳ Retrying database connection in ${waitTime}ms...`);
+        await this.sleep(waitTime);
+      }
     }
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   getPool(): Pool {
@@ -39,11 +62,22 @@ class Database {
     try {
       const result = await this.pool.query(text, params);
       const duration = Date.now() - start;
-      console.log('Executed query', { text, duration, rows: result.rowCount });
+      console.log('Executed query', { text: text.substring(0, 100), duration, rows: result.rowCount });
       return result;
     } catch (error) {
       console.error('Query error:', error);
       throw error;
+    }
+  }
+
+  // ✅ Thêm healthCheck method bị thiếu
+  async healthCheck(): Promise<boolean> {
+    try {
+      const result = await this.query('SELECT 1 as health');
+      return result.rows[0].health === 1;
+    } catch (error) {
+      console.error('Database health check failed:', error);
+      return false;
     }
   }
 
