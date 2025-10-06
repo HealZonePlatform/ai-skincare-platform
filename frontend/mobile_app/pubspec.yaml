@@ -1,15 +1,39 @@
-# pubspec.yaml
+name: ai_skincare_platform
+description: AI-powered skincare analysis platform mobile application.
+
+# Prevent accidental publishing to pub.dev
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.5         # Để quản lý state
-  dio: ^5.3.3              # Để gọi API
-  flutter_secure_storage: ^9.0.0 # Để lưu trữ token an toàn
-  image_picker: ^1.0.4     # Để chọn ảnh từ thư viện hoặc camera
-  cached_network_image: ^3.3.0 # Để hiển thị và cache ảnh từ mạng
+  
+  # State Management
+  provider: ^6.0.5
+  
+  # HTTP Client
+  dio: ^5.3.3
+  
+  # Secure Storage
+  flutter_secure_storage: ^9.0.0
+  
+  # Image Handling
+  image_picker: ^1.0.4
+  cached_network_image: ^3.3.0
+  
+  # File System & Permissions
+  path_provider: ^2.1.1
+  permission_handler: ^11.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

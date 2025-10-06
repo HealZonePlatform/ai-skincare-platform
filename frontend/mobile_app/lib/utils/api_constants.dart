@@ -1,15 +1,36 @@
-// lib/utils/api_constants.dart
-
 class ApiConstants {
-  // QUAN TRỌNG: Thay thế 'YOUR_LOCAL_IP' bằng địa chỉ IP của máy tính trong mạng LAN.
-  // Ví dụ: '192.168.1.10'.
-  // Không được dùng 'localhost' hoặc '127.0.0.1' vì máy ảo Android/iOS
-  // sẽ không thể kết nối đến máy tính của bạn qua địa chỉ đó.
-  // Bạn có thể tìm IP của mình bằng lệnh `ipconfig` (Windows) hoặc `ifconfig` (macOS/Linux).
-  static const String _localIp = 'YOUR_LOCAL_IP';
-  // TODO: Sử dụng cấu hình động dựa trên môi trường (dev, staging, prod)
-  static const String baseUrl = 'http://192.168.56.1:3001/api/v1';
-   
-  static const String registerUrl = '$baseUrl/auth/register';
-  static const String loginUrl = '$baseUrl/auth/login';
+  // Private constructor to prevent instantiation
+  ApiConstants._();
+
+  // Base Configuration
+  static const String _localIp = '192.168.56.1';
+  static const String _port = '3001';
+  static const String _apiVersion = 'v1';
+
+  // Base URL with API version
+  static const String baseUrl = 'http://$_localIp:$_port/api/$_apiVersion';
+
+  // ✅ ADDED: Full URL getters for backward compatibility
+  static String get registerUrl => '$baseUrl/auth/register';
+  static String get loginUrl => '$baseUrl/auth/login';
+
+  // Authentication Endpoints
+  static const String register = '/auth/register';
+  static const String login = '/auth/login';
+  static const String refreshToken = '/auth/refresh';
+
+  // User Profile Endpoints
+  static const String userProfile = '/users/profile';
+  static const String changePassword = '/users/change-password';
+  static const String uploadAvatar = '/users/upload-avatar';
+
+  // Skin Analysis Endpoints
+  static const String analysesHistory = '/analyses/history';
+  static const String analysesUpload = '/analyses/upload';
+  static String analysisDetail(String id) => '/analyses/$id';
+
+  // Request Timeouts
+  static const Duration connectTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration sendTimeout = Duration(seconds: 30);
 }

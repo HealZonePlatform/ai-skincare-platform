@@ -1,6 +1,5 @@
 // lib/providers/auth_provider.dart
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:ai_skincare_platform/api/auth_api_service.dart';
@@ -40,7 +39,10 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final accessToken = response.data['data']['accessToken'];
         final refreshToken = response.data['data']['refreshToken'];
-        await _storageService.saveTokens(accessToken: accessToken, refreshToken: refreshToken);
+        await _storageService.saveTokens(
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        );
         _isLoggedIn = true;
         return true;
       }
@@ -53,15 +55,18 @@ class AuthProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> register(String email, String password) async {
+  // ✅ FIXED: Changed from (String email, String password) to (Map<String, dynamic> userData)
+  Future<bool> register(Map<String, dynamic> userData) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await _apiService.register(email, password);
-       if (response.statusCode == 201) {
-        // Có thể tự động đăng nhập sau khi đăng ký thành công
+      final response = await _apiService.register(userData);
+      if (response.statusCode == 201) {
+        // Auto login after successful registration
+        final email = userData['email'];
+        final password = userData['password'];
         return await login(email, password);
       }
     } on DioException catch (e) {

@@ -2,109 +2,173 @@
 
 import 'package:dio/dio.dart';
 import 'package:ai_skincare_platform/utils/api_constants.dart';
-import 'package:ai_skincare_platform/models/user_profile.dart';
+import 'package:ai_skincare_platform/utils/exceptions.dart';
+
 
 class UserProfileApiService {
-  final Dio _dio = Dio();
+  final Dio _dio;
 
-  // Lấy thông tin người dùng
+  UserProfileApiService({Dio? dio})
+      : _dio = dio ??
+            Dio(
+              BaseOptions(
+                baseUrl: ApiConstants.baseUrl,
+                connectTimeout: ApiConstants.connectTimeout,
+                receiveTimeout: ApiConstants.receiveTimeout,
+                sendTimeout: ApiConstants.sendTimeout,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                },
+              ),
+            );
+
+  /// Get user profile
   Future<Response> getUserProfile(String token) async {
-    final options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    
     try {
       final response = await _dio.get(
-        '${ApiConstants.baseUrl}/users/profile',
-        options: options,
+        ApiConstants.userProfile,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
       return response;
     } on DioException catch (e) {
-      // Xử lý lỗi từ API
-      throw e;
+      throw _handleDioError(e);
+    } catch (e) {
+      throw UnknownException('Unexpected error: ${e.toString()}');
     }
- }
+  }
 
-  // Cập nhật thông tin người dùng
-  Future<Response> updateUserProfile(String token, Map<String, dynamic> userData) async {
-    final options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    
+  /// Update user profile
+  Future<Response> updateUserProfile(
+    String token,
+    Map<String, dynamic> userData,
+  ) async {
     try {
       final response = await _dio.put(
-        '${ApiConstants.baseUrl}/users/profile',
+        ApiConstants.userProfile,
         data: userData,
-        options: options,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
       return response;
     } on DioException catch (e) {
-      // Xử lý lỗi từ API
-      throw e;
+      throw _handleDioError(e);
+    } catch (e) {
+      throw UnknownException('Unexpected error: ${e.toString()}');
     }
   }
 
-  // Lấy lịch sử phân tích da
+  /// Get skin analysis history
   Future<Response> getSkinAnalysisHistory(String token) async {
-    final options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    
     try {
       final response = await _dio.get(
-        '${ApiConstants.baseUrl}/analysis/history',
-        options: options,
+        ApiConstants.analysesHistory,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
       return response;
     } on DioException catch (e) {
-      // Xử lý lỗi từ API
-      throw e;
+      throw _handleDioError(e);
+    } catch (e) {
+      throw UnknownException('Unexpected error: ${e.toString()}');
     }
   }
 
-  // Thêm phương thức upload ảnh đại diện nếu cần
+  /// Upload user avatar
   Future<Response> uploadAvatar(String token, String filePath) async {
-    final options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    
     try {
       final formData = FormData.fromMap({
-        'avatar': await MultipartFile.fromFile(filePath, filename: 'avatar.jpg'),
+        'avatar': await MultipartFile.fromFile(
+          filePath,
+          filename: 'avatar.jpg',
+        ),
       });
-      
+
       final response = await _dio.post(
-        '${ApiConstants.baseUrl}/users/upload-avatar',
+        ApiConstants.uploadAvatar,
         data: formData,
-        options: options,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
       );
       return response;
     } on DioException catch (e) {
-      // Xử lý lỗi từ API
-      throw e;
+      throw _handleDioError(e);
+    } catch (e) {
+      throw UnknownException('Unexpected error: ${e.toString()}');
     }
   }
-  
-  // Thay đổi mật khẩu người dùng
- Future<Response> changePassword(String token, String oldPassword, String newPassword) async {
-    final options = Options(headers: {
-      'Authorization': 'Bearer $token',
-    });
-    
+
+  /// Change user password
+  Future<Response> changePassword(
+    String token,
+    String oldPassword,
+    String newPassword,
+  ) async {
     try {
       final response = await _dio.put(
-        '${ApiConstants.baseUrl}/users/change-password',
+        ApiConstants.changePassword,
         data: {
           'oldPassword': oldPassword,
           'newPassword': newPassword,
         },
-        options: options,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+        ),
       );
       return response;
     } on DioException catch (e) {
-      // Xử lý lỗi từ API
-      throw e;
+      throw _handleDioError(e);
+    } catch (e) {
+      throw UnknownException('Unexpected error: ${e.toString()}');
     }
   }
-}
+
+  /// Handle Dio errors
+  AppException _handleDioError(DioException error) {
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return NetworkException(
+          'Connection timeout. Please check your internet connection.',
+        );
+
+      case DioExceptionType.badResponse:
+        final statusCode = error.response?.statusCode;
+        final message = error.response?.data['message'] ?? 'API Error';
+
+        if (statusCode != null) {
+          return ApiException(
+            message: message,
+            statusCode: statusCode,
+          );
+        }
+        return ApiException(message: message);
+
+      case DioExceptionType.connectionError:
+        return NetworkException(
+          'Network connection failed. Please check your internet.',
+        );
+
+      case DioExceptionType.cancel:
+        return ApiException(message: 'Request was cancelled');
+
+      case DioExceptionType.badCertificate:
+        return NetworkException('SSL certificate verification failed');
+
+      case DioExceptionType.unknown:
+      default:
+        return NetworkException(
+          'Network error occurred. Please try again.',
+        );
+    }
+  }
 }

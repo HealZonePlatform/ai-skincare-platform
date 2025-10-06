@@ -19,13 +19,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.register(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      ).then((success) {
+      
+      // ✅ FIXED: Changed from two parameters to Map
+      final userData = {
+        'email': _emailController.text.trim(),
+        'password': _passwordController.text.trim(),
+      };
+      
+      authProvider.register(userData).then((success) {
         if (success && mounted) {
-          // Quay về màn hình trước (Login) hoặc điều hướng đến Home
-          Navigator.of(context).pop(); 
+          // Return to previous screen (Login) or navigate to Home
+          Navigator.of(context).pop();
         }
       });
     }
@@ -103,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                 Consumer<AuthProvider>(
+                Consumer<AuthProvider>(
                   builder: (context, auth, child) {
                     if (auth.errorMessage != null) {
                       return Text(

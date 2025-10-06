@@ -1,6 +1,5 @@
 // lib/providers/user_profile_provider.dart
 
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:ai_skincare_platform/api/user_profile_api_service.dart';
@@ -8,7 +7,7 @@ import 'package:ai_skincare_platform/models/user_profile.dart';
 import 'package:ai_skincare_platform/services/secure_storage_service.dart';
 
 class UserProfileProvider with ChangeNotifier {
- final UserProfileApiService _apiService = UserProfileApiService();
+  final UserProfileApiService _apiService = UserProfileApiService();
   final SecureStorageService _storageService = SecureStorageService();
 
   UserProfile? _userProfile;
@@ -20,13 +19,24 @@ class UserProfileProvider with ChangeNotifier {
   String? _errorMessage;
   String _searchQuery = '';
 
+  // Pagination properties
+  int _currentPage = 1;
+  int _totalPages = 1;
+  final int _pageSize = 10;
+  bool _hasMoreData = true;
+
+  // Getters
   UserProfile? get userProfile => _userProfile;
-  List<SkinAnalysisHistory> get skinAnalysisHistory => _filteredSkinAnalysisHistory.isEmpty ? _skinAnalysisHistory : _filteredSkinAnalysisHistory;
+  List<SkinAnalysisHistory> get skinAnalysisHistory => 
+      _filteredSkinAnalysisHistory.isEmpty ? _skinAnalysisHistory : _filteredSkinAnalysisHistory;
   bool get isLoading => _isLoading;
   bool get isUpdating => _isUpdating;
   String? get errorMessage => _errorMessage;
-  
   String get searchQuery => _searchQuery;
+  int get currentPage => _currentPage;
+  int get totalPages => _totalPages;
+  int get pageSize => _pageSize;
+  bool get hasMoreData => _hasMoreData;
 
   UserProfileProvider() {
     loadUserProfile();
@@ -43,7 +53,7 @@ class UserProfileProvider with ChangeNotifier {
         final response = await _apiService.getUserProfile(token);
         if (response.statusCode == 200 || response.statusCode == 201) {
           _userProfile = UserProfile.fromJson(response.data['data']);
-          // Tải lịch sử phân tích trong nền để không làm chậm tải hồ sơ chính
+          // Load analysis history in background
           _loadSkinAnalysisHistoryInBackground();
         } else {
           _errorMessage = 'Không thể tải thông tin người dùng';
@@ -52,8 +62,9 @@ class UserProfileProvider with ChangeNotifier {
         _errorMessage = 'Người dùng chưa đăng nhập';
       }
     } on DioException catch (e) {
-      // Xử lý lỗi mạng và lỗi API
-      if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout) {
+      // Handle network and API errors
+      if (e.type == DioExceptionType.connectionError || 
+          e.type == DioExceptionType.connectionTimeout) {
         _errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
       } else if (e.type == DioExceptionType.receiveTimeout) {
         _errorMessage = 'Hết thời gian kết nối. Vui lòng thử lại sau.';
@@ -72,7 +83,7 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
-  // Hàm tải lịch sử phân tích trong nền
+  // Load skin analysis history in background
   Future<void> _loadSkinAnalysisHistoryInBackground() async {
     try {
       final token = await _storageService.getAccessToken();
@@ -95,17 +106,6 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
-  // Thêm các thuộc tính cho phân trang
-  int _currentPage = 1;
-  int _totalPages = 1;
-  int _pageSize = 10;
-  bool _hasMoreData = true;
-  
-  int get currentPage => _currentPage;
-  int get totalPages => _totalPages;
-  int get pageSize => _pageSize;
-  bool get hasMoreData => _hasMoreData;
-
   Future<void> loadSkinAnalysisHistory({int page = 1, bool isLoadMore = false}) async {
     if (page == 1 && !isLoadMore) {
       _isLoading = true;
@@ -115,9 +115,8 @@ class UserProfileProvider with ChangeNotifier {
     try {
       final token = await _storageService.getAccessToken();
       if (token != null) {
-        // Thêm tham số phân trang vào API (giả định API hỗ trợ)
         final response = await _apiService.getSkinAnalysisHistory(token);
-        if (response.statusCode == 20 || response.statusCode == 201) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           final List<dynamic> historyList = response.data['data'];
           final newHistory = historyList
               .map((item) => SkinAnalysisHistory.fromJson(item))
@@ -129,7 +128,7 @@ class UserProfileProvider with ChangeNotifier {
             _skinAnalysisHistory = newHistory;
           }
           
-          // Cập nhật thông tin phân trang (giả định từ API)
+          // Update pagination info
           _currentPage = page;
           _totalPages = response.data['totalPages'] ?? 1;
           _hasMoreData = _currentPage < _totalPages;
@@ -172,7 +171,6 @@ class UserProfileProvider with ChangeNotifier {
 
         final response = await _apiService.updateUserProfile(token, userData);
         if (response.statusCode == 200 || response.statusCode == 201) {
-          // Cập nhật thông tin trong local
           _userProfile = UserProfile.fromJson(response.data['data']);
           notifyListeners();
           return true;
@@ -196,7 +194,6 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
-  // Thêm phương thức upload avatar
   Future<bool> uploadAvatar(String filePath) async {
     _isUpdating = true;
     _errorMessage = null;
@@ -207,7 +204,6 @@ class UserProfileProvider with ChangeNotifier {
       if (token != null) {
         final response = await _apiService.uploadAvatar(token, filePath);
         if (response.statusCode == 200 || response.statusCode == 201) {
-          // Cập nhật thông tin avatar trong local
           final updatedData = response.data['data'];
           _userProfile = _userProfile!.copyWith(avatarUrl: updatedData['avatarUrl']);
           notifyListeners();
@@ -232,7 +228,6 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
   
-  // Thay đổi mật khẩu người dùng
   Future<bool> changePassword(String oldPassword, String newPassword) async {
     _isUpdating = true;
     _errorMessage = null;
@@ -264,26 +259,25 @@ class UserProfileProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-}
 
-void setSearchQuery(String query) {
-  _searchQuery = query;
-  if (query.isEmpty) {
-    _filteredSkinAnalysisHistory = [];
-  } else {
-    _filteredSkinAnalysisHistory = _skinAnalysisHistory
-        .where((item) =>
-            item.id.toLowerCase().contains(query.toLowerCase()) ||
-            item.createdAt.toString().toLowerCase().contains(query.toLowerCase()) ||
-            (item.status?.toLowerCase().contains(query.toLowerCase()) ?? false))
-        .toList();
+  // ✅ FIXED: Moved these methods INSIDE the class
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    if (query.isEmpty) {
+      _filteredSkinAnalysisHistory = [];
+    } else {
+      _filteredSkinAnalysisHistory = _skinAnalysisHistory
+          .where((item) =>
+              item.id.toLowerCase().contains(query.toLowerCase()) ||
+              item.createdAt.toString().toLowerCase().contains(query.toLowerCase()) ||
+              (item.status?.toLowerCase().contains(query.toLowerCase()) ?? false))
+          .toList();
+    }
+    notifyListeners();
   }
-  notifyListeners();
-}
 
-void clearError() {
-  _errorMessage = null;
-  notifyListeners();
-}
-}
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
 }
