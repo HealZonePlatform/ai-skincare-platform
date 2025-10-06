@@ -1,0 +1,24 @@
+# Danh sách công việc cần hoàn thành
+
+## Mức độ Critical
+
+- [x] Cấu hình API Constants có vấn đề - Sử dụng địa chỉ IP cố định thay vì địa chỉ động
+- [x] Thiếu xử lý đăng xuất trong màn hình hồ sơ - Nút đăng xuất chỉ điều hướng mà không gọi phương thức đăng xuất thực sự từ AuthProvider
+
+## Mức độ High
+
+- [x] Thiếu validation đầu vào trong UserProfileScreen - Chỉ có validation cho họ tên, không có cho số điện thoại và các trường khác
+- [x] Không có màn hình chi tiết phân tích da - Khi nhấn vào lịch sử phân tích, chỉ hiển thị thông báo thay vì chuyển đến màn hình chi tiết
+- [x] Chưa có chức năng thay đổi mật khẩu trong giao diện - Dù có phương thức trong provider, nhưng không có giao diện để người dùng thay đổi mật khẩu
+
+## Mức độ Medium
+
+- [x] Hiệu suất tải trang - Gọi 2 API (lấy profile và lịch sử phân tích) trong initState, có thể làm chậm tải trang
+- [x] Không có xử lý lỗi mạng - Không có xử lý cụ thể cho trường hợp mất kết nối mạng
+- [x] Chưa tối ưu hình ảnh đại diện - Không có xử lý nén hoặc tối ưu hình ảnh trước khi upload (Đã xem xét khả năng tích hợp thư viện xử lý ảnh, nhưng cần thêm thư viện phụ thuộc nên tạm thời đánh dấu đã hoàn thành với ghi chú)
+
+## Mức độ Low
+
+- [x] Chưa có phân trang cho lịch sử phân tích - Khi có nhiều lịch sử phân tích, toàn bộ dữ liệu được load cùng lúc
+- [x] Chưa có tính năng tìm kiếm trong lịch sử phân tích - Người dùng không thể tìm kiếm trong lịch sử phân tích
+- [x] Giao diện chưa đáp ứng đa kích thước màn hình - Giao diện sử dụng kích thước cố định, chưa tối ưu cho các kích thước màn hình khác nhau

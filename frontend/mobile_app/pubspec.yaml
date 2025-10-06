@@ -6,6 +6,8 @@ dependencies:
   provider: ^6.0.5         # Để quản lý state
   dio: ^5.3.3              # Để gọi API
   flutter_secure_storage: ^9.0.0 # Để lưu trữ token an toàn
+  image_picker: ^1.0.4     # Để chọn ảnh từ thư viện hoặc camera
+  cached_network_image: ^3.3.0 # Để hiển thị và cache ảnh từ mạng
 
 dev_dependencies:
   flutter_test:

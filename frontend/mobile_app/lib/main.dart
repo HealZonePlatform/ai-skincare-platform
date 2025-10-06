@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:ai_skincare_platform/providers/auth_provider.dart';
 import 'package:ai_skincare_platform/screens/auth/login_screen.dart';
 import 'package:ai_skincare_platform/screens/home_screen.dart';
+import 'package:ai_skincare_platform/screens/profile/user_profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
