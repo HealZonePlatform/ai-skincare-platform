@@ -24,7 +24,7 @@ const CallToAction = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Tham gia cùng hàng nghìn người dùng đã đạt được làn da khỏe mạnh hơn với nền tảng AI của chúng tôi
+            Tham gia cùng hàng nghìn người dùng đã đạt được làn da khỏe mạnh hơn với nền tảng AI của chúng tôi .
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
