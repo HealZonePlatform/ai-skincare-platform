@@ -15,7 +15,7 @@ const CallToAction = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            Ready to Transform Your Skin?
+            Sẵn sàng để thay đổi làn da của bạn?
           </motion.h2>
           <motion.p 
             className="text-xl mb-8 text-primary-100"
@@ -24,7 +24,7 @@ const CallToAction = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Join thousands of users who have achieved healthier skin with our AI-powered platform
+            Tham gia cùng hàng nghìn người dùng đã đạt được làn da khỏe mạnh hơn với nền tảng AI của chúng tôi
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -37,13 +37,13 @@ const CallToAction = () => {
               href="/early-access"
               className="btn-primary bg-white text-primary-600 hover:bg-gray-100"
             >
-              Download App Now
+              Tải ứng dụng ngay
             </Link>
             <Link 
               href="#features" 
               className="btn-outline border-white text-white hover:bg-primary-500"
             >
-              Learn More
+              Tìm hiểu thêm
             </Link>
           </motion.div>
         </div>

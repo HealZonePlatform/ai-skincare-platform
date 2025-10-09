@@ -140,7 +140,7 @@ export default function EarlyAccessPage() {
             href="/"
             className="border border-primary-600 text-primary-600 hover:bg-primary-50 font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out"
           >
-            Back to Home
+            Quay về trang chủ
           </Link>
         </header>
 
@@ -154,11 +154,11 @@ export default function EarlyAccessPage() {
           >
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Download Our AI Skincare App
+                Tải ứng dụng chăm sóc da AI của chúng tôi
               </h1>
               <p className="text-gray-600">
-                The app is not yet available on App Store and CH Play. Sign up to get early access to our AI skincare app
-                or receive a notification when we officially launch!
+                Ứng dụng chưa có sẵn trên App Store và CH Play. Đăng ký để nhận quyền truy cập sớm vào ứng dụng chăm sóc da AI của chúng tôi
+                hoặc nhận thông báo khi chúng tôi chính thức ra mắt!
               </p>
             </div>
 
@@ -169,15 +169,15 @@ export default function EarlyAccessPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Cảm ơn bạn!</h3>
                 <p className="text-gray-600 mb-6">
-                  We've received your information and will notify you when the app launches.
+                  Chúng tôi đã nhận được thông tin của bạn và sẽ thông báo khi ứng dụng được ra mắt.
                 </p>
                 <button
                   onClick={() => setIsSubmitted(false)}
                   className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out"
                 >
-                  Submit Another Request
+                  Gửi yêu cầu khác
                 </button>
               </div>
             ) : (
@@ -234,10 +234,10 @@ export default function EarlyAccessPage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        Processing...
+                        Đang xử lý...
                       </span>
                     ) : (
-                      'Request Early Access'
+                      'Đăng ký truy cập sớm'
                     )}
                   </button>
                 </div>
@@ -246,7 +246,7 @@ export default function EarlyAccessPage() {
             
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-500">
-                We respect your privacy. Your information will be used solely to notify you about the app launch.
+                Chúng tôi tôn trọng quyền riêng tư của bạn. Thông tin của bạn sẽ chỉ được sử dụng để thông báo về việc ra mắt ứng dụng.
               </p>
             </div>
           </motion.div>
@@ -259,7 +259,7 @@ export default function EarlyAccessPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Transform Your Skincare Journey with AI
+              Thay đổi hành trình chăm sóc da của bạn với AI
             </h2>
             
             <div className="space-y-6 mb-8">
@@ -272,8 +272,8 @@ export default function EarlyAccessPage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">AI-Powered Analysis</h3>
-                  <p className="text-gray-60 mt-1">Get professional skin analysis with 96% accuracy in just 30 seconds</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Phân tích bằng AI</h3>
+                  <p className="text-gray-60 mt-1">Nhận phân tích da chuyên nghiệp với độ chính xác 96% chỉ trong 30 giây</p>
                 </div>
               </div>
               
@@ -286,8 +286,8 @@ export default function EarlyAccessPage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-90">Instant Results</h3>
-                  <p className="text-gray-600 mt-1">Receive personalized recommendations immediately after analysis</p>
+                  <h3 className="text-lg font-semibold text-gray-90">Kết quả tức thì</h3>
+                  <p className="text-gray-600 mt-1">Nhận khuyến nghị cá nhân hóa ngay sau khi phân tích</p>
                 </div>
               </div>
               
@@ -300,8 +300,8 @@ export default function EarlyAccessPage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Personalized Care</h3>
-                  <p className="text-gray-600 mt-1">Tailored skincare routines designed specifically for your skin profile</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Chăm sóc cá nhân hóa</h3>
+                  <p className="text-gray-600 mt-1">Quy trình chăm sóc da được thiết kế riêng cho hồ sơ da của bạn</p>
                 </div>
               </div>
             </div>
@@ -310,15 +310,15 @@ export default function EarlyAccessPage() {
               <div className="flex space-x-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary-600">10,000+</div>
-                  <div className="text-sm text-gray-600">Happy Users</div>
+                  <div className="text-sm text-gray-600">Người dùng hài lòng</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary-60">96%</div>
-                  <div className="text-sm text-gray-600">Accuracy Rate</div>
+                  <div className="text-sm text-gray-600">Độ chính xác</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary-600">30 Sec</div>
-                  <div className="text-sm text-gray-600">Analysis Time</div>
+                  <div className="text-2xl font-bold text-primary-600">30 giây</div>
+                  <div className="text-sm text-gray-600">Thời gian phân tích</div>
                 </div>
               </div>
             </div>

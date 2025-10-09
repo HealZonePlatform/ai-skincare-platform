@@ -21,16 +21,16 @@ export default function Hero() {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight mb-6">
-                Transform Your{' '}
+                Nâng Tầm{' '}
                 <span className="text-gradient bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                  Skincare Journey
+                  Hành Trình Chăm Sóc Da
                 </span>{' '}
-                with AI
+                với AI
               </h1>
               
               <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-                Get professional skin analysis and personalized recommendations with our AI-powered platform. 
-                96% accuracy, instant results in just 30 seconds.
+                Nhận phân tích da chuyên nghiệp và đề xuất cá nhân hóa với nền tảng được hỗ trợ bởi AI của chúng tôi. 
+                Độ chính xác 96%, kết quả tức thì chỉ trong 30 giây.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -38,13 +38,13 @@ export default function Hero() {
                   href="#features"
                   className="btn btn-primary text-lg px-8 py-4"
                 >
-                  Get Started Free
+                  Bắt Đầu Miễn Phí
                 </a>
                 <a
                   href="#how-it-works"
                   className="btn btn-secondary text-lg px-8 py-4"
                 >
-                  Learn More
+                  Tìm Hiểu Thêm
                 </a>
               </div>
 
@@ -52,15 +52,15 @@ export default function Hero() {
               <div className="mt-12 flex flex-col sm:flex-row gap-8 justify-center lg:justify-start">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary-600">10,000+</div>
-                  <div className="text-sm text-gray-600">Happy Users</div>
+                  <div className="text-sm text-gray-600">Người Dùng Hài Lòng</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary-600">96%</div>
-                  <div className="text-sm text-gray-600">Accuracy Rate</div>
+                  <div className="text-sm text-gray-600">Độ Chính Xác</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary-600">30 Sec</div>
-                  <div className="text-sm text-gray-600">Analysis Time</div>
+                  <div className="text-2xl font-bold text-primary-600">30 Giây</div>
+                  <div className="text-sm text-gray-600">Thời Gian Phân Tích</div>
                 </div>
               </div>
             </motion.div>
@@ -82,8 +82,8 @@ export default function Hero() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">AI Skin Analysis</h3>
-                    <p className="text-sm text-gray-600">Upload your photo and get instant professional analysis</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Phân Tích Da AI</h3>
+                    <p className="text-sm text-gray-600">Tải ảnh lên và nhận phân tích chuyên nghiệp tức thì</p>
                   </div>
                 </div>
               </div>

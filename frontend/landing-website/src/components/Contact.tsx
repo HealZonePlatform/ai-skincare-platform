@@ -20,23 +20,23 @@ const Contact = () => {
     switch (name) {
       case 'name':
         if (!value.trim()) {
-          return 'Name is required';
+          return 'Họ và tên là bắt buộc';
         } else if (value.trim().length < 2) {
-          return 'Name must be at least 2 characters';
+          return 'Họ và tên phải có ít nhất 2 ký tự';
         }
         return '';
       case 'email':
         if (!value.trim()) {
-          return 'Email is required';
+          return 'Email là bắt buộc';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return 'Please enter a valid email address';
+          return 'Vui lòng nhập địa chỉ email hợp lệ';
         }
         return '';
       case 'message':
         if (!value.trim()) {
-          return 'Message is required';
+          return 'Tin nhắn là bắt buộc';
         } else if (value.trim().length < 10) {
-          return 'Message must be at least 10 characters';
+          return 'Tin nhắn phải có ít nhất 10 ký tự';
         }
         return '';
       default:

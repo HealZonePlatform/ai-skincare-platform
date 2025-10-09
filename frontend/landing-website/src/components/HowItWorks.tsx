@@ -4,23 +4,23 @@ import { motion } from 'framer-motion';
 
 const steps = [
   {
-    title: "Upload Your Photo",
-    description: "Take a clear photo of your face in good lighting to capture your skin condition accurately.",
+    title: "Tải Ảnh Lên",
+    description: "Chụp ảnh khuôn mặt rõ ràng với ánh sáng tốt để ghi lại tình trạng da chính xác.",
     number: "01"
   },
   {
-    title: "AI Analysis",
-    description: "Our advanced AI algorithms analyze your skin for texture, tone, pores, wrinkles, and more.",
+    title: "Phân Tích AI",
+    description: "Thuật toán AI tiên tiến của chúng tôi phân tích kết cấu da, tông màu, lỗ chân lông, nếp nhăn và nhiều hơn nữa.",
     number: "02"
   },
   {
-    title: "Get Results",
-    description: "Receive a comprehensive report with insights about your skin's current condition.",
+    title: "Nhận Kết Quả",
+    description: "Nhận báo cáo toàn diện với các thông tin chi tiết về tình trạng da hiện tại của bạn.",
     number: "03"
   },
   {
-    title: "Personalized Plan",
-    description: "Get a customized skincare routine tailored to your specific needs and goals.",
+    title: "Kế Hoạch Cá Nhân",
+    description: "Nhận quy trình chăm sóc da được tùy chỉnh phù hợp với nhu cầu và mục tiêu cụ thể của bạn.",
     number: "04"
   }
 ];
@@ -37,7 +37,7 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            How It <span className="text-primary-600">Works</span>
+            Cách Thức <span className="text-primary-600">Hoạt Động</span>
           </motion.h2>
           <motion.p 
             className="text-lg text-gray-600 max-w-2xl mx-auto"
@@ -46,7 +46,7 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Getting personalized skincare advice is simple with our AI-powered platform
+            Nhận tư vấn chăm sóc da cá nhân hóa thật đơn giản với nền tảng AI của chúng tôi
           </motion.p>
         </div>
 

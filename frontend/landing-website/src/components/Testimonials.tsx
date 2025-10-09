@@ -6,8 +6,8 @@ const testimonials = [
   {
     id: 1,
     name: "Dr. Linh Nguyen",
-    role: "Dermatologist, Bach Mai Hospital",
-    content: "As a medical professional, I'm impressed with the AI's accuracy in skin analysis. It correctly identified conditions I would typically diagnose, and patients love the personalized recommendations. This is a valuable tool for preventive care.",
+    role: "Bác sĩ da liễu, Bệnh viện Bạch Mai",
+    content: "Là một chuyên gia y tế, tôi ấn tượng với độ chính xác trong phân tích da của AI. Nó nhận diện chính xác các tình trạng mà tôi thường chẩn đoán, và bệnh nhân rất thích những đề xuất được cá nhân hóa. Đây là một công cụ có giá trị cho việc chăm sóc phòng ngừa.",
     avatar: "/ai-skincare-platform/avatars/linh-nguyen.jpg",
     rating: 5,
     caseStudyLink: "/case-studies/dermatologist-results",
@@ -16,8 +16,8 @@ const testimonials = [
   {
     id: 2,
     name: "Minh Hoang",
-    role: "Software Engineer",
-    content: "I struggled with acne for years. After 8 weeks using the AI platform, my skin is clearer than it's been since high school. The progress tracking feature kept me motivated throughout my journey.",
+    role: "Kỹ sư phần mềm",
+    content: "Tôi đã vật lộn với mụn trong nhiều năm. Sau 8 tuần sử dụng nền tảng AI, làn da của tôi sạch hơn so với thời trung học. Tính năng theo dõi tiến trình giúp tôi luôn giữ được động lực trong suốt hành trình.",
     avatar: "/ai-skincare-platform/avatars/minh-hoang.jpg",
     rating: 5,
     caseStudyLink: "/case-studies/engineer-acne-journey",
@@ -26,8 +26,8 @@ const testimonials = [
   {
     id: 3,
     name: "Thuy Duong",
-    role: "Beauty Influencer",
-    content: "I've tested dozens of skincare apps, but this AI platform stands out. The analysis is remarkably accurate, and the product recommendations have genuinely improved my skin texture and reduced hyperpigmentation significantly.",
+    role: "Người ảnh hưởng về làm đẹp",
+    content: "Tôi đã thử hàng chục ứng dụng chăm sóc da, nhưng nền tảng AI này thực sự nổi bật. Việc phân tích rất chính xác, và những đề xuất sản phẩm đã thực sự cải thiện kết cấu da và giảm đáng kể tình trạng thâm nám.",
     avatar: "/ai-skincare-platform/avatars/thuy-duong.jpg",
     rating: 5,
     caseStudyLink: "/case-studies/influencer-skincare-results",
@@ -36,8 +36,8 @@ const testimonials = [
   {
     id: 4,
     name: "Dr. Hung Pham",
-    role: "Cosmetic Surgeon, Tham My Dong A",
-    content: "I recommend this platform to my patients for daily skincare maintenance. The AI provides excellent complementary advice between our professional treatments, helping maintain results longer and prevent new issues.",
+    role: "Bác sĩ phẫu thuật thẩm mỹ, Thẩm mỹ Đông Á",
+    content: "Tôi giới thiệu nền tảng này cho bệnh nhân để duy trì chăm sóc da hàng ngày. AI cung cấp lời khuyên bổ sung tuyệt vời giữa các liệu trình chuyên nghiệp của chúng tôi, giúp duy trì kết quả lâu hơn và ngăn ngừa các vấn đề mới.",
     avatar: "/ai-skincare-platform/avatars/hung-pham.jpg",
     rating: 4,
     caseStudyLink: "/case-studies/cosmetic-surgeon-perspective",
@@ -46,8 +46,8 @@ const testimonials = [
   {
     id: 5,
     name: "Mai Anh",
-    role: "University Student",
-    content: "As a student on a budget, I couldn't afford regular dermatologist visits. This app helped me understand my skin type and find affordable products that actually work. My confidence has improved dramatically!",
+    role: "Sinh viên",
+    content: "Là một sinh viên có ngân sách hạn hẹp, tôi không thể thường xuyên đi khám bác sĩ da liễu. Ứng dụng này đã giúp tôi hiểu được loại da của mình và tìm được những sản phẩm phù hợp với giá cả. Sự tự tin của tôi đã cải thiện đáng kể!",
     avatar: "/ai-skincare-platform/avatars/mai-anh.jpg",
     rating: 5,
     caseStudyLink: "/case-studies/student-budget-skincare",
@@ -56,8 +56,8 @@ const testimonials = [
   {
     id: 6,
     name: "Khanh Tran",
-    role: "Working Mother",
-    content: "With a busy schedule, I needed an efficient skincare solution. The AI platform created a 5-minute routine that fits my lifestyle. In just 6 weeks, my tired-looking skin looks refreshed and younger.",
+    role: "Người mẹ đi làm",
+    content: "Với lịch trình bận rộn, tôi cần một giải pháp chăm sóc da hiệu quả. Nền tảng AI đã tạo ra một quy trình 5 phút phù hợp với lối sống của tôi. Chỉ sau 6 tuần, làn da mệt mỏi của tôi đã trở nên tươi tắn và trẻ trung hơn.",
     avatar: "/ai-skincare-platform/avatars/khanh-tran.jpg",
     rating: 5,
     caseStudyLink: "/case-studies/busy-mother-skincare",
@@ -77,7 +77,7 @@ const Testimonials = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            What Our <span className="text-primary-600">Users</span> Say
+            Đánh Giá Từ <span className="text-primary-600">Người Dùng</span>
           </motion.h2>
           <motion.p 
             className="text-lg text-gray-600 max-w-2xl mx-auto"
@@ -86,7 +86,7 @@ const Testimonials = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Join thousands of satisfied users who have transformed their skin with our AI-powered platform
+            Tham gia cùng hàng nghìn người dùng hài lòng đã cải thiện làn da của họ với nền tảng AI của chúng tôi
           </motion.p>
         </div>
 
@@ -115,7 +115,7 @@ const Testimonials = () => {
                 </div>
                 {testimonial.verified && (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    Verified
+                    Đã xác thực
                   </span>
                 )}
               </div>
@@ -137,7 +137,7 @@ const Testimonials = () => {
                     href={testimonial.caseStudyLink} 
                     className="inline-block text-primary-600 hover:text-primary-800 text-sm font-medium transition-colors duration-300"
                   >
-                    Read detailed case study →
+                    Xem nghiên cứu chi tiết →
                   </a>
                 )}
               </div>

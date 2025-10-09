@@ -49,7 +49,7 @@ const SocialProof = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
           {/* Trust Badges */}
           <div className="text-center lg:text-left">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">As featured in</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Được giới thiệu trên</h3>
             <div className="flex flex-wrap justify-center lg:justify-start gap-4">
               {['Healthline', 'WebMD', 'Allure', 'VnExpress', 'Tuoi Tre', 'Zing News'].map((publication, index) => (
                 <div key={index} className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-100 flex items-center">
@@ -63,13 +63,13 @@ const SocialProof = () => {
           {/* Live User Counter */}
           <div className="text-center">
             <div className="text-4xl font-bold text-primary-600">{liveUsers.toLocaleString()}+</div>
-            <div className="text-gray-700">Active Users</div>
-            <div className="text-sm text-gray-500 mt-1">Join our community today</div>
+            <div className="text-gray-700">Người Dùng Hiện Tại</div>
+            <div className="text-sm text-gray-500 mt-1">Tham gia cộng đồng ngay hôm nay</div>
           </div>
 
           {/* Security Certifications */}
           <div className="text-center lg:text-right">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Security & Compliance</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Bảo Mật & Tuân Thủ</h3>
             <div className="flex flex-wrap justify-center lg:justify-end gap-3">
               {['GDPR Compliant', 'SOC 2 Type II', 'ISO 27001', 'HIPAA Ready'].map((cert, index) => (
                 <div key={index} className="flex flex-col items-center">
@@ -91,7 +91,7 @@ const SocialProof = () => {
             <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
-            Recent Signups
+            Đăng Ký Gần Đây
           </h3>
           <div className="space-y-3">
             {recentSignups.map((signup, index) => (

@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { Dialog } from '@headlessui/react';
 
 const navigation = [
-  { name: 'Home', href: '#home' },
-  { name: 'Features', href: '#features' },
-  { name: 'How It Works', href: '#how-it-works' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Trang chủ', href: '#home' },
+  { name: 'Tính năng', href: '#features' },
+  { name: 'Cách hoạt động', href: '#how-it-works' },
+  { name: 'Đánh giá', href: '#testimonials' },
+  { name: 'Liên hệ', href: '#contact' },
 ];
 
 export default function Header() {
@@ -39,7 +39,7 @@ export default function Header() {
             href="/early-access"
             className="btn-primary bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg transition-colors"
           >
-            Download App
+            Tải ứng dụng
           </Link>
         </div>
 
@@ -83,7 +83,7 @@ export default function Header() {
               className="-m-2.5 rounded-md p-2.5 text-gray-700"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <span className="sr-only">Close menu</span>
+              <span className="sr-only">Đóng menu</span>
               <svg
                 className="h-6 w-6"
                 fill="none"
@@ -120,7 +120,7 @@ export default function Header() {
                   className="btn-primary bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg inline-block text-center w-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Download App
+                  Tải ứng dụng
                 </Link>
               </div>
             </div>
