@@ -1,0 +1,21 @@
+{
+  "name": "AI Skincare Platform",
+  "short_name": "AI Skincare",
+  "description": "Get professional skin analysis and personalized recommendations with our AI-powered skincare platform",
+  "start_url": "/ai-skincare-platform/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ec4899",
+  "icons": [
+    {
+      "src": "/ai-skincare-platform/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/ai-skincare-platform/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

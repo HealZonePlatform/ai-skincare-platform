@@ -16,57 +16,57 @@ const FAQSection = () => {
   const faqs: FAQItem[] = [
     {
       id: 1,
-      question: "What is AI Skincare Platform?",
-      answer: "AI Skincare Platform is an innovative application that uses artificial intelligence to analyze your skin condition and provide personalized skincare recommendations. Our technology uses advanced algorithms to assess your skin and suggest products and routines tailored specifically to your needs."
+      question: "AI Skincare Platform là gì?",
+      answer: "AI Skincare Platform là một ứng dụng sáng tạo sử dụng trí tuệ nhân tạo để phân tích tình trạng da và đưa ra các khuyến nghị chăm sóc da cá nhân hóa. Công nghệ của chúng tôi sử dụng các thuật toán tiên tiến để đánh giá làn da của bạn và đề xuất các sản phẩm và quy trình phù hợp nhất với nhu cầu của bạn."
     },
     {
       id: 2,
-      question: "How accurate is the skin analysis?",
-      answer: "Our AI-powered skin analysis has an accuracy rate of 96%, which is comparable to professional dermatologist assessments. We use high-resolution imaging and machine learning algorithms trained on thousands of skin samples to provide precise analysis."
+      question: "Độ chính xác của phân tích da như thế nào?",
+      answer: "Phân tích da bằng AI của chúng tôi có tỷ lệ chính xác 96%, tương đương với đánh giá của bác sĩ da liễu chuyên nghiệp. Chúng tôi sử dụng hình ảnh độ phân giải cao và thuật toán học máy được đào tạo trên hàng nghìn mẫu da để cung cấp phân tích chính xác."
     },
     {
       id: 3,
-      question: "How long does the skin analysis take?",
-      answer: "The skin analysis is completed in just 30 seconds. Simply take a photo of your skin in good lighting, and our AI will analyze it and provide personalized recommendations instantly."
+      question: "Thời gian phân tích da mất bao lâu?",
+      answer: "Phân tích da được hoàn thành chỉ trong 30 giây. Bạn chỉ cần chụp ảnh làn da của mình trong điều kiện ánh sáng tốt, và AI của chúng tôi sẽ phân tích và đưa ra các khuyến nghị cá nhân hóa ngay lập tức."
     },
     {
       id: 4,
-      question: "Is my skin data secure?",
-      answer: "Yes, we prioritize your privacy and security. All skin images and personal data are encrypted and stored securely. We never share your information with third parties without your explicit consent. Our platform complies with all relevant data protection regulations."
+      question: "Dữ liệu da của tôi có an toàn không?",
+      answer: "Có, chúng tôi ưu tiên quyền riêng tư và bảo mật của bạn. Tất cả hình ảnh da và dữ liệu cá nhân đều được mã hóa và lưu trữ an toàn. Chúng tôi không bao giờ chia sẻ thông tin của bạn với bên thứ ba mà không có sự đồng ý rõ ràng của bạn. Nền tảng của chúng tôi tuân thủ tất cả các quy định bảo vệ dữ liệu liên quan."
     },
     {
       id: 5,
-      question: "What skin conditions can the AI detect?",
-      answer: "Our AI can detect various skin conditions including acne, wrinkles, hyperpigmentation, dryness, oiliness, pore size, and redness. It also assesses your skin type (oily, dry, combination, sensitive) to provide the most appropriate recommendations."
+      question: "AI có thể phát hiện những tình trạng da nào?",
+      answer: "AI của chúng tôi có thể phát hiện nhiều tình trạng da khác nhau bao gồm mụn, nếp nhăn, tăng sắc tố, khô da, da dầu, kích thước lỗ chân lông và đỏ da. Nó cũng đánh giá loại da của bạn (da dầu, da khô, da hỗn hợp, da nhạy cảm) để đưa ra các khuyến nghị phù hợp nhất."
     },
     {
       id: 6,
-      question: "Do I need special equipment for the skin analysis?",
-      answer: "No special equipment is needed! You can use your smartphone's camera to take the photos required for analysis. We recommend using good lighting and ensuring your face is well-lit for the most accurate results."
+      question: "Tôi có cần thiết bị đặc biệt để phân tích da không?",
+      answer: "Không cần thiết bị đặc biệt nào! Bạn có thể sử dụng camera điện thoại thông minh để chụp ảnh cần thiết cho việc phân tích. Chúng tôi khuyến nghị sử dụng ánh sáng tốt và đảm bảo khuôn mặt của bạn được chiếu sáng tốt để có kết quả chính xác nhất."
     },
     {
       id: 7,
-      question: "How often should I use the app?",
-      answer: "For best results, we recommend using the app weekly to track changes in your skin condition. However, you can use it as often as you like to monitor your progress and adjust your skincare routine accordingly."
+      question: "Tôi nên sử dụng ứng dụng thường xuyên như thế nào?",
+      answer: "Để có kết quả tốt nhất, chúng tôi khuyên bạn nên sử dụng ứng dụng hàng tuần để theo dõi những thay đổi về tình trạng da. Tuy nhiên, bạn có thể sử dụng nó thường xuyên theo ý muốn để theo dõi tiến trình và điều chỉnh quy trình chăm sóc da cho phù hợp."
     },
     {
       id: 8,
-      question: "Can I get recommendations for specific skin concerns?",
-      answer: "Absolutely! Our AI analyzes your skin to identify specific concerns like aging, acne, dryness, or sensitivity, and provides targeted recommendations for each concern. You can also specify concerns during your profile setup for more personalized results."
+      question: "Tôi có thể nhận được khuyến nghị cho các vấn đề da cụ thể không?",
+      answer: "Hoàn toàn có thể! AI của chúng tôi phân tích da để xác định các vấn đề cụ thể như lão hóa, mụn, khô da hoặc nhạy cảm và đưa ra các khuyến nghị có mục tiêu cho từng vấn đề. Bạn cũng có thể chỉ định các vấn đề trong quá trình thiết lập hồ sơ để nhận kết quả được cá nhân hóa hơn."
     },
     {
       id: 9,
-      question: "Is the app suitable for all skin types?",
-      answer: "Yes, our AI has been trained on diverse skin types and tones to provide accurate analysis for everyone. Whether you have oily, dry, combination, or sensitive skin, our platform can provide relevant recommendations tailored to your unique needs."
+      question: "Ứng dụng có phù hợp với mọi loại da không?",
+      answer: "Có, AI của chúng tôi đã được đào tạo trên nhiều loại và tông màu da khác nhau để cung cấp phân tích chính xác cho tất cả mọi người. Cho dù bạn có da dầu, da khô, da hỗn hợp hay da nhạy cảm, nền tảng của chúng tôi đều có thể đưa ra các khuyến nghị phù hợp với nhu cầu độc đáo của bạn."
     },
     {
       id: 10,
-      question: "When will the app be available for download?",
-      answer: "We're currently in the final stages of development and testing. Sign up for early access to be notified as soon as the app is available for download on iOS and Android platforms. Early access users will receive special offers and priority support."
+      question: "Khi nào ứng dụng sẽ có sẵn để tải về?",
+      answer: "Chúng tôi hiện đang trong giai đoạn cuối của phát triển và kiểm thử. Đăng ký truy cập sớm để được thông báo ngay khi ứng dụng có sẵn để tải về trên các nền tảng iOS và Android. Người dùng truy cập sớm sẽ nhận được các ưu đãi đặc biệt và hỗ trợ ưu tiên."
     }
   ];
 
- const filteredFAQs = faqs.filter(faq => 
+  const filteredFAQs = faqs.filter(faq => 
     faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
     faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -79,9 +79,9 @@ const FAQSection = () => {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Câu Hỏi Thường Gặp</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Find answers to common questions about our AI skincare platform, technology, and how to get the best results.
+            Tìm câu trả lời cho các câu hỏi phổ biến về nền tảng chăm sóc da AI, công nghệ và cách để có kết quả tốt nhất.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ const FAQSection = () => {
           <div className="relative max-w-xl mx-auto">
             <input
               type="text"
-              placeholder="Search questions..."
+              placeholder="Tìm kiếm câu hỏi..."
               className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-50 transition"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -165,7 +165,7 @@ const FAQSection = () => {
             ))
           ) : (
             <div className="text-center py-8 text-gray-50">
-              <p>No questions match your search. Try different keywords.</p>
+              <p>Không tìm thấy câu hỏi phù hợp. Vui lòng thử từ khóa khác.</p>
             </div>
           )}
         </div>
