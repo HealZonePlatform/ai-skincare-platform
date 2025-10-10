@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://healzoneplatform.github.io/ai-skincare-platform/sitemap.xml

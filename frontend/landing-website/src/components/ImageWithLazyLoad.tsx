@@ -1,7 +1,7 @@
 'use client';
 
-import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
+import Image from 'next/image';
+import React from 'react';
 
 interface ImageWithLazyLoadProps {
   src: string;
@@ -12,30 +12,24 @@ interface ImageWithLazyLoadProps {
   priority?: boolean;
 }
 
-const ImageWithLazyLoad = ({ 
-  src, 
-  alt, 
+const ImageWithLazyLoad: React.FC<ImageWithLazyLoadProps> = ({
+  src,
+  alt,
   className = '',
   width,
   height,
-  priority = false
-}: ImageWithLazyLoadProps) => {
+  priority = false,
+}) => {
   return (
-    <LazyLoadImage
+    <Image
       src={src}
       alt={alt}
       className={className}
       width={width}
       height={height}
-      effect="blur"
-      threshold={100}
-      placeholder={
-        <div className={`bg-gray-200 border-2 border-dashed border-gray-400 rounded-xl flex items-center justify-center ${className}`}>
-          <span className="text-gray-500">Loading...</span>
-        </div>
-      }
-      visibleByDefault={priority}
-      wrapperClassName="w-full h-full"
+      // Next.js Image component lazy-loads by default; use loading="eager" for priority images
+      loading={priority ? 'eager' : 'lazy'}
+      placeholder="empty"
     />
   );
 };
