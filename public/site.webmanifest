@@ -1,0 +1,21 @@
+{
+  "name": "Horizon Skincare AI",
+  "short_name": "Horizon Skincare",
+  "description": "Nâng tầm hành trình chăm sóc da với phân tích AI chính xác và lộ trình cá nhân hoá.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF7D3",
+  "theme_color": "#E69534",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

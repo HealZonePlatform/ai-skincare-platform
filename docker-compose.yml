@@ -1,0 +1,91 @@
+# docker-compose.yml
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai_skincare_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ai_skincare
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ai-skincare-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ai_skincare"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ai_skincare_redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai-skincare-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3001
+      
+      # Database Configuration - QUAN TRỌNG: Sử dụng service names
+      DB_HOST: postgres  # ✅ Dùng tên service thay vì localhost
+      DB_PORT: 5432
+      DB_NAME: ai_skincare
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      
+      # Redis Configuration - QUAN TRỌNG: Sử dụng service name
+      REDIS_URL: redis://redis:6379  # ✅ Dùng tên service
+      
+      # JWT Configuration
+      JWT_ACCESS_SECRET: your-super-secret-access-key-at-least-64-characters-long-for-production-security-purposes
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-at-least-64-characters-long-for-production-security-purposes
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      
+      # CORS
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3002
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ai-skincare-network
+    volumes:
+      - ./services/auth-service/logs:/app/logs
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  ai-skincare-network:
+    driver: bridge
