@@ -19,6 +19,9 @@ dependencies:
   # HTTP Client
   dio: ^5.3.3
   
+  # Routing
+  go_router: ^14.2.0
+  
   # Secure Storage
   flutter_secure_storage: ^9.0.0
   
@@ -37,3 +40,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - healzone_spec/
