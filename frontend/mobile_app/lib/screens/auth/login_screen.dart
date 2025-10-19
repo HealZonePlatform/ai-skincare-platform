@@ -1,31 +1,22 @@
-// lib/screens/auth/login_screen.dart
-
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import 'package:ai_skincare_platform/providers/auth_provider.dart';
-import 'package:ai_skincare_platform/screens/auth/register_screen.dart';
+import 'package:ai_skincare_platform/theme/app_theme.dart';
+import 'package:ai_skincare_platform/widgets/hz_buttons.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.login(
-        _emailController.text.trim(),
-        _passwordController.text.trim(),
-      );
-    }
-  }
 
   @override
   void dispose() {
@@ -34,92 +25,114 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    final auth = context.read<AuthProvider>();
+    final success = await auth.login(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+    if (success && mounted) {
+      context.go('/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Đăng nhập')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Chào mừng trở lại!',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(),
+      appBar: AppBar(title: const Text('Sign in')),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Welcome back!',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty || !value.contains('@')) {
-                      return 'Vui lòng nhập email hợp lệ.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Mật khẩu',
-                    prefixIcon: Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: AppSpacing.s),
+                  Text(
+                    'Sign in to keep your routines, reminders, and scan history in sync.',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                    textAlign: TextAlign.center,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Mật khẩu không được để trống.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                Consumer<AuthProvider>(
-                  builder: (context, auth, child) {
-                    if (auth.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Text('ĐĂNG NHẬP'),
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-                 Consumer<AuthProvider>(
-                  builder: (context, auth, child) {
-                    if (auth.errorMessage != null) {
-                      return Text(
-                        auth.errorMessage!,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                  const SizedBox(height: AppSpacing.xl),
+                  HzSecondaryButton(
+                    label: 'Continue with Google',
+                    icon: Icons.g_mobiledata_outlined,
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('OAuth sign-in is coming soon.')),
                       );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                    );
-                  },
-                  child: const Text('Chưa có tài khoản? Đăng ký ngay'),
-                ),
-              ],
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  const Divider(),
+                  const SizedBox(height: AppSpacing.l),
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      prefixIcon: Icon(Icons.email_outlined),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty || !value.contains('@')) {
+                        return 'Please enter a valid email address.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Password',
+                      prefixIcon: Icon(Icons.lock_outline),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Password must not be empty.';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, _) => HzPrimaryButton(
+                      label: 'Sign in',
+                      icon: Icons.lock_open,
+                      onPressed: _submit,
+                      isLoading: auth.isLoading,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                  Consumer<AuthProvider>(
+                    builder: (context, auth, _) {
+                      if (auth.errorMessage == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: AppSpacing.s),
+                        child: Text(
+                          auth.errorMessage!,
+                          style: const TextStyle(color: AppColors.danger),
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  TextButton(
+                    onPressed: () => context.push('/auth/signup'),
+                    child: const Text('New here? Create an account'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
