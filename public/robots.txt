@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-
-# Point search engines to the canonical sitemap on the custom domain.
-Sitemap: https://horizonskincare.online/sitemap.xml

@@ -23,6 +23,7 @@ export interface IProduct extends Document {
   tags: string[];
   isActive: boolean;
   isRecommended: boolean;
+  verified: boolean;
   expertReviews?: IExpertReview[];
   userReviews?: Types.ObjectId[]; // Reference to Review collection
   createdAt: Date;
@@ -402,6 +403,11 @@ const ProductSchema = new Schema<IProduct>({
     default: false,
     index: true
   },
+  verified: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
   expertReviews: [ExpertReviewSchema],
   userReviews: [{
     type: Schema.Types.ObjectId,
@@ -471,6 +477,6 @@ ProductSchema.methods.isSuitableFor = function(skinType: string, concerns?: stri
 };
 
 // Create and export model
-const Product = mongoose.model<IProduct>('Product', ProductSchema);
+export const Product = mongoose.model<IProduct>('Product', ProductSchema);
 
 export default Product;
