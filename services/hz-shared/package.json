@@ -4,8 +4,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p .",
-    "prepare": "npm run build"
+    "build": "tsc -p ."
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

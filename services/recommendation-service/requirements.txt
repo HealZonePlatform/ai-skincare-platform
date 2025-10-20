@@ -1,1 +1,4 @@
-# requirements for recommendation
+fastapi
+uvicorn[standard]
+httpx
+pydantic
