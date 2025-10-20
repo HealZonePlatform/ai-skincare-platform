@@ -1,0 +1,89 @@
+openapi: 3.0.3
+info:
+  title: HealZone User Service v2
+  version: 2.0.0
+servers:
+  - url: http://localhost:3004/api/v1
+paths:
+  /me/profile:
+    get: { summary: Get profile (JWT), security: [{ bearerAuth: [] }], responses: {"200": {description: OK}} }
+    put:
+      summary: Update profile
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateProfile' } } }
+      responses: {"200": {description: OK}}
+  /me/history:
+    get:
+      summary: Get analysis history
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 30 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses: {"200": {description: OK}}
+  /me/reminders:
+    get: { summary: Get reminders, security: [{ bearerAuth: [] }], responses: {"200": {description: OK}} }
+    put:
+      summary: Update reminders
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateReminders' } } }
+      responses: {"200": {description: OK}}
+  /me/lifestyle:
+    get: { summary: Get lifestyle, security: [{ bearerAuth: [] }], responses: {"200": {description: OK}} }
+    put:
+      summary: Update lifestyle
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateLifestyle' } } }
+      responses: {"200": {description: OK}}
+  /me/goals:
+    get: { summary: Get goals, security: [{ bearerAuth: [] }], responses: {"200": {description: OK}} }
+    put:
+      summary: Set goals
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/UpdateGoals' } } }
+      responses: {"200": {description: OK}}
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    UpdateProfile:
+      type: object
+      properties:
+        full_name: { type: string }
+        phone: { type: string }
+        gender: { type: string, enum: [male, female, other] }
+        dob: { type: string }
+        preferences: { type: object, properties: { categories: { type: array, items: { type: string } } } }
+        avatar_url: { type: string }
+    UpdateReminders:
+      type: object
+      properties:
+        daily_care_enabled: { type: boolean }
+        daily_care_time: { type: string, example: "08:00" }
+        periodic_scan_enabled: { type: boolean }
+        periodic_scan_frequency: { type: string, enum: [weekly,biweekly,monthly] }
+    UpdateLifestyle:
+      type: object
+      properties:
+        sleep_hours_range: { type: string, enum: ["<5","5-7","7-9",">9"] }
+        water_cups_range: { type: string, enum: ["1","3-5","5-7","7-9"] }
+        diet_tags: { type: array, items: { type: string } }
+        cycle_phase: { type: string, enum: [pre,during,post,none,male] }
+        stress_level: { type: integer, minimum: 1, maximum: 3 }
+        allergy_notes: { type: string }
+    UpdateGoals:
+      type: object
+      required: [goals]
+      properties:
+        goals: { type: array, items: { type: string }, maxItems: 20 }

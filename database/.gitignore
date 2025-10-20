@@ -1,0 +1,29 @@
+# Database related files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sql
+*.log
+*.dump
+
+# Environment variables
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node modules (if any JS/TS tools are used)
+node_modules/
+
+# Build outputs (if any)
+dist/
+build/

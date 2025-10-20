@@ -1,0 +1,29 @@
+# Documentation related files
+*.log
+*.tmp
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Build outputs (if any)
+_dist/
+_build/
+out/
+_site/
+
+# Generated documentation
+api-docs/
+generated/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

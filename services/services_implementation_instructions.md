@@ -1,119 +1,210 @@
-HealZone Backend Services Implementation Guide
+HealZone Backend Services Implementation Guide - User Service v2 & Shared Library
 
-This guide provides detailed implementation notes for missing backend services in the HealZone platform. The goal is to build on the existing repository in services/ without creating unnecessary extra services. The focus here is on two services that currently have no source code (product-service and expert-service). Included are TypeScript/Node.js skeletons with Express and MongoDB integration, along with instructions for customizing and integrating them into your repository.
+# Hướng Dẫn Implement User Service v2 và Shared Library
 
-Repository Overview
+## Tổng Quan
 
-The HealZone project uses a microservices architecture. At the time of writing, the auth-service is implemented, but several services under services/ only contain placeholders and require implementation. The following services are incomplete:
+Tài liệu này cung cấp hướng dẫn chi tiết để implement User Service v2 và tích hợp Shared Library trong hệ thống microservices của HealZone platform. User Service v2 được thiết kế để tránh trùng lặp với auth-service bằng cách sử dụng endpoint `/api/v1/me/*` thay vì `/users/*`, không có foreign key sang bảng `users` mà lưu `user_id` UUID độc lập, lấy email/role từ JWT claim.
 
-Service	Current state	Notes
-product-service	Only a Mongoose model exists; no server or routes.	Manages skincare product catalog, filtering, ratings and verification flags.
-expert-service	No code other than a Dockerfile and package.json placeholder.	Handles expert profiles, scheduling, reviews and verification.
-ai-service	Placeholder for FastAPI; no inference code.	Analyzes skin images and returns metrics.
-recommendation-service	Placeholder; no recommendation logic.	Suggests products and routines based on analysis and user profiles.
-user-service	Placeholder; no controllers or routes.	Manages user profiles beyond authentication (skin type, history, preferences).
-api-gateway	Placeholder; no routing logic.	Acts as a single entry point, forwarding requests to services and handling cross‑cutting concerns.
+## Cấu trúc thư mục
 
-This guide focuses on implementing the product-service and expert-service. The other services can follow a similar pattern.
+Sau khi giải nén, bạn sẽ có hai thư mục mới trong thư mục `services/`:
 
-Getting Started
+- `user-service-skeleton-v2/` - Skeleton cho User Service v2
+- `hz-shared/` - Thư viện dùng chung cho các microservices
 
-Clone the repository (if not already done) and navigate to the services directory.
+## Shared Library
 
-Create two new folders: product-service and expert-service. These will hold the code for each service.
+### Tổng quan
 
-Copy the corresponding skeletons from the supplied zip archive into these folders (see the skeleton-services.zip provided). The skeletons provide a solid foundation with Express, TypeScript, MongoDB integration, and routing layers.
+Shared Library (`hz-shared`) là thư viện dùng chung cho các microservices, cung cấp các chức năng thường dùng:
 
-Install dependencies by running npm install in each service folder. Ensure you have a running MongoDB instance (local or Atlas) and set up a .env file containing MONGODB_URI and optionally PORT.
+- `jwt` helpers - Hỗ trợ xác thực và xử lý JWT tokens
+- `ApiError` - Lớp lỗi chuẩn cho các service
+- `validate()` - Middleware xác thực request
+- `pgPool()` wrapper và `healthCheck()` - Wrapper cho PostgreSQL và kiểm tra sức khỏe database
 
-Start each service in development mode using npm run dev or build and run using npm run build && npm start.
+### Cài đặt và sử dụng
 
-Service: product‑service
+1. Trong package.json của service, thêm dependency:
+```json
+{
+  "dependencies": {
+    "hz-shared": "file:../hz-shared"
+  }
+}
+```
 
-This service manages the product catalog and exposes CRUD and query endpoints. The skeleton includes the following files:
+2. Sau đó chạy `npm install` để cài đặt
 
-src/models/product.model.ts – Defines the Mongoose schema and TypeScript interface. Key fields include name, description, brand, category, skinTypes, skinConcerns, price, currency, images, rating, isActive, verified, and timestamps. Feel free to extend the schema with additional fields such as ingredients, availability, or specifications.
+3. Import các module trong service:
+```ts
+import { jwtUtil, errors, validate, db } from 'hz-shared';
+```
 
-src/services/product.service.ts – Contains business logic for creating, listing, retrieving, updating, and deleting products. It supports query filters for skinType, concern, category, verified, as well as pagination via limit and offset. You can add additional methods to compute derived values or perform bulk updates.
+### Các module trong thư viện
 
-src/controllers/product.controller.ts – Exposes controller functions for each endpoint: create, list, retrieve, update, and delete. It delegates to the service layer and handles errors via Express’s next() mechanism.
+#### jwt.ts
+- `verify(token: string, secret: string): JwtUser` - Xác minh JWT token và trả về thông tin người dùng
+- `JwtUser` interface: `{ id: string; email?: string; role?: string }`
 
-src/routes/product.routes.ts – Defines Express routes and maps them to controller functions. You can add route-level middleware here (e.g., JWT authentication or role‑based access control).
+#### errors.ts
+- `ApiError` class: Lỗi có status code
+- `notFound()`, `unauthorized()`, `forbidden()` - Các hàm tiện ích tạo lỗi chuẩn
 
-src/config/database.ts – Handles MongoDB connection using Mongoose. The connectDB() function reads MONGODB_URI from environment variables.
+#### validate.ts
+- `validate(schema: ZodSchema, source: 'body'|'query'|'params')` - Middleware xác thực request với Zod schema
 
-src/app.ts – Sets up the Express application with middleware (CORS, JSON parsing, logging) and mounts the product routes under /api/v1/products. It also provides a /health endpoint for readiness checks.
+#### pg.ts
+- `pgPool(config)` - Tạo PostgreSQL connection pool với kiểm tra sức khỏe
 
-package.json – Contains dependencies (express, mongoose, cors, morgan, typescript, etc.) and scripts for dev (nodemon), build (tsc), and start.
+## User Service v2
 
-tsconfig.json – Configures the TypeScript compiler to target ES2019, output CommonJS modules, and include source maps for debugging.
+### Mục tiêu thiết kế
 
-README.md – Summarizes endpoints and provides setup instructions.
+- Tránh trùng lặp với `auth-service` bằng cách:
+  - Đổi prefix endpoint thành `/api/v1/me/*` (không dùng `/users/*`)
+  - Không join/không FK sang bảng `users`: lưu `user_id` UUID độc lập; email/role lấy từ JWT claim
+  - Giữ chức năng: profile mở rộng, thói quen sinh hoạt, nhắc nhở, mục tiêu, lịch sử phân tích
 
-How to extend
+### Endpoints
 
-Authentication and authorization – Integrate JWT verification by adding middleware in src/routes/product.routes.ts. Use roles (e.g., admin, store, expert) to restrict create/update/delete actions.
+- `GET /api/v1/me/profile` — lấy hồ sơ (trả kèm `user_id` + `email` từ JWT)
+- `PUT /api/v1/me/profile`
+- `GET /api/v1/me/history?limit=30&offset=0`
+- `GET /api/v1/me/reminders` • `PUT /api/v1/me/reminders`
+- `GET /api/v1/me/lifestyle` • `PUT /api/v1/me/lifestyle`
+- `GET /api/v1/me/goals` • `PUT /api/v1/me/goals`
 
-Validation – Use a library like joi or zod to validate request bodies and query parameters. Attach validation middleware before controller functions.
+### Schema cơ sở dữ liệu
 
-Logging and error handling – Add an error‑handling middleware in src/app.ts to centralize error responses. Use a logging library (e.g., winston) for structured logs.
+User Service v2 sử dụng PostgreSQL với các bảng không có foreign key sang bảng `users`:
 
-Unit tests – Create a tests folder and use a framework like jest to write tests for services and controllers. Mock the database using mongodb-memory-server.
+- `user_profiles` - Thông tin hồ sơ người dùng
+- `user_lifestyle` - Thói quen sinh hoạt của người dùng
+- `user_reminders` - Nhắc nhở của người dùng
+- `user_goals` - Mục tiêu của người dùng
+- `skin_analyses` - (tùy chọn) lịch sử phân tích da
 
-Dockerization – Create a Dockerfile that installs dependencies, copies the code, and sets the entry point. Expose port 3003 and provide a .dockerignore.
+Xem chi tiết trong `sql/001_init_user_service_v2.sql`.
 
-Service: expert‑service
+### Cài đặt và chạy thử
 
-This service manages expert profiles and is prepared for future scheduling features. The skeleton contains:
+1. Sao chép file môi trường:
+```bash
+cp .env.example .env
+```
 
-src/models/expert.model.ts – Defines the Mongoose schema and interface for experts. Fields include name, about, specialties, rating, verified, avatar, and timestamps. You can extend the schema with fields like availableSlots for scheduling.
+2. Cài đặt dependencies:
+```bash
+npm ci
+```
 
-src/services/expert.service.ts – Business logic to create, list, find, update, and delete experts. It supports filters for specialty, verified, and pagination via limit and offset. You can extend the service to include scheduling, booking, and rating aggregation.
+3. Chạy migration database:
+```bash
+npm run db:migrate
+```
 
-src/controllers/expert.controller.ts – Controller functions for REST endpoints. They call service methods and handle error responses.
+4. Chạy service ở chế độ development:
+```bash
+npm run dev
+```
 
-src/routes/expert.routes.ts – Express router for /api/v1/experts. Add authentication middleware here if needed.
+Service sẽ chạy trên cổng 3004: `http://localhost:3004/health`
 
-src/config/database.ts – Connection helper for MongoDB. Shares the same implementation as the product service.
+### Cấu hình môi trường
 
-src/app.ts – Express app configuration, route mounting, and health endpoint.
+File `.env` cần chứa các biến sau:
 
-package.json and tsconfig.json – Similar structure to the product service with appropriate dependencies.
+- `PORT` - Cổng chạy service (mặc định 3004)
+- `DB_HOST` - Host của PostgreSQL
+- `DB_PORT` - Cổng của PostgreSQL (mặc định 5432)
+- `DB_NAME` - Tên database
+- `DB_USER` - Username của database
+- `DB_PASSWORD` - Password của database
+- `JWT_ACCESS_SECRET` - Secret key để xác minh JWT
+- `ALLOWED_ORIGINS` - Danh sách các origin được phép truy cập (cách nhau bằng dấu phẩy)
 
-README.md – Provides endpoint descriptions and setup instructions.
+### Tích hợp với Gateway
 
-How to extend
+- Map `/auth/*` → auth-service; `/me/*` → user-service v2
+- Forward header `Authorization` (bearer) để xác thực JWT
 
-Scheduling – Define a new model (e.g., consultation.model.ts) that stores time slots, user bookings, and expert availability. Create routes (/api/v1/consultations) for users to book and manage appointments.
+### Sử dụng Shared Library trong User Service
 
-Reviews and ratings – Add a reviews subdocument or separate collection to store user feedback. Write endpoints (POST /experts/:id/reviews, GET /experts/:id/reviews) and update the expert’s rating field based on averages.
+User Service v2 đã được cấu hình sẵn để sử dụng Shared Library. Bạn có thể thay đổi các import trong service để dùng các module từ `hz-shared`:
 
-Verification – Introduce a flag verified and create endpoints for admin to verify or reject experts. Consider storing documents (certifications) via a file service.
+```ts
+// Thay vì sử dụng các hàm được định nghĩa trong service
+import { jwtUtil, errors, validate, db } from 'hz-shared';
 
-Video integration – If future requirements include online consultation, integrate video SDKs (e.g., Zoom API) by storing meeting IDs and tokens in the consultation model.
+// Ví dụ sử dụng validate middleware
+import { validate } from 'hz-shared';
+app.post('/api/v1/me/profile', validate(profileSchema, 'body'), profileController.update);
 
-Security – Use role‑based middleware to restrict who can create or update expert profiles (only admins or experts themselves). Validate payloads with a library like joi.
+// Ví dụ sử dụng ApiError
+import { errors } from 'hz-shared';
+throw errors.unauthorized();
+```
 
-Integration with API Gateway and other services
+## Các bước triển khai cụ thể
 
-Once these services are operational, configure the api-gateway to route requests:
+### Bước 1: Cài đặt môi trường
 
-Forward /api/v1/products/* requests to the product service at port 3003.
+1. Đảm bảo PostgreSQL đang chạy
+2. Tạo database mới cho User Service v2
+3. Cập nhật file `.env` với thông tin kết nối database
 
-Forward /api/v1/experts/* requests to the expert service at port 3002.
+### Bước 2: Cài đặt dependencies
 
-The API Gateway should handle JWT verification and user role extraction, perform basic CORS checks, rate limiting, and log requests. It can also aggregate responses if necessary.
+```bash
+cd services/user-service-skeleton-v2
+npm install
+```
 
-Next Steps
+### Bước 3: Chạy migration
 
-Implement user-service – Manage user profiles, preferences, and history beyond authentication. Use PostgreSQL for relational data or MongoDB if more flexible.
+```bash
+npm run db:migrate
+```
 
-Implement ai-service – Build a FastAPI service that loads a trained model, processes images, and returns analysis results. Store large models in cloud storage and load them in the service startup.
+### Bước 4: Tùy chỉnh các thành phần
 
-Implement recommendation-service – Create a rule‑based or ML model that combines skin analysis results with user preferences to rank products and routines. Expose an endpoint POST /recommend that returns recommended products with explanations.
+1. Cập nhật các controller trong `src/controllers/me.controller.ts` để xử lý logic nghiệp vụ
+2. Cập nhật các service trong `src/services/me.service.ts` để thực hiện các thao tác nghiệp vụ
+3. Cập nhật các repository trong `src/repositories/` để thực hiện các thao tác với database
+4. Thêm xác thực và kiểm tra lỗi nếu cần
 
-Enhance api-gateway – Add robust routing and middleware, secure environment configuration, and metrics collection.
+### Bước 5: Kiểm tra và chạy
 
-Write CI/CD pipelines – Use GitHub Actions to lint, test, build, and deploy each service to environments such as GCP Cloud Run or Docker Swarm. Reuse patterns from the existing auth-service workflow.
+1. Chạy service ở chế độ development:
+```bash
+npm run dev
+```
 
-By following this guide and using the provided skeletons, you can implement the missing services in the repository while maintaining consistent code structure and service interaction. Feel free to adapt the models and logic to match the domain requirements of the HealZone platform.
+2. Kiểm tra endpoint health: `http://localhost:3004/health`
+
+3. Kiểm tra các endpoint API theo tài liệu
+
+### Bước 6: Tích hợp với hệ thống
+
+1. Cập nhật API Gateway để route các endpoint `/api/v1/me/*` đến User Service v2
+2. Đảm bảo JWT được truyền đúng cách từ Gateway đến service
+3. Kiểm tra tích hợp với các service khác nếu cần
+
+## Lưu ý khi phát triển
+
+- Luôn sử dụng UUID cho `user_id` thay vì auto-increment ID
+- Không thực hiện JOIN với bảng `users` từ auth-service
+- Chỉ lấy thông tin người dùng từ JWT claims
+- Sử dụng các hàm từ Shared Library để đảm bảo tính nhất quán
+- Tuân thủ các quy tắc đặt tên và kiểu dữ liệu như trong tài liệu
+- Thêm logging và monitoring nếu cần thiết
+- Viết unit test cho các module quan trọng
+
+## Mở rộng trong tương lai
+
+- Thêm các endpoint mới theo nhu cầu nghiệp vụ
+- Tích hợp với các hệ thống bên ngoài (email, notification, etc.)
+- Thêm các tính năng caching nếu cần
+- Tối ưu hiệu suất và bảo mật
