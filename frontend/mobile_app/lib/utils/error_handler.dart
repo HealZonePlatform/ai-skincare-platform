@@ -1,7 +1,8 @@
-// Flutter imports
+// lib/utils/error_handler.dart
+
 import 'package:flutter/foundation.dart';
 
-// Local imports
+import 'package:ai_skincare_platform/core/logging/app_logger.dart';
 import 'package:ai_skincare_platform/utils/exceptions.dart';
 
 class ErrorHandler {
@@ -10,13 +11,19 @@ class ErrorHandler {
   /// Log errors to console (in debug mode) or external service (in production)
   static void logError(dynamic error, StackTrace? stackTrace) {
     if (kDebugMode) {
-      debugPrint('❌ Error: $error');
+      debugPrint('[HealZone] Error: $error');
       if (stackTrace != null) {
         debugPrint('Stack trace: $stackTrace');
       }
-    } else {
-      // TODO: Send to error reporting service (Firebase Crashlytics, Sentry, etc.)
     }
+
+    AppLogger.error(
+      'Captured error',
+      error: error,
+      stackTrace: stackTrace,
+    );
+
+    // TODO: integrate Crashlytics/Sentry when available.
   }
 
   /// Get user-friendly error message

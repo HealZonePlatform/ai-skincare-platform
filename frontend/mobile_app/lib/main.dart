@@ -1,18 +1,23 @@
-// Flutter imports
-import 'package:flutter/material.dart';
+// lib/main.dart
 
-// Package imports
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-// Local imports
-import 'package:ai_skincare_platform/providers/auth_provider.dart';
-import 'package:ai_skincare_platform/router/app_router.dart';
+import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
+import 'package:ai_skincare_platform/core/network/api_client.dart';
+import 'package:ai_skincare_platform/l10n/app_localizations.dart';
+import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
+import 'package:ai_skincare_platform/presentation/router/app_router.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/utils/error_handler.dart';
 
-void main() {
-  // Setup global error handling
-  FlutterError.onError = (FlutterErrorDetails details) {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ApiClient.instance.init();
+
+  FlutterError.onError = (details) {
     FlutterError.presentError(details);
     ErrorHandler.logError(details.exception, details.stack);
   };
@@ -21,21 +26,46 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (ctx) => AuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+      ],
       child: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           final theme = AppTheme.build();
           final router = AppRouter(isLoggedIn: auth.isLoggedIn).router;
-          return MaterialApp.router(
-            title: 'HealZone',
-            debugShowCheckedModeBanner: false,
-            theme: theme,
-            routerConfig: router,
+          return ValueListenableBuilder<String?>(
+            valueListenable: GlobalErrorNotifier.notifier,
+            child: MaterialApp.router(
+              title: 'HealZone',
+              debugShowCheckedModeBanner: false,
+              theme: theme,
+              routerConfig: router,
+              localizationsDelegates: const [
+                AppLocalizationsDelegate(),
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: AppLocalizations.supportedLocales,
+            ),
+            builder: (context, errorMessage, child) {
+              if (errorMessage != null && errorMessage.isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  final messenger = ScaffoldMessenger.of(context);
+                  messenger
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text(errorMessage)));
+                  GlobalErrorNotifier.clear();
+                });
+              }
+              return child!;
+            },
           );
         },
       ),

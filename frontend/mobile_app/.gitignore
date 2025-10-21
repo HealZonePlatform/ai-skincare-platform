@@ -12,6 +12,12 @@
 .swiftpm/
 migrate_working_dir/
 
+# Environment
+.env
+.env.local
+.env.production
+.env.staging
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -33,6 +39,26 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Flutter/Dart/Pub additional
+*.pid
+*.swo
+*.swp
+*~
+.DS_Store
+.dart_tool/
+.flutter-plugins/
+.ios/
+.manylinux/
+.macos/
+.windows/
+.linux/
+packages/
+test/**
+!.gitkeep
+*.tmp
+*.bak
+*.log
+
 # Symbolication related
 app.*.symbols
 
@@ -43,6 +69,49 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/.gradle/
+/android/captures/
+/android/gradlew
+/android/gradlew.bat
+/android/local.properties
+/android/key.properties
+/android/app/key.properties
+/android/app/secrets.properties
+/android/app/.cxx/
+/android/app/build/
+/android/build/
+/android/app/src/main/kotlin/
+
+# iOS
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcshareddata/xcschemes/
+ios/build/
+ios/Flutter/ephemeral/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.so
+ios/Flutter/flutter_assets/
+ios/Flutter/.last_build_id
+
+# Code signing (iOS)
+ios/Runner/Runner-Bridging-Header.h
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Key files
+**/secrets.properties
+**/local.properties
+**/key.properties
+**/google-services.json
+**/GoogleService-Info.plist
+**/keystore.jks
+**/app.keystore
+**/upload-keystore.jks
 
 # Code guidelines directory
 healzone_spec/

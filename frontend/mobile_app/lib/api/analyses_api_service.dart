@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 
 // Local imports
 import 'package:ai_skincare_platform/utils/api_constants.dart';
+import 'package:ai_skincare_platform/core/network/network_config.dart';
 import 'package:ai_skincare_platform/utils/exceptions.dart';
-import 'package:ai_skincare_platform/models/user_profile.dart';
-import 'package:ai_skincare_platform/services/api_client.dart';
+import 'package:ai_skincare_platform/core/network/api_client.dart';
 
 class AnalysesApiService {
   final Dio _dio;
@@ -35,6 +35,8 @@ class AnalysesApiService {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          sendTimeout: NetworkConfig.uploadTimeout,
+          receiveTimeout: NetworkConfig.uploadTimeout,
         ),
       );
       return response;
@@ -145,3 +147,5 @@ class AnalysesApiService {
     }
   }
 }
+
+
