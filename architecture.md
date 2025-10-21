@@ -48,22 +48,23 @@ AI Skincare Platform được thiết kế theo mô hình microservices với ki
 
 ### 3. Microservices Layer
 
-#### AI Service 🤖
-- **Technology Stack**: Python + FastAPI
+#### Auth Service 🔐
+- **Technology Stack**: Node.js + TypeScript
 - **Primary Functions**:
-  - Skin image analysis sử dụng computer vision
-  - Machine learning model inference
-  - Image preprocessing và enhancement
-  - Result interpretation và scoring
+  - User registration và authentication
+  - JWT token management với refresh token mechanism
+  - Password hashing và verification
+  - Token blacklist và session management
 - **Key APIs**:
-  - `POST /analyze` - Phân tích hình ảnh da
-  - `POST /recommend` - AI-based product recommendations
-  - `POST /feedback` - Thu thập user feedback để improve models
-- **ML Components**:
-  - TensorFlow/PyTorch models
-  - OpenCV cho image processing
-  - Custom CNN models cho skin analysis
-  - Model versioning và A/B testing
+  - `POST /register` - Đăng ký người dùng mới
+  - `POST /login` - Xác thực người dùng
+  - `POST /refresh` - Làm mới access token
+  - `POST /logout` - Đăng xuất và thu hồi token
+  - `GET /profile` - Lấy thông tin hồ sơ cơ bản
+- **Data Management**:
+  - PostgreSQL cho user data
+ - Redis cho session caching và token storage
+  - Encrypted sensitive data storage
 
 #### User Service 👤  
 - **Technology Stack**: Node.js + TypeScript
@@ -135,15 +136,15 @@ AI Skincare Platform được thiết kế theo mô hình microservices với ki
 - **Technology Stack**: Python + FastAPI
 - **Primary Functions**:
   - ML-based product recommendations
-  - Collaborative filtering
-  - Content-based filtering
-  - Hybrid recommendation algorithms
+ - Rule-based và hybrid recommendation algorithms
+ - Personalization dựa trên lịch sử người dùng
+  - Feedback loop từ user interactions
 - **Key APIs**:
   - `POST /recommend` - Generate recommendations
   - `POST /feedback` - Collect recommendation feedback
 - **ML Features**:
-  - Graph-based recommendations (Neo4j)
-  - Real-time recommendation updates
+  - Content-based filtering kết hợp với skin type/concerns
+  - Learning từ lịch sử và phản hồi của người dùng
   - A/B testing cho recommendation algorithms
 
 ## 4. Data Layer

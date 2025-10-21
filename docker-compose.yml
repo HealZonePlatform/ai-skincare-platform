@@ -82,6 +82,160 @@ services:
     volumes:
       - ./services/auth-service/logs:/app/logs
 
+  # Expert Service
+  expert-service:
+    build:
+      context: ./services/expert-service
+      dockerfile: Dockerfile
+    container_name: expert-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3002
+      
+      # Database Configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ai_skincare
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ai-skincare-network
+
+ # User Service
+ user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3004
+      
+      # Database Configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ai_skincare
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      
+      # JWT Configuration (must match auth-service)
+      JWT_ACCESS_SECRET: your-super-secret-access-key-at-least-64-characters-long-for-production-security-purposes
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ai-skincare-network
+    volumes:
+      - ./services/user-service/logs:/app/logs
+
+  # Product Service
+  product-service:
+    build:
+      context: ./services/product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3003
+      
+      # Database Configuration
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ai_skincare
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ai-skincare-network
+
+ # AI Service
+ ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    container_name: ai-service
+    restart: unless-stopped
+    ports:
+      - "3006:3006"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3006
+    networks:
+      - ai-skincare-network
+
+ # Recommendation Service
+ recommendation-service:
+    build:
+      context: ./services/recommendation-service
+      dockerfile: Dockerfile
+    container_name: recommendation-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      # Downstream service URLs
+      PRODUCT_SERVICE_URL: http://product-service:3003
+      AI_SERVICE_URL: http://ai-service:3006
+      
+      # Recommendation behaviour
+      RECOMMENDATION_LIMIT: 5
+      HTTP_TIMEOUT_SECONDS: 5.0
+    depends_on:
+      - product-service
+      - ai-service
+    networks:
+      - ai-skincare-network
+
+ # API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Server Configuration
+      NODE_ENV: development
+      PORT: 3000
+      
+      # JWT Configuration (must match auth-service)
+      JWT_ACCESS_SECRET: your-super-secret-access-key-at-least-64-characters-long-for-production-security-purposes
+      
+      # CORS
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3002
+      
+      # Downstream service URLs
+      AUTH_SERVICE_URL: http://auth-service:3001
+      USER_SERVICE_URL: http://user-service:3004
+      PRODUCT_SERVICE_URL: http://product-service:3003
+      AI_SERVICE_URL: http://ai-service:3006
+      RECOMMENDATION_SERVICE_URL: http://recommendation-service:3005
+      EXPERT_SERVICE_URL: http://expert-service:3002
+    depends_on:
+      - auth-service
+    networks:
+      - ai-skincare-network
+
 volumes:
   postgres_data:
   redis_data:

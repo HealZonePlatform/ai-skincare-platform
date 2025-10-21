@@ -86,6 +86,8 @@ CREATE INDEX IF NOT EXISTS idx_skin_analyses_date ON skin_analyses(analysis_date
 CREATE INDEX IF NOT EXISTS idx_skin_analyses_severity ON skin_analyses(severity_level);
 CREATE INDEX IF NOT EXISTS idx_skin_analyses_model_version ON skin_analyses(ai_model_version);
 CREATE INDEX IF NOT EXISTS idx_skin_analyses_created_at ON skin_analyses(created_at);
+CREATE INDEX IF NOT EXISTS idx_skin_analyses_user_date ON skin_analyses(user_id, analysis_date DESC);
+CREATE INDEX IF NOT EXISTS idx_skin_analyses_user_severity ON skin_analyses(user_id, severity_level);
 
 -- GIN indexes for JSONB columns
 CREATE INDEX IF NOT EXISTS idx_skin_analyses_result_gin ON skin_analyses USING GIN (analysis_result);

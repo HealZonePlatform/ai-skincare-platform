@@ -39,8 +39,8 @@ AI Skincare Platform là một hệ thống tư vấn chăm sóc da thông minh 
 
 ### Backend
 - **API Gateway**: Node.js + Express
-- **Microservices**: Node.js + TypeScript, Python + FastAPI (Bao gồm User, Product, AI, Expert, Routine, và Recommendation services)
-- **Authentication**: JWT tokens
+- **Microservices**: Node.js + TypeScript, Python + FastAPI (Bao gồm Auth, User, Product, Expert, Recommendation services)
+- **Authentication**: JWT tokens với refresh token mechanism
 - **Rate Limiting**: Redis-based
 
 ### AI/ML
@@ -49,10 +49,9 @@ AI Skincare Platform là một hệ thống tư vấn chăm sóc da thông minh 
 - **Image Processing**: Specialized algorithms cho phân tích da
 
 ### Database
-- **PostgreSQL**: Dữ liệu người dùng và giao dịch
+- **PostgreSQL**: Dữ liệu người dùng, xác thực và giao dịch
 - **MongoDB**: Catalog sản phẩm và content
 - **Redis**: Cache và session management
-- **Neo4j**: Graph database cho recommendation engine
 
 ### Infrastructure
 - **Cloud Platform**: Google Cloud Platform (GCP)
@@ -78,14 +77,19 @@ AI Skincare Platform là một hệ thống tư vấn chăm sóc da thông minh 
 
 ### Phase 1 - MVP (Tháng 1-3)
 - ✅ Thiết lập môi trường phát triển
-- 🔄 Phát triển core AI analysis engine
+- ✅ Phát triển core Auth Service (xác thực, JWT, refresh token)
+- ✅ Phát triển User Service (hồ sơ người dùng, thói quen, nhắc nhở, mục tiêu)
+- ✅ Phát triển Product Service (quản lý catalog sản phẩm)
+- ✅ Phát triển Expert Service (quản lý chuyên gia, đặt lịch tư vấn)
+- ✅ Phát triển Recommendation Service (gợi ý sản phẩm)
+- ✅ Phát triển API Gateway (định tuyến, xác thực, rate limiting)
 - 🔄 Xây dựng Flutter mobile app
-- 🔄 API Gateway và User Service
 - 🔄 Tích hợp cơ bản với product catalog
 
 ### Phase 2 - Enhanced Features (Tháng 4-5)
-- 📅 Tích hợp recommendation engine
-- 📅 Expert consultation system
+- 📅 Tích hợp AI analysis engine
+- 📅 Tích hợp recommendation engine hoàn chỉnh
+- 📅 Expert consultation system hoàn chỉnh
 - 📅 Web dashboard cho chuyên gia
 - 📅 Advanced UI/UX improvements
 - 📅 Security hardening và performance optimization
