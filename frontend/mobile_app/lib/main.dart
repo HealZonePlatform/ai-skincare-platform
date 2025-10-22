@@ -25,6 +25,8 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -46,6 +48,7 @@ class MyApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               theme: theme,
               routerConfig: router,
+              scaffoldMessengerKey: _scaffoldMessengerKey,
               localizationsDelegates: const [
                 AppLocalizationsDelegate(),
                 GlobalMaterialLocalizations.delegate,
@@ -57,10 +60,12 @@ class MyApp extends StatelessWidget {
             builder: (context, errorMessage, child) {
               if (errorMessage != null && errorMessage.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final messenger = ScaffoldMessenger.of(context);
-                  messenger
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(SnackBar(content: Text(errorMessage)));
+                  final messenger = _scaffoldMessengerKey.currentState;
+                  if (messenger != null) {
+                    messenger
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(SnackBar(content: Text(errorMessage)));
+                  }
                   GlobalErrorNotifier.clear();
                 });
               }

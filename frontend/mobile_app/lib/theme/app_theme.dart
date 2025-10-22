@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const primary = Color(0xFF8A8E5A);
@@ -61,9 +62,11 @@ class AppTheme {
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
       ),
-      textTheme: Typography.blackMountainView.apply(
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
+      textTheme: GoogleFonts.manropeTextTheme(
+        Typography.blackMountainView.apply(
+          bodyColor: AppColors.textPrimary,
+          displayColor: AppColors.textPrimary,
+        ),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.chipBg,

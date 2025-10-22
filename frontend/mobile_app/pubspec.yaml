@@ -36,6 +36,9 @@ dependencies:
   permission_handler: ^11.0.1
   shared_preferences: ^2.2.2
 
+  # UI/Styling
+  google_fonts: ^6.1.0
+
   intl: ^0.20.2
 
 dev_dependencies:
@@ -47,4 +50,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/logo_full.png
+    - assets/images/logo_mark.png
+    - assets/images/hero_wave.png
+    - assets/images/onboarding_1.png
+    - assets/images/product_placeholder.png
+    - assets/images/analysis_placeholder.png
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
+import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/router/router_observer.dart';
 import 'package:ai_skincare_platform/presentation/screens/advice/advice_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/auth/login_screen.dart';
@@ -14,6 +17,7 @@ import 'package:ai_skincare_platform/presentation/screens/onboarding/onboarding_
 import 'package:ai_skincare_platform/presentation/screens/paywall/paywall_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/products/products_screens.dart';
 import 'package:ai_skincare_platform/presentation/screens/profile/profile_screens.dart';
+import 'package:ai_skincare_platform/presentation/screens/profile/skin_analysis_detail_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/routine/routine_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/scan/scan_screens.dart';
 import 'package:ai_skincare_platform/presentation/screens/survey/survey_screens.dart';
@@ -40,8 +44,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: 'detail/:id',
-                builder: (context, state) =>
-                    CommunityDetailScreen(postId: state.pathParameters['id'] ?? ''),
+                builder: (context, state) => CommunityDetailScreen(postId: state.pathParameters['id'] ?? ''),
               ),
               GoRoute(path: 'new', builder: (context, state) => const CommunityNewPostScreen()),
             ],
@@ -54,6 +57,32 @@ class AppRouter {
               GoRoute(path: 'reminders', builder: (context, state) => const ProfileRemindersScreen()),
               GoRoute(path: 'goals', builder: (context, state) => const ProfileGoalsScreen()),
               GoRoute(path: 'basic', builder: (context, state) => const ProfileBasicScreen()),
+              GoRoute(
+                path: 'analysis/:id',
+                name: 'analysis-detail',
+                builder: (context, state) {
+                  final analysis = state.extra as SkinAnalysisHistory?;
+                  if (analysis != null) {
+                    return SkinAnalysisDetailScreen(analysisItem: analysis);
+                  }
+
+                  final id = state.pathParameters['id'];
+                  if (id == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('Analysis result not available.')),
+                    );
+                  }
+
+                  final provider = Provider.of<UserProfileProvider>(context, listen: false);
+                  final fallback = provider.skinAnalysisHistory.firstWhere(
+                    (item) => item.id == id,
+                    orElse: () => provider.skinAnalysisHistory.isNotEmpty
+                        ? provider.skinAnalysisHistory.first
+                        : throw StateError('Analysis $id not found'),
+                  );
+                  return SkinAnalysisDetailScreen(analysisItem: fallback);
+                },
+              ),
             ],
           ),
         ],
@@ -95,5 +124,3 @@ class AppRouter {
     },
   );
 }
-
-

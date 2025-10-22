@@ -1,520 +1,664 @@
-// lib/presentation/screens/profile/user_profile_screen.dart
-
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
+
+import 'package:ai_skincare_platform/core/constants/app_assets.dart';
+import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
-import 'package:ai_skincare_platform/presentation/screens/profile/skin_analysis_detail_screen.dart';
+import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
+import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
+import 'package:ai_skincare_platform/presentation/widgets/hz_skeleton.dart';
+import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  const UserProfileScreen({Key? key}) : super(key: key);
+  const UserProfileScreen({super.key});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  bool _isEditing = false;
+  final _phoneController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<UserProfileProvider>(context, listen: false).loadUserProfile();
+      context.read<UserProfileProvider>().loadUserProfile();
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<UserProfileProvider>(
-      builder: (context, profileProvider, child) {
-        final userProfile = profileProvider.userProfile;
-        final history = profileProvider.skinAnalysisHistory;
-
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Hồ sơ người dùng'),
-            actions: [
-              IconButton(
-                icon: Icon(_isEditing ? Icons.check : Icons.edit),
-                onPressed: () => _handleEditProfile(context, profileProvider, userProfile),
-              ),
-            ],
-          ),
-          body: profileProvider.isLoading && userProfile == null
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildAvatarSection(context, userProfile),
-                      const SizedBox(height: 16),
-                      _buildProfileForm(userProfile),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Lịch sử phân tích da',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildAnalysisHistory(profileProvider, history),
-                      const SizedBox(height: 24),
-                      _buildChangePasswordButton(context),
-                      const SizedBox(height: 16),
-                      _buildLogoutButton(context),
-                    ],
-                  ),
-                ),
-        );
-      },
-    );
-  }
-
-  // ✅ FIXED: Extract to method to avoid async gap
-  void _handleEditProfile(
-    BuildContext context,
-    UserProfileProvider profileProvider,
-    dynamic userProfile,
-  ) {
-    if (_isEditing) {
-      if (_formKey.currentState!.validate()) {
-        profileProvider
-            .updateUserProfile(
-          fullName: _fullNameController.text,
-          phoneNumber: _phoneNumberController.text,
-        )
-            .then((success) {
-          if (!mounted) return;
-          
-          if (success) {
-            setState(() {
-              _isEditing = false;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Cập nhật hồ sơ thành công!'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(profileProvider.errorMessage ?? 'Lỗi khi cập nhật hồ sơ'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        });
-      }
-    } else {
-      _fullNameController.text = userProfile?.fullName ?? '';
-      _phoneNumberController.text = userProfile?.phoneNumber ?? '';
-      setState(() {
-        _isEditing = true;
-      });
-    }
-  }
-
-  Widget _buildAvatarSection(BuildContext context, dynamic userProfile) {
-    return Center(
-      child: Stack(
-        children: [
-          Container(
-            width: MediaQuery.of(context).size.width * 0.3,
-            height: MediaQuery.of(context).size.width * 0.3,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Theme.of(context).primaryColor,
-                width: 2,
-              ),
-            ),
-            child: ClipOval(
-              child: userProfile?.avatarUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: userProfile!.avatarUrl!,
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      height: MediaQuery.of(context).size.width * 0.3,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    )
-                  : const Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Colors.grey,
-                    ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: Container(
-              width: 35,
-              height: 35,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileForm(dynamic userProfile) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _fullNameController,
-            enabled: _isEditing,
-            decoration: const InputDecoration(
-              labelText: 'Họ và tên',
-              prefixIcon: Icon(Icons.person),
-            ),
-            validator: (value) {
-              if (_isEditing && (value == null || value.isEmpty)) {
-                return 'Vui lòng nhập họ và tên';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _phoneNumberController,
-            enabled: _isEditing,
-            decoration: const InputDecoration(
-              labelText: 'Số điện thoại',
-              prefixIcon: Icon(Icons.phone),
-            ),
-            keyboardType: TextInputType.phone,
-            validator: (value) {
-              if (_isEditing && value != null && value.isNotEmpty) {
-                final phoneRegex = RegExp(r'^(0|\+84)(3|5|7|8|9)\d{8}$');
-                if (!phoneRegex.hasMatch(value)) {
-                  return 'Vui lòng nhập số điện thoại hợp lệ';
-                }
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            initialValue: userProfile?.email,
-            enabled: false,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              prefixIcon: Icon(Icons.email),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-    Widget _buildAnalysisHistory(UserProfileProvider profileProvider, List<dynamic> history) {
-    if (profileProvider.isLoading && history.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (history.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Text(
-          'Chua c� l?ch s? ph�n t�ch da',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey),
-        ),
-      );
-    }
-
-    final totalItems = history.length + (profileProvider.hasMoreHistory ? 1 : 0);
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: totalItems,
-      itemBuilder: (context, index) {
-        final isLoaderRow = index >= history.length;
-        if (isLoaderRow) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Center(
-              child: profileProvider.isHistoryLoading
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
-                  : OutlinedButton(
-                      onPressed: () => profileProvider.loadSkinAnalysisHistory(loadMore: true),
-                      child: const Text('Load more'),
-                    ),
-            ),
-          );
-        }
-
-        final item = history[index];
-        return Card(
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: item.imageUrl,
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.image),
-                ),
-              ),
-            ),
-            title: Text(
-              'Ph�n t�ch #${item.id.substring(0, 8)}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text('Ng�y: ${item.createdAt.toString().split(' ')[0]}'),
-            trailing: item.status != null
-                ? Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: item.status == 'completed'
-                          ? Colors.green
-                          : item.status == 'pending'
-                              ? Colors.orange
-                              : Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(item.status!, style: const TextStyle(color: Colors.white, fontSize: 12)),
-                  )
-                : null,
-            onTap: () => _navigateToDetail(context, item),
-          ),
-        );
-      },
-    );
-  }
-
-  // ✅ FIXED: Extract navigation to avoid async gap
-  void _navigateToDetail(BuildContext context, dynamic item) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SkinAnalysisDetailScreen(analysisItem: item),
-      ),
-    );
-  }
-
-  Widget _buildChangePasswordButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () => _showChangePasswordDialog(context),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-      child: const Text('Thay đổi mật khẩu'),
-    );
-  }
-
-  Widget _buildLogoutButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () => _showLogoutDialog(context),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-      child: const Text('Đăng xuất'),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Xác nhận đăng xuất'),
-          content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Hủy'),
-            ),
-            TextButton(
-              onPressed: () => _performLogout(dialogContext),
-              child: const Text('Đăng xuất'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // ✅ FIXED: Extract logout logic to avoid async gap
-  void _performLogout(BuildContext dialogContext) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.logout();
-    
-    if (!mounted) return;
-    
-    Navigator.of(dialogContext).pop();
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/login',
-      (route) => false,
-    );
   }
 
   @override
   void dispose() {
     _fullNameController.dispose();
-    _phoneNumberController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
-  void _showChangePasswordDialog(BuildContext context) {
-    final oldPasswordController = TextEditingController();
-    final newPasswordController = TextEditingController();
-    final confirmNewPasswordController = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<UserProfileProvider>(
+      builder: (context, provider, _) {
+        final profile = provider.userProfile;
 
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Thay đổi mật khẩu'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: oldPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Mật khẩu hiện tại',
-                    prefixIcon: Icon(Icons.lock_outline),
+        return Scaffold(
+          body: RefreshIndicator(
+            onRefresh: () => provider.loadUserProfile(forceRefresh: true),
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  expandedHeight: 230,
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: _ProfileHero(
+                      profile: profile,
+                      onEditPressed: profile == null
+                          ? null
+                          : () => _showEditSheet(
+                                context,
+                                provider,
+                                profile.fullName,
+                                profile.phoneNumber,
+                              ),
+                    ),
+                  ),
+                  actions: [
+                    IconButton(
+                      tooltip: 'Sign out',
+                      onPressed: () => context.read<AuthProvider>().logout(),
+                      icon: const Icon(Icons.logout_rounded),
+                    ),
+                  ],
+                ),
+                if (provider.isLoading && profile == null)
+                  const SliverToBoxAdapter(child: _ProfileSkeleton())
+                else
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.l),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _QuickStats(provider: provider),
+                          const SizedBox(height: AppSpacing.xl),
+                          _ActionCards(onChangePassword: () => _showChangePasswordDialog(context, provider)),
+                        ],
+                      ),
+                    ),
+                  ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.l, AppSpacing.xl, AppSpacing.s),
+                  sliver: SliverToBoxAdapter(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Skin analysis history',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        TextButton(
+                          onPressed: () => context.push('/history'),
+                          child: const Text('Compare results'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: newPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Mật khẩu mới',
-                    prefixIcon: Icon(Icons.lock),
-                  ),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                  sliver: provider.isHistoryLoading && provider.skinAnalysisHistory.isEmpty
+                      ? SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => const Padding(
+                              padding: EdgeInsets.only(bottom: AppSpacing.m),
+                              child: HzSkeleton.rect(height: 96, width: double.infinity),
+                            ),
+                            childCount: 4,
+                          ),
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final history = provider.skinAnalysisHistory[index];
+                              return _HistoryTile(item: history);
+                            },
+                            childCount: provider.skinAnalysisHistory.length,
+                          ),
+                        ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: confirmNewPasswordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Xác nhận mật khẩu mới',
-                    prefixIcon: Icon(Icons.lock),
+                if (provider.hasMoreHistory)
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.l),
+                    sliver: SliverToBoxAdapter(
+                      child: Center(
+                        child: OutlinedButton.icon(
+                          onPressed: provider.isHistoryLoading ? null : () => provider.loadSkinAnalysisHistory(loadMore: true),
+                          icon: provider.isHistoryLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(Icons.expand_more),
+                          label: const Text('Load more history'),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                const SliverPadding(padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showEditSheet(
+    BuildContext context,
+    UserProfileProvider provider,
+    String? fullName,
+    String? phoneNumber,
+  ) async {
+    _fullNameController.text = fullName ?? '';
+    _phoneController.text = phoneNumber ?? '';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.l)),
+      ),
+      builder: (bottomSheetContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: AppSpacing.xl,
+            right: AppSpacing.xl,
+            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom + AppSpacing.xl,
+            top: AppSpacing.l,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Edit profile',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSpacing.l),
+              TextFormField(
+                controller: _fullNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Full name',
+                  prefixIcon: Icon(Icons.person_outline),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.m),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(
+                  labelText: 'Phone number',
+                  prefixIcon: Icon(Icons.call_outlined),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.l),
+              HzPrimaryButton(
+                label: 'Save changes',
+                icon: Icons.save_outlined,
+                onPressed: () async {
+                  final navigator = Navigator.of(bottomSheetContext);
+                  final messenger = ScaffoldMessenger.of(context);
+                  final success = await provider.updateUserProfile(
+                    fullName: _fullNameController.text.trim(),
+                    phoneNumber: _phoneController.text.trim(),
+                  );
+                  if (!mounted) return;
+                  navigator.pop();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success ? 'Profile updated successfully.' : provider.errorMessage ?? 'Could not update profile.',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showChangePasswordDialog(BuildContext context, UserProfileProvider provider) async {
+    final currentController = TextEditingController();
+    final newController = TextEditingController();
+    final confirmController = TextEditingController();
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Change password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: currentController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Current password'),
+              ),
+              const SizedBox(height: AppSpacing.m),
+              TextField(
+                controller: newController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'New password'),
+              ),
+              const SizedBox(height: AppSpacing.m),
+              TextField(
+                controller: confirmController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Confirm new password'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () => _performPasswordChange(
-                dialogContext,
-                oldPasswordController.text.trim(),
-                newPasswordController.text.trim(),
-                confirmNewPasswordController.text.trim(),
-              ),
-              child: const Text('Đổi mật khẩu'),
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(dialogContext);
+
+                if (newController.text.trim() != confirmController.text.trim()) {
+                  messenger.showSnackBar(const SnackBar(content: Text('New password does not match.')));
+                  return;
+                }
+
+                final success = await provider.changePassword(
+                  currentPassword: currentController.text.trim(),
+                  newPassword: newController.text.trim(),
+                );
+                if (!mounted) return;
+
+                navigator.pop();
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success ? 'Password updated successfully.' : provider.errorMessage ?? 'Could not change password.',
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Confirm'),
             ),
           ],
         );
       },
     );
   }
+}
 
-  // ✅ FIXED: Extract password change logic to avoid async gap
-  void _performPasswordChange(
-    BuildContext dialogContext,
-    String oldPassword,
-    String newPassword,
-    String confirmNewPassword,
-  ) async {
-    // Validate passwords
-    if (newPassword != confirmNewPassword) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(dialogContext).showSnackBar(
-        const SnackBar(
-          content: Text('Mật khẩu mới không khớp'),
-          backgroundColor: Colors.red,
+class _ProfileHero extends StatelessWidget {
+  const _ProfileHero({required this.profile, required this.onEditPressed});
+
+  final UserProfile? profile;
+  final VoidCallback? onEditPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final name = profile?.fullName?.isNotEmpty == true ? profile!.fullName! : 'HealZone member';
+    final since = profile?.createdAt != null ? profile!.createdAt!.year : DateTime.now().year;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF6F52ED), Color(0xFF8A8E5A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
         ),
-      );
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(dialogContext).showSnackBar(
-        const SnackBar(
-          content: Text('Mật khẩu mới phải có ít nhất 6 ký tự'),
-          backgroundColor: Colors.red,
+        Positioned.fill(
+          child: Image.asset(
+            AppAssets.analysisPlaceholder,
+            fit: BoxFit.cover,
+            color: Colors.black.withOpacityFraction(0.35),
+            colorBlendMode: BlendMode.darken,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
         ),
-      );
-      return;
-    }
-
-    final profileProvider = Provider.of<UserProfileProvider>(context, listen: false);
-    final success = await profileProvider.changePassword(currentPassword: oldPassword, newPassword: newPassword);
-
-    if (!mounted) return;
-
-    if (success) {
-      ScaffoldMessenger.of(dialogContext).showSnackBar(
-        const SnackBar(
-          content: Text('Thay đổi mật khẩu thành công'),
-          backgroundColor: Colors.green,
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: Colors.white.withOpacityFraction(0.18),
+                child: Text(
+                  name.isNotEmpty ? name.characters.first.toUpperCase() : 'U',
+                  style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.m),
+              Text(
+                name,
+                style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Healing journey with HealZone since $since',
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacityFraction(0.85)),
+              ),
+              const SizedBox(height: AppSpacing.m),
+              Wrap(
+                spacing: AppSpacing.s,
+                runSpacing: AppSpacing.s,
+                children: [
+                  InputChip(
+                    backgroundColor: Colors.white.withOpacityFraction(0.16),
+                    avatar: const Icon(Icons.email_outlined, size: 18, color: Colors.white),
+                    label: Text(profile?.email ?? 'Syncing email...', style: const TextStyle(color: Colors.white)),
+                    onPressed: () {},
+                  ),
+                  if (onEditPressed != null)
+                    InputChip(
+                      backgroundColor: Colors.white.withOpacityFraction(0.16),
+                      avatar: const Icon(Icons.edit_outlined, size: 18, color: Colors.white),
+                      label: const Text('Edit profile', style: TextStyle(color: Colors.white)),
+                      onPressed: onEditPressed,
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
-      );
-      Navigator.of(dialogContext).pop();
-    } else {
-      final errorMessage = profileProvider.errorMessage ?? 'Lỗi khi thay đổi mật khẩu';
-      ScaffoldMessenger.of(dialogContext).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+      ],
+    );
   }
 }
 
+class _ProfileSkeleton extends StatelessWidget {
+  const _ProfileSkeleton();
 
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(AppSpacing.xl),
+      child: Column(
+        children: [
+          HzSkeleton.rect(height: 120, width: double.infinity),
+          SizedBox(height: AppSpacing.l),
+          HzSkeleton.rect(height: 64, width: double.infinity),
+          SizedBox(height: AppSpacing.l),
+          HzSkeleton.rect(height: 64, width: double.infinity),
+        ],
+      ),
+    );
+  }
+}
 
+class _QuickStats extends StatelessWidget {
+  const _QuickStats({required this.provider});
+
+  final UserProfileProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final history = provider.skinAnalysisHistory;
+    final latest = history.isNotEmpty ? history.first : null;
+    final strengths = (latest?.analysisResult?['strengths'] as List?)?.length ?? 0;
+    final confidence = ((latest?.analysisResult?['confidenceScore'] ?? 0.0) * 100).round();
+
+    final stats = [
+      _StatItem(
+        icon: Icons.schedule_outlined,
+        title: 'Recent scan',
+        description: latest == null ? 'Waiting for a new scan' : _formatDate(latest.createdAt),
+      ),
+      _StatItem(
+        icon: Icons.star_rate_rounded,
+        title: 'Skin strengths',
+        description: strengths == 0 ? 'Building insights...' : '$strengths highlighted areas',
+      ),
+      _StatItem(
+        icon: Icons.timeline_rounded,
+        title: 'Model confidence',
+        description: latest == null ? 'Pending analysis' : '$confidence%',
+      ),
+    ];
+
+    final isWide = MediaQuery.of(context).size.width > 620;
+    return Wrap(
+      spacing: AppSpacing.l,
+      runSpacing: AppSpacing.l,
+      children: stats
+          .map(
+            (stat) => SizedBox(
+              width: isWide ? (MediaQuery.of(context).size.width / 3) - AppSpacing.xl * 1.8 : double.infinity,
+              child: Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+                elevation: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.l),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(stat.icon, color: AppColors.primary),
+                      const SizedBox(width: AppSpacing.m),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(stat.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              stat.description,
+                              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  String _formatDate(DateTime input) {
+    final date = input.toLocal();
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class _ActionCards extends StatelessWidget {
+  const _ActionCards({required this.onChangePassword});
+
+  final VoidCallback onChangePassword;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.l),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.shield_moon_outlined, color: AppColors.primary),
+                        const SizedBox(width: AppSpacing.m),
+                        Text('Account security', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: onChangePassword,
+                      child: const Text('Change password'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s),
+                Text(
+                  'Refresh your password frequently to keep your account safe.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.l),
+        Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.l),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.auto_graph_outlined, color: AppColors.primary),
+                    const SizedBox(width: AppSpacing.m),
+                    Text('Progress tracking', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.s),
+                Text(
+                  'Run weekly scans so HealZone can tune your regimen with accurate trend data.',
+                  style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HistoryTile extends StatelessWidget {
+  const _HistoryTile({required this.item});
+
+  final SkinAnalysisHistory item;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final statusColor = switch (item.status) {
+      'completed' => AppColors.primary,
+      'pending' => AppColors.warning,
+      'failed' => AppColors.danger,
+      _ => AppColors.textSecondary,
+    };
+
+    final summary = item.analysisResult?['summary'] as String? ??
+        'Detailed summary will appear here once the analysis is complete.';
+
+    return InkWell(
+      onTap: () => context.goNamed(
+        'analysis-detail',
+        pathParameters: {'id': item.id},
+        extra: item,
+      ),
+      borderRadius: BorderRadius.circular(AppRadius.l),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.m),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          boxShadow: AppShadows.mild,
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(AppRadius.l),
+                bottomLeft: Radius.circular(AppRadius.l),
+              ),
+              child: AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Image.asset(
+                  AppAssets.analysisPlaceholder,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: statusColor.withOpacityFraction(0.12),
+                    alignment: Alignment.center,
+                    child: Icon(Icons.image_outlined, color: statusColor),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.l),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.l, horizontal: AppSpacing.s),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Analysis • ${_formatDate(item.createdAt)}',
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      summary,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Chip(
+                      backgroundColor: statusColor.withOpacityFraction(0.18),
+                      labelStyle: theme.textTheme.labelSmall?.copyWith(color: statusColor, fontWeight: FontWeight.w600),
+                      visualDensity: VisualDensity.compact,
+                      label: Text(item.status?.toUpperCase() ?? 'UNKNOWN'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.l),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime input) {
+    final date = input.toLocal();
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}
+
+class _StatItem {
+  const _StatItem({required this.icon, required this.title, required this.description});
+
+  final IconData icon;
+  final String title;
+  final String description;
+}
 
