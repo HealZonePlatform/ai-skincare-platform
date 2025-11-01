@@ -28,11 +28,12 @@ export const DataTable = <T,>({ data, columns, emptyMessage }: DataTableProps<T>
   const [sortState, setSortState] = useState<SortState<T>>({ key: null, direction: 'asc' });
 
   const sortedData = useMemo(() => {
-    if (!sortState.key) return data;
+    const sortKey = sortState.key;
+    if (!sortKey) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = resolveValue(a, sortState.key);
-      const bValue = resolveValue(b, sortState.key);
+      const aValue = resolveValue(a, sortKey);
+      const bValue = resolveValue(b, sortKey);
 
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortState.direction === 'asc' ? aValue - bValue : bValue - aValue;

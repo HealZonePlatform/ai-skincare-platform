@@ -3,8 +3,7 @@ const nextConfig = {
   output: 'export',
   reactStrictMode: true,
   experimental: {
-    typedRoutes: true,
-    serverActions: false
+    typedRoutes: true
   },
   images: {
     unoptimized: true

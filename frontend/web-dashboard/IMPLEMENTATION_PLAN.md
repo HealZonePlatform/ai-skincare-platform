@@ -1,16 +1,16 @@
 # HealZone Web Dashboard – Implementation Plan
 
 ## 0. Foundation
-- [ ] Scaffold Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui baseline
-- [ ] Configure project metadata (`package.json`, `tsconfig.json`, `next.config.js`, `tailwind.config.ts`)
-- [ ] Set up linting & formatting (`eslint`, `prettier`)
-- [ ] Establish absolute import aliases and shared type directory
+- [x] Scaffold Next.js 14 (App Router) + TypeScript + Tailwind baseline
+- [x] Configure project metadata (`package.json`, `tsconfig.json`, `next.config.js`, `tailwind.config.ts`)
+- [x] Set up linting & formatting (`eslint`, `prettier`)
+- [x] Establish absolute import aliases and shared type directory
 
 ## 1. Core Layout & Navigation
-- [ ] `app/layout.tsx` with global providers (theme, auth stub)
-- [ ] Shell layout: sidebar navigation, top bar, responsive breakpoints
-- [ ] Route grouping per role (`(partner)`, `(expert)`, `(admin)`)
-- [ ] Shared UI primitives (`DataTable`, `StatCard`, `Badge`, `StatusPill`)
+- [x] `app/layout.tsx` with global providers (React Query + role context)
+- [x] Dashboard shell: sidebar navigation, top bar, responsive breakpoints
+- [x] Route grouping per role (`(partner)`, `(expert)`, `(admin)`)
+- [x] Shared UI primitives (`DataTable`, `StatCard`, `Badge`, `StatusPill`, buttons, inputs)
 
 ## 2. Authentication & Access Control (stubbed)
 - [ ] Token-aware API client scaffold (`lib/api/client.ts`)
@@ -19,37 +19,37 @@
 - [ ] Mock sign-in flow for local development
 
 ## 3. Partner Module
-- [ ] Overview dashboard (`app/(partner)/dashboard/page.tsx`)
-- [ ] Product catalogue table with filters/sorts
+- [x] Overview dashboard (`/partner/overview`)
+- [x] Product catalogue table with filters/sorts
 - [ ] Product creation wizard (multi-step form, validation)
-- [ ] Partner analytics widgets (traffic, conversion, rating)
+- [x] Partner insights & analytics widgets
 
 ## 4. Expert Module
-- [ ] Review queue page with prioritised list
-- [ ] Product review detail view
+- [x] Review queue page with prioritised list
+- [x] Product review detail view
 - [ ] Review submission form + comment threads
-- [ ] History tab with filters and status pills
+- [x] History tab with filters and status pills
 
 ## 5. Admin Module
-- [ ] System overview dashboard (metrics & alerts)
-- [ ] User management table with CRUD stubs
-- [ ] Approval queue with expert recommendations
-- [ ] Platform settings page (feature flags, thresholds)
+- [x] System overview dashboard (metrics & alerts)
+- [x] User management table with filters
+- [x] Approval queue with expert recommendations
+- [x] Platform settings page (feature flags, thresholds)
+- [x] Reports page for recurring exports
 
 ## 6. Shared Utilities
-- [ ] Query hooks scaffold (`hooks/useProducts`, etc.) using React Query
+- [x] Query hooks scaffold (`useProducts`, `useReviews`, `useUsers`, `usePartnerInsights`)
 - [ ] Validation utilities (Zod schemas)
-- [ ] Formatting helpers (dates, status labels)
+- [ ] Formatting & number/date helpers beyond basics
 
 ## 7. Testing & QA
-- [ ] Configure Jest + Testing Library
+- [x] Configure Jest + Testing Library
 - [ ] Snapshot tests for layout and critical components
 - [ ] Unit tests for utilities and hooks
 - [ ] Manual test checklist documenting primary flows
 
 ## 8. Documentation & DX
-- [ ] Update `README.md` with setup instructions & module overview
-- [ ] Add architecture overview in `docs/05_WEB_DASHBOARD_PLAN.md` appendix
+- [x] Update `README.md` with setup instructions & module overview
+- [ ] Add architecture appendix in `docs/05_WEB_DASHBOARD_PLAN.md`
 - [ ] Document API contract expectations (stubs) for backend team
 - [ ] Create contributor checklist (lint, test, typecheck)
-

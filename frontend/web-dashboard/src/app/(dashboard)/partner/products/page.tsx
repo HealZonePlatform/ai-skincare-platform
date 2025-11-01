@@ -2,33 +2,34 @@
 
 import { useMemo } from 'react';
 import { Filter, Plus } from 'lucide-react';
-import { DataTable } from '@/components/table/DataTable';
+import { ColumnConfig, DataTable } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { StatusPill } from '@/components/common/StatusPill';
 import { useProducts } from '@/hooks/useProducts';
-import { ProductStatus } from '@/types/product';
+import type { Product, ProductStatus } from '@/types/product';
 
 const STATUS_LABELS: Record<ProductStatus | 'all', string> = {
-  all: 'Tất cả',
-  draft: 'Nháp',
-  pending_review: 'Chờ chuyên gia',
-  pending_approval: 'Chờ admin',
-  approved: 'Đã duyệt',
-  rejected: 'Từ chối'
+  all: 'Tat ca',
+  draft: 'Nhap',
+  pending_review: 'Cho chuyen gia',
+  pending_approval: 'Cho admin',
+  approved: 'Da duyet',
+  rejected: 'Tu choi'
 };
 
 export default function PartnerProductsPage() {
-  const { products, search, setSearch, statusFilter, setStatusFilter, statusSummary } = useProducts();
+  const { products, search, setSearch, statusFilter, setStatusFilter, statusSummary } =
+    useProducts();
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnConfig<Product>[]>(
     () => [
       {
         key: 'name',
-        label: 'Sản phẩm',
-        render: (product: (typeof products)[number]) => (
+        label: 'San pham',
+        render: (product) => (
           <div className="flex flex-col">
             <span className="font-medium text-slate-800">{product.name}</span>
             <span className="text-xs text-slate-500">
@@ -39,8 +40,8 @@ export default function PartnerProductsPage() {
       },
       {
         key: 'category',
-        label: 'Danh mục',
-        render: (product: (typeof products)[number]) => (
+        label: 'Danh muc',
+        render: (product) => (
           <Badge variant="muted" className="capitalize">
             {product.category}
           </Badge>
@@ -48,15 +49,15 @@ export default function PartnerProductsPage() {
       },
       {
         key: 'status',
-        label: 'Trạng thái',
-        render: (product: (typeof products)[number]) => <StatusPill status={product.status} />
+        label: 'Trang thai',
+        render: (product) => <StatusPill status={product.status} />
       },
       {
         key: 'metrics.conversionRate',
-        label: 'Tỉ lệ chuyển đổi',
+        label: 'Ti le chuyen doi',
         align: 'center',
         sortable: true,
-        render: (product: (typeof products)[number]) => (
+        render: (product) => (
           <span className="font-semibold text-slate-800">
             {product.metrics.conversionRate.toFixed(1)}%
           </span>
@@ -64,34 +65,33 @@ export default function PartnerProductsPage() {
       },
       {
         key: 'metrics.reviewTimeInHours',
-        label: 'Thời gian duyệt',
+        label: 'Thoi gian duyet',
         align: 'center',
         sortable: true,
-        render: (product: (typeof products)[number]) =>
+        render: (product) =>
           product.metrics.reviewTimeInHours ? `${product.metrics.reviewTimeInHours}h` : '—'
       },
       {
         key: 'updatedAt',
-        label: 'Cập nhật',
-        render: (product: (typeof products)[number]) =>
-          new Date(product.updatedAt).toLocaleString('vi-VN')
+        label: 'Cap nhat',
+        render: (product) => new Date(product.updatedAt).toLocaleString('vi-VN')
       }
     ],
-    [products]
+    []
   );
 
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Quản lý sản phẩm</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Quan ly san pham</h1>
           <p className="text-sm text-slate-500">
-            Theo dõi trạng thái duyệt, chỉ số hiệu suất và tài liệu liên quan.
+            Theo doi trang thai duyet, chi so hieu suat va tai lieu lien quan.
           </p>
         </div>
         <Button>
           <Plus className="h-4 w-4" />
-          Thêm sản phẩm mới
+          Them san pham moi
         </Button>
       </section>
 
@@ -100,12 +100,12 @@ export default function PartnerProductsPage() {
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <Filter className="h-4 w-4" />
-              Lọc nhanh theo trạng thái
+              Loc nhanh theo trang thai
             </div>
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Tìm kiếm theo tên, mã sản phẩm hoặc thương hiệu..."
+              placeholder="Tim theo ten, ma san pham hoac thuong hieu..."
               className="w-full max-w-sm"
             />
           </div>
@@ -133,7 +133,7 @@ export default function PartnerProductsPage() {
           <DataTable
             data={products}
             columns={columns}
-            emptyMessage="Không tìm thấy sản phẩm nào phù hợp với bộ lọc."
+            emptyMessage="Khong tim thay san pham phu hop voi bo loc."
           />
         </CardContent>
       </Card>

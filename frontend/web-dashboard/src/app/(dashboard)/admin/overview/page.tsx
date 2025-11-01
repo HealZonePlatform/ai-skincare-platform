@@ -6,7 +6,7 @@ import { StatusPill } from '@/components/common/StatusPill';
 import { DataTable } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockReviews, mockUsers } from '@/data/mockData';
+import { mockUsers } from '@/data/mockData';
 import { useProducts } from '@/hooks/useProducts';
 import { useReviews } from '@/hooks/useReviews';
 import { useUsers } from '@/hooks/useUsers';
