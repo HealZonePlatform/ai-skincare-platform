@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard đa vai trò - Mỹ phẩm AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Nâng cao từ lần trước */
+        .sidebar-link { transition: all 0.2s ease-in-out; }
+        .sidebar-link:hover { background-color: #eff6ff; color: #2563eb; transform: translateX(4px); }
+        .sidebar-link.active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .sidebar-link.active:hover { background-color: #1d4ed8; transform: translateX(0); }
+        .chart-container { height: 300px; }
+        .card-interactive { transition: all 0.2s ease-in-out; }
+        .card-interactive:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1); }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header chung -->
+    <header class="bg-white shadow-md border-b sticky top-0 z-20">
+        <div class="px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <i id="header-icon" class="fas fa-store text-white"></i>
+                    </div>
+                    <div>
+                        <h1 id="header-title" class="text-xl font-bold text-gray-800">BeautyStore Official</h1>
+                        <p id="header-subtitle" class="text-sm text-gray-500">Store Partner Dashboard</p>
+                    </div>
+                </div>
+
+                <!-- BỘ VAI TRÒ -->
+                <!-- KHỐI AVATAR ĐÃ ĐƯỢC NÂNG CẤP -->
+                <div class="flex items-center space-x-6">
+                    <div class="relative">
+                        <!-- Icon chuông thông báo giữ nguyên -->
+                        <i class="fas fa-bell text-gray-500 text-xl cursor-pointer hover:text-blue-600 transition-colors"></i>
+                        <span class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-xs text-white flex items-center justify-center border-2 border-white">3</span>
+                    </div>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="relative">
+                        <!-- Avatar trigger -->
+                        <button onclick="toggleUserMenu()" class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center ring-2 ring-offset-2 ring-transparent hover:ring-blue-500 transition-all focus:outline-none focus:ring-blue-500">
+                            <img id="user-avatar-img" src="https://i.pravatar.cc/40?u=partner" alt="User Avatar" class="rounded-full">
+                        </button>
+
+                        <!-- Dropdown menu -->
+                        <div id="user-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg py-2 z-30 ring-1 ring-black ring-opacity-5">
+                            <div class="px-4 py-2 border-b">
+                                <p id="user-menu-name" class="font-semibold text-gray-800">BeautyStore Official</p>
+                                <p id="user-menu-role" class="text-sm text-gray-500">Vai trò: Partner</p>
+                            </div>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-user-circle w-6"></i>Hồ sơ của tôi</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-cog w-6"></i>Cài đặt tài khoản</a>
+                            <div class="border-t my-2"></div>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium"><i class="fas fa-sign-out-alt w-6"></i>Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- ===== SIDEBAR CHO PARTNER ===== -->
+        <nav id="sidebar-partner" class="w-64 bg-white shadow-lg h-screen sticky top-0">
+            <div class="p-4">
+                <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Menu</p>
+                <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt w-6 text-center"></i><span class="font-medium">Tổng quan</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('products')"><i class="fas fa-box w-6 text-center"></i><span class="font-medium">Sản phẩm</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('add-product')"><i class="fas fa-plus-circle w-6 text-center"></i><span class="font-medium">Thêm sản phẩm</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('insights')"><i class="fas fa-chart-line w-6 text-center"></i><span class="font-medium">Thống kê</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('messages')"><i class="fas fa-comments w-6 text-center"></i><span class="font-medium">Tin nhắn</span></a></li>
+                </ul>
+                <div class="px-4 pt-8 pb-2 text-xs font-semibold text-gray-400 uppercase">Tài khoản</div>
+                <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg"><i class="fas fa-cog w-6 text-center"></i><span class="font-medium">Cài đặt</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"><i class="fas fa-sign-out-alt w-6 text-center"></i><span class="font-medium">Đăng xuất</span></a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- ===== SIDEBAR CHO PROVIDER ===== -->
+        <nav id="sidebar-expert" class="w-64 bg-white shadow-lg h-screen sticky top-0 hidden">
+            <div class="p-4">
+                <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Duyệt sản phẩm</p>
+                <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('expert-dashboard')"><i class="fas fa-clipboard-check w-6 text-center"></i><span class="font-medium">Bảng điều khiển</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('expert-queue')"><i class="fas fa-tasks w-6 text-center"></i><span class="font-medium">Hàng đợi duyệt</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('expert-history')"><i class="fas fa-history w-6 text-center"></i><span class="font-medium">Lịch sử duyệt</span></a></li>
+                </ul>
+                <div class="px-4 pt-8 pb-2 text-xs font-semibold text-gray-400 uppercase">Tài khoản</div>
+                 <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg"><i class="fas fa-user-cog w-6 text-center"></i><span class="font-medium">Tài khoản</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"><i class="fas fa-sign-out-alt w-6 text-center"></i><span class="font-medium">Đăng xuất</span></a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- ===== SIDEBAR CHO ADMIN ===== -->
+        <nav id="sidebar-admin" class="w-64 bg-white shadow-lg h-screen sticky top-0 hidden">
+            <div class="p-4">
+                <p class="px-4 pt-4 pb-2 text-xs font-semibold text-gray-400 uppercase">Quản trị hệ thống</p>
+                <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link active flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-dashboard')"><i class="fas fa-user-shield w-6 text-center"></i><span class="font-medium">Tổng quan Admin</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-users')"><i class="fas fa-users-cog w-6 text-center"></i><span class="font-medium">Quản lý người dùng</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-products')"><i class="fas fa-sitemap w-6 text-center"></i><span class="font-medium">Quản lý sản phẩm</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-analytics')"><i class="fas fa-chart-pie w-6 text-center"></i><span class="font-medium">Phân tích hệ thống</span></a></li>
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-settings')"><i class="fas fa-cogs w-6 text-center"></i><span class="font-medium">Cài đặt nền tảng</span></a></li>
+                    <li>
+                      <a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg" onclick="showSection('admin-approval-queue')">
+                          <i class="fas fa-stamp w-6 text-center"></i>
+                          <span class="font-medium">Xác nhận duyệt</span>
+                          <span class="ml-auto w-5 h-5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full flex items-center justify-center">2</span>
+                      </a>
+                    </li>
+                </ul>
+                 <div class="px-4 pt-8 pb-2 text-xs font-semibold text-gray-400 uppercase">Tài khoản</div>
+                 <ul class="space-y-2">
+                    <li><a href="#" class="sidebar-link flex items-center space-x-3 p-3 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-600"><i class="fas fa-sign-out-alt w-6 text-center"></i><span class="font-medium">Đăng xuất</span></a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <main class="flex-1 p-8">
+            <div id="partner-view">
+                <!-- Partner Dashboard -->
+                <div id="dashboard" class="section">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Tổng quan cửa hàng</h2>
+                        <p class="text-gray-500">Dữ liệu được cập nhật lần cuối lúc 10:45 AM, hôm nay.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Tổng sản phẩm</p><p class="text-3xl font-bold text-gray-800 mt-1">24</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-box text-blue-600 text-xl"></i></div></div></div>
+                        <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Đã duyệt</p><p class="text-3xl font-bold text-green-600 mt-1">18</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check-circle text-green-600 text-xl"></i></div></div></div>
+                        <a href="#" onclick="navigateToProductsWithFilter('pending')" class="block bg-white p-6 rounded-xl shadow-md card-interactive ring-2 ring-transparent hover:ring-yellow-500 transition-all"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Chờ duyệt</p><p class="text-3xl font-bold text-yellow-500 mt-1">3</p></div><div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"><i class="fas fa-clock text-yellow-500 text-xl"></i></div></div></a>
+                        <a href="#" onclick="navigateToProductsWithFilter('rejected')" class="block bg-white p-6 rounded-xl shadow-md card-interactive ring-2 ring-transparent hover:ring-red-500 transition-all"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Bị từ chối</p><p class="text-3xl font-bold text-red-600 mt-1">3</p></div><div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center"><i class="fas fa-times-circle text-red-600 text-xl"></i></div></div></a>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Hiệu suất tương tác (7 ngày qua)</h3>
+                                <div class="flex items-center space-x-2 p-1 bg-gray-100 rounded-lg">
+                                    <button id="perf-btn-views" class="px-3 py-1 text-sm font-medium rounded-md bg-white text-blue-600 shadow-sm">Lượt xem</button>
+                                    <button id="perf-btn-clicks" class="px-3 py-1 text-sm font-medium rounded-md text-gray-600">Lượt click</button>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="partnerPerformanceChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Cần hành động ngay</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-start space-x-4 p-4 bg-red-50 rounded-lg border-l-4 border-red-400"><div class="w-10 h-10 bg-red-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-exclamation-triangle text-red-600"></i></div><div><p class="font-medium text-gray-800">Sản phẩm <span class="font-bold">"Toner BHA"</span> bị từ chối.</p><a href="#" onclick="showSection('messages')" class="text-sm text-blue-600 font-semibold hover:underline">Xem lý do & Gửi lại</a></div></div>
+                                <div class="flex items-start space-x-4 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400"><div class="w-10 h-10 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-star-half-alt text-yellow-600"></i></div><div><p class="font-medium text-gray-800">Sản phẩm <span class="font-bold">"Serum HA"</span> có rating thấp (2.5/5).</p><a href="#" class="text-sm text-blue-600 font-semibold hover:underline">Xem đánh giá & phản hồi</a></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Partner Products -->
+                <div id="products" class="section hidden">
+                    <div class="flex justify-between items-center mb-6"><div><h2 class="text-3xl font-bold text-gray-800 mb-1">Quản lý Sản phẩm</h2><p class="text-gray-500">Xem, tìm kiếm, và quản lý toàn bộ sản phẩm của bạn.</p></div><button onclick="showSection('add-product')" class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all"><i class="fas fa-plus mr-2"></i>Thêm sản phẩm mới</button></div>
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-4"><div class="md:col-span-2 relative"><i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i><input id="product-search-input" type="text" placeholder="Tìm theo tên hoặc ID sản phẩm..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></div><select id="product-filter-status" class="px-4 py-2 border rounded-lg"><option value="all">Tất cả trạng thái</option><option value="approved">Đã duyệt</option><option value="pending">Chờ duyệt</option><option value="rejected">Bị từ chối</option></select><select id="product-sort-by" class="px-4 py-2 border rounded-lg"><option value="newest">Sắp xếp: Mới nhất</option><option value="views_desc">Sắp xếp: Lượt xem giảm dần</option><option value="views_asc">Sắp xếp: Lượt xem tăng dần</option></select></div></div>
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="p-4 text-left"><input type="checkbox" class="rounded"></th><th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm</th><th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th><th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase flex items-center justify-end space-x-2"><span id="views-column-header">Lượt xem (7d)</span><select id="product-views-timeframe" class="text-xs border-none bg-transparent focus:ring-0 p-0"><option value="7d">7d</option><option value="30d">30d</option><option value="90d">90d</option></select></th><th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Rating</th><th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th></tr></thead><tbody id="products-table-body" class="divide-y divide-gray-200"></tbody></table></div>
+                    <div class="flex justify-between items-center mt-4"><p id="pagination-info" class="text-sm text-gray-600"></p><div id="pagination-controls" class="flex items-center space-x-1"></div></div>
+                </div>
+                <div id="add-product" class="section hidden">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Thêm sản phẩm mới</h2>
+                        <p class="text-gray-500">Cung cấp thông tin chi tiết để AI phân tích và xếp hạng sản phẩm của bạn.</p>
+                    </div>
+
+                    <!-- Layout 2 cột -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- CỘT BÊN TRÁI: FORM NHẬP LIỆU -->
+                        <div class="lg:col-span-2 space-y-8">
+
+                            <!-- Card 1: Thông tin cơ bản -->
+                            <div class="bg-white p-8 rounded-xl shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1">1. Thông tin cơ bản</h3>
+                                <p class="text-gray-500 mb-6">Tên, thương hiệu và hình ảnh đại diện cho sản phẩm.</p>
+                                <div class="space-y-6">
+                                    <!-- Tên sản phẩm & Thương hiệu -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="add-product-name" class="block text-sm font-medium text-gray-700 mb-2">Tên sản phẩm <span class="text-red-500">*</span></label>
+                                            <input type="text" id="add-product-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="VD: Serum The Ordinary Niacinamide 10%">
+                                        </div>
+                                        <div>
+                                            <label for="add-product-brand" class="block text-sm font-medium text-gray-700 mb-2">Thương hiệu <span class="text-red-500">*</span></label>
+                                            <input type="text" id="add-product-brand" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="VD: The Ordinary">
+                                        </div>
+                                    </div>
+                                    <!-- Upload ảnh -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Ảnh sản phẩm <span class="text-red-500">*</span></label>
+                                        <div id="image-previews-container" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-4">
+                                            <!-- Thumbnails ảnh đã upload sẽ hiện ở đây -->
+                                        </div>
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                            <p class="text-gray-600">Kéo thả ảnh hoặc <span class="font-semibold text-blue-600">chọn file</span></p>
+                                            <p class="text-xs text-gray-500 mt-2">PNG, JPG, WEBP. Ảnh đầu tiên là ảnh đại diện.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Phân tích thành phần -->
+                            <div class="bg-white p-8 rounded-xl shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1">2. Phân tích thành phần (INCI)</h3>
+                                <p class="text-gray-500 mb-6">Dán danh sách thành phần để AI tự động phân tích và đánh giá.</p>
+                                <div>
+                                    <label for="add-product-inci" class="block text-sm font-medium text-gray-700 mb-2">Danh sách thành phần (cách nhau bởi dấu phẩy) <span class="text-red-500">*</span></label>
+                                    <textarea id="add-product-inci" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="VD: Aqua, Glycerin, Niacinamide, Alcohol Denat, ..."></textarea>
+                                    <p id="inci-analysis-summary" class="text-sm text-gray-600 mt-2 h-5"></p>
+                                    <div id="inci-tags-container" class="mt-4 flex flex-wrap gap-2">
+                                        <!-- Các tag thành phần sẽ hiện ở đây -->
+                                    </div>
+                                </div>
+                            </div>
+
+                             <!-- Card 3: Chi tiết bán hàng -->
+                            <div class="bg-white p-8 rounded-xl shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1">3. Chi tiết bán hàng</h3>
+                                <p class="text-gray-500 mb-6">Cung cấp các thuộc tính và liên kết để người dùng tìm mua.</p>
+                                <div class="space-y-6">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Công dụng chính</label>
+                                            <select id="add-product-use" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"><option>Chọn công dụng</option></select>
+                                        </div>
+                                        <div>
+                                             <label for="add-product-link" class="block text-sm font-medium text-gray-700 mb-2">Link bán chính thức <span class="text-red-500">*</span></label>
+                                            <input type="url" id="add-product-link" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://shopee.vn/product/...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Tài liệu & Chứng nhận -->
+                            <div class="bg-white p-8 rounded-xl shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1">4. Tài liệu & Chứng nhận</h3>
+                                <p class="text-gray-500 mb-6">Tải lên các tài liệu để chứng minh nguồn gốc và chất lượng sản phẩm.</p>
+                                <div class="space-y-4">
+                                    <!-- Mục upload Phiếu công bố (Bắt buộc) -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Phiếu công bố sản phẩm <span class="text-red-500">*</span></label>
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500">
+                                            <i class="fas fa-file-upload text-3xl text-gray-400 mb-2"></i>
+                                            <p class="text-sm text-gray-600">Tải lên file PDF/JPG</p>
+                                            <p class="text-xs text-gray-500 mt-1">Đây là tài liệu bắt buộc để lưu hành tại Việt Nam.</p>
+                                        </div>
+                                    </div>
+                                    <!-- Mục upload Tài liệu khác (Không bắt buộc) -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tài liệu khác (COA, CFS, v.v.)</label>
+                                         <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500">
+                                            <i class="fas fa-file-upload text-3xl text-gray-400 mb-2"></i>
+                                            <p class="text-sm text-gray-600">Tải lên các file bổ sung</p>
+                                            <p class="text-xs text-gray-500 mt-1">Không bắt buộc, nhưng giúp duyệt nhanh hơn.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- CỘT BÊN PHẢI: AI ASSISTANT & CHECKLIST -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white p-6 rounded-xl shadow-md sticky top-24">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-clipboard-check text-blue-600 mr-3"></i>Danh sách kiểm tra
+                                </h3>
+                                <ul id="submission-checklist" class="space-y-3">
+                                    <li id="check-name" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Nhập tên sản phẩm (tối thiểu 5 ký tự)</span></li>
+                                    <li id="check-brand" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Nhập tên thương hiệu</span></li>
+                                    <li id="check-images" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Tải lên ít nhất 1 ảnh</span></li>
+                                    <li id="check-inci" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Nhập ít nhất 5 thành phần</span></li>
+                                    <li id="check-link" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Nhập link bán hàng hợp lệ</span></li>
+                                    <li id="check-docs" class="flex items-center text-gray-500 transition-colors"><i class="far fa-circle w-6"></i><span>Tải lên Phiếu công bố</span></li>
+                                </ul>
+                                <div class="border-t my-6"></div>
+                                <button id="submit-product-button" type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed">
+                                    Gửi đi duyệt
+                                </button>
+                                <p class="text-xs text-gray-500 text-center mt-3">Bạn có thể gửi khi tất cả các mục đã được đánh dấu.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="expert-view" class="hidden">
+                <!-- BẮT ĐẦU KHỐI CODE MỚI CHO DASHBOARD CỦA EXPERT -->
+                <div id="expert-dashboard" class="section">
+                    <!-- Header -->
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Bảng điều khiển Chuyên gia</h2>
+                        <p class="text-gray-500">Tổng quan về hiệu suất và hàng đợi duyệt sản phẩm của bạn.</p>
+                    </div>
+
+                    <!-- 1. Stats Cards tập trung vào Chất lượng & Hiệu suất thực tế -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Hàng đợi -->
+                        <a href="#" onclick="showSection('expert-queue')" class="block bg-white p-6 rounded-xl shadow-md card-interactive ring-2 ring-transparent hover:ring-blue-500 transition-all">
+                            <div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Sản phẩm chờ duyệt</p><p class="text-3xl font-bold text-blue-600 mt-1">12</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-inbox text-blue-600 text-xl"></i></div></div>
+                        </a>
+                        <!-- Hiệu suất (Số lượng hợp lý) -->
+                        <div class="bg-white p-6 rounded-xl shadow-md card-interactive">
+                            <div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Đã xử lý (hôm nay)</p><p class="text-3xl font-bold text-green-600 mt-1">8</p></div><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center"><i class="fas fa-check-double text-green-600 text-xl"></i></div></div>
+                        </div>
+                        <!-- Thời gian duyệt (Thực tế hơn) -->
+                        <div class="bg-white p-6 rounded-xl shadow-md card-interactive">
+                            <div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Thời gian xử lý trung bình</p><p class="text-3xl font-bold text-yellow-500 mt-1">45 phút</p></div><div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center"><i class="fas fa-hourglass-half text-yellow-500 text-xl"></i></div></div>
+                        </div>
+                        <!-- Tỉ lệ duyệt thành công (Chỉ số chất lượng) -->
+                        <div class="bg-white p-6 rounded-xl shadow-md card-interactive">
+                            <div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Tỉ lệ duyệt thành công</p><p class="text-3xl font-bold text-purple-600 mt-1">85%</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-thumbs-up text-purple-600 text-xl"></i></div></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Bố cục chính: Hàng đợi ưu tiên & Công cụ hỗ trợ -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Cột trái: Hàng đợi ưu tiên -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Hàng đợi ưu tiên</h3>
+                                <a href="#" onclick="showSection('expert-queue')" class="text-sm font-medium text-blue-600 hover:underline">Xem tất cả</a>
+                            </div>
+                            <!-- Bảng hàng đợi -->
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-gray-50"><tr><th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm & Đối tác</th><th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Thời gian chờ</th><th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Độ phức tạp (AI)</th><th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase"></th></tr></thead>
+                                    <tbody class="divide-y divide-gray-200">
+                                        <!-- Sản phẩm 1: Chờ lâu, phức tạp -->
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="p-4"><div class="font-medium text-gray-900">Serum Retinol 1% nồng độ cao</div><div class="text-sm text-gray-500">từ <span class="font-semibold">Paula's Choice Official</span></div></td>
+                                            <td class="p-4 text-sm text-red-600 font-medium">2 ngày</td>
+                                            <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Cao</span></td>
+                                            <td class="p-4 text-center"><button class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm">Bắt đầu duyệt</button></td>
+                                        </tr>
+                                        <!-- Sản phẩm 2: Mới, dễ -->
+                                         <tr class="hover:bg-gray-50">
+                                            <td class="p-4"><div class="font-medium text-gray-900">Son dưỡng môi không màu</div><div class="text-sm text-gray-500">từ <span class="font-semibold">DHC Vietnam</span></div></td>
+                                            <td class="p-4 text-sm text-gray-700">3 giờ</td>
+                                            <td class="p-4 text-center"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Thấp</span></td>
+                                            <td class="p-4 text-center"><button class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm">Bắt đầu duyệt</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Cột phải: Công cụ & Tài nguyên -->
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Công cụ cho Chuyên gia</h3>
+                            <div class="space-y-3">
+                                <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-book w-8 text-center text-xl text-blue-600"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Cơ sở dữ liệu thành phần</p>
+                                        <p class="text-sm text-gray-500">Tra cứu INCI, công dụng, rủi ro</p>
+                                    </div>
+                                </a>
+                                 <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-file-signature w-8 text-center text-xl text-green-600"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Quy tắc & Tiêu chuẩn duyệt</p>
+                                        <p class="text-sm text-gray-500">Tài liệu hướng dẫn của hệ thống</p>
+                                    </div>
+                                </a>
+                                 <a href="#" class="flex items-center p-3 rounded-lg hover:bg-gray-100">
+                                    <i class="fas fa-comments w-8 text-center text-xl text-yellow-500"></i>
+                                    <div>
+                                        <p class="font-medium text-gray-800">Kênh trao đổi nội bộ</p>
+                                        <p class="text-sm text-gray-500">Thảo luận với các chuyên gia khác</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KẾT THÚC KHỐI CODE MỚI -->
+
+                <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG HÀNG ĐỢI DUYỆT -->
+                <div id="expert-queue" class="section hidden">
+                    <!-- Header -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-1">Hàng đợi duyệt sản phẩm</h2>
+                            <p class="text-gray-500">Xem xét và phê duyệt các sản phẩm mới được gửi lên từ đối tác.</p>
+                        </div>
+                        <!-- Bộ lọc cho trang hàng đợi -->
+                        <div class="flex items-center space-x-4">
+                             <select id="queue-filter-complexity" class="px-4 py-2 border rounded-lg bg-white">
+                                <option value="all">Tất cả độ phức tạp</option>
+                                <option value="high">Cao</option>
+                                <option value="medium">Trung bình</option>
+                                <option value="low">Thấp</option>
+                            </select>
+                            <input type="text" placeholder="Tìm kiếm theo tên sản phẩm, đối tác..." class="w-72 px-4 py-2 border rounded-lg bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Bảng danh sách sản phẩm chờ duyệt -->
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm & Đối tác</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Ngày gửi</th>
+                                    <th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Độ phức tạp (AI)</th>
+                                    <th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <!-- Dữ liệu sẽ được JS render vào đây -->
+                            <tbody id="expert-queue-table-body" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- KẾT THÚC KHỐI CODE MỚI -->
+
+                <!-- THÊM MỚI SECTION NÀY VÀO BÊN TRONG expert-view -->
+                <div id="expert-review-detail" class="section hidden">
+                    <!-- Header với nút Back và thông tin sản phẩm -->
+                    <div class="flex items-center justify-between mb-6">
+                        <button onclick="showSection('expert-queue')" class="flex items-center text-sm font-semibold text-gray-600 hover:text-blue-600">
+                            <i class="fas fa-arrow-left mr-2"></i> Quay lại hàng đợi
+                        </button>
+                        <div class="text-right">
+                            <h2 class="text-xl font-bold text-gray-800">Đang duyệt: Serum Retinol 1%</h2>
+                            <p class="text-sm text-gray-500">từ <span class="font-semibold">Paula's Choice Official</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Layout 2 cột: Thông tin sản phẩm & Form duyệt -->
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <!-- Cột trái: Thông tin sản phẩm do Partner cung cấp -->
+                        <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-3">Thông tin sản phẩm</h3>
+                            <!-- NÂNG CẤP: Dùng grid để hiển thị thông tin gọn hơn -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                <div class="md:col-span-2">
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Tên sản phẩm</p>
+                                    <p class="font-medium text-gray-900 mt-1">Serum Retinol 1% nồng độ cao</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Thương hiệu</p>
+                                    <p class="font-medium text-gray-900 mt-1">Paula's Choice Official</p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Link bán hàng</p>
+                                    <a href="#" class="font-medium text-blue-600 hover:underline break-all mt-1 block">https://shopee.vn/paulaschoice/...</a>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <p class="text-xs text-gray-500 uppercase font-semibold">Bảng thành phần (INCI)</p>
+                                    <p class="font-mono text-sm bg-gray-100 p-3 rounded-md mt-1">Aqua, Dimethicone, Glycerin, Butylene Glycol, Isononyl Isononanoate, Castor Isostearate Succinate, Glyceryl Stearate, C12-15 Alkyl Benzoate, Dimethicone Crosspolymer, PEG-100 Stearate, Retinol (1%), ...</p>
+                                </div>
+
+                                <!-- **ĐÂY LÀ PHẦN NÂNG CẤP QUAN TRỌNG** -->
+                                <div class="md:col-span-2 pt-4 border-t">
+                                    <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Tài liệu & Chứng nhận do Partner cung cấp</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <!-- Tài liệu 1: Phiếu công bố -->
+                                        <a href="#" class="group flex items-center p-3 bg-gray-50 rounded-lg border hover:bg-blue-50 hover:border-blue-300">
+                                            <i class="fas fa-file-pdf text-2xl text-red-500 mr-3"></i>
+                                            <div>
+                                                <p class="font-semibold text-sm text-gray-800 group-hover:text-blue-700">Phiếu công bố sản phẩm.pdf</p>
+                                                <p class="text-xs text-gray-500">Bắt buộc</p>
+                                            </div>
+                                        </a>
+                                        <!-- Tài liệu 2: Chứng nhận thành phần -->
+                                        <a href="#" class="group flex items-center p-3 bg-gray-50 rounded-lg border hover:bg-blue-50 hover:border-blue-300">
+                                            <i class="fas fa-file-alt text-2xl text-gray-400 mr-3"></i>
+                                            <div>
+                                                <p class="font-semibold text-sm text-gray-800 group-hover:text-blue-700">COA-Retinol-1-percent.pdf</p>
+                                                <p class="text-xs text-gray-500">Không bắt buộc</p>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Cột phải: Form duyệt của Expert -->
+                        <div class="lg:col-span-2">
+                             <div class="bg-white p-6 rounded-xl shadow-md sticky top-24">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-3">Bảng đề xuất</h3>
+                                <div class="space-y-6">
+                                    <!-- Thêm mục chọn Đề xuất -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Đề xuất của bạn <span class="text-red-500">*</span></label>
+                                        <select class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+                                            <option disabled selected>-- Chọn một quyết định --</option>
+                                            <option value="approve">Phê duyệt</option>
+                                            <option value="reject">Từ chối</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú cho Admin (bắt buộc nếu từ chối)</label>
+                                        <textarea rows="4" class="w-full px-4 py-2 border rounded-lg" placeholder="Giải thích rõ lý do đề xuất của bạn..."></textarea>
+                                    </div>
+                                    <!-- Nút bấm được cập nhật -->
+                                    <div class="pt-2">
+                                        <button class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                                            <i class="fas fa-paper-plane mr-2"></i>Gửi đề xuất cho Admin
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG LỊCH SỬ DUYỆT CỦA EXPERT -->
+                <div id="expert-history" class="section hidden">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Lịch sử đề xuất</h2>
+                        <p class="text-gray-500">Tra cứu lại các đề xuất bạn đã gửi và phản hồi từ Admin.</p>
+                    </div>
+
+                    <!-- Bộ lọc & Tìm kiếm -->
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="md:col-span-2 relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input id="history-search-input" type="text" placeholder="Tìm kiếm theo tên sản phẩm, đối tác..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <select id="history-filter-recommendation" class="px-4 py-2 border rounded-lg">
+                                <option value="all">Tất cả đề xuất</option>
+                                <option value="approve">Đề xuất Phê duyệt</option>
+                                <option value="reject">Đề xuất Từ chối</option>
+                            </select>
+                             <select id="history-filter-admin-status" class="px-4 py-2 border rounded-lg">
+                                <option value="all">Tất cả phản hồi</option>
+                                <option value="confirmed">Admin đã xác nhận</option>
+                                <option value="overridden">Admin đã ghi đè</option>
+                                <option value="pending">Đang chờ Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Bảng lịch sử -->
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm & Đối tác</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Ngày gửi đề xuất</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Đề xuất của bạn</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Phản hồi từ Admin</th>
+                                </tr>
+                            </thead>
+                            <!-- Dữ liệu sẽ được JS render vào đây -->
+                            <tbody id="expert-history-table-body" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+
+                     <!-- Phân trang -->
+                    <div class="flex justify-between items-center mt-4">
+                        <p id="history-pagination-info" class="text-sm text-gray-600"></p>
+                        <div id="history-pagination-controls" class="flex items-center space-x-1"></div>
+                    </div>
+                </div>
+                <!-- KẾT THÚC KHỐI CODE MỚI -->
+
+            </div>
+            <!-- ===== NỘI DUNG CHO ADMIN ===== -->
+            <div id="admin-view" class="hidden">
+                <div id="admin-dashboard" class="section">
+                  <!-- Header -->
+                  <div class="mb-8">
+                      <h2 class="text-3xl font-bold text-gray-800 mb-1">Tổng quan Quản trị viên</h2>
+                      <p class="text-gray-500">Thống kê toàn bộ hoạt động trên nền tảng, cập nhật lúc 10:30 AM.</p>
+                  </div>
+
+                  <!-- Stats Cards with Trends -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                      <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Tổng Đối tác</p><p class="text-3xl font-bold text-indigo-600 mt-1">1,204</p><p class="text-xs text-green-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-up mr-1"></i> 2.5% so với tháng trước</p></div><div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center"><i class="fas fa-handshake text-indigo-600 text-xl"></i></div></div></div>
+                      <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Tổng Sản phẩm</p><p class="text-3xl font-bold text-purple-600 mt-1">25,839</p><p class="text-xs text-green-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-up mr-1"></i> 15% so với tháng trước</p></div><div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center"><i class="fas fa-boxes text-purple-600 text-xl"></i></div></div></div>
+                      <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Sản phẩm chờ duyệt</p><p class="text-3xl font-bold text-blue-600 mt-1">12</p><p class="text-xs text-red-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-down mr-1"></i> 5% so với hôm qua</p></div><div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><i class="fas fa-inbox text-blue-600 text-xl"></i></div></div></div>
+                      <div class="bg-white p-6 rounded-xl shadow-md card-interactive"><div class="flex items-center justify-between"><div><p class="text-sm font-medium text-gray-500">Doanh thu (tháng)</p><p class="text-3xl font-bold text-teal-600 mt-1">$15,6K</p><p class="text-xs text-gray-500 font-semibold mt-2 flex items-center">Tính năng sắp ra mắt</p></div><div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center"><i class="fas fa-dollar-sign text-teal-600 text-xl"></i></div></div></div>
+                  </div>
+
+                  <!-- Charts & Recent Activities -->
+                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <!-- Main Chart -->
+                      <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                          <h3 class="text-lg font-semibold text-gray-800 mb-4">Tăng trưởng người dùng & sản phẩm (6 tháng)</h3>
+                          <div class="chart-container">
+                              <canvas id="adminGrowthChart"></canvas>
+                          </div>
+                      </div>
+                      <!-- Recent Activities Log -->
+                      <div class="bg-white p-6 rounded-xl shadow-md">
+                          <h3 class="text-lg font-semibold text-gray-800 mb-4">Hoạt động quan trọng</h3>
+                          <div class="space-y-4">
+                              <div class="flex items-start space-x-4"><div class="w-10 h-10 bg-green-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-user-plus text-green-600"></i></div><div><p class="font-medium text-gray-800">Partner mới <span class="font-bold">"The Ordinary VN"</span> đã đăng ký.</p><p class="text-sm text-gray-500">15 phút trước</p></div></div>
+                              <div class="flex items-start space-x-4"><div class="w-10 h-10 bg-yellow-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-cogs text-yellow-600"></i></div><div><p class="font-medium text-gray-800">Admin <span class="font-bold">Trần Minh Tuấn</span> đã cập nhật <span class="font-bold">"Quy tắc duyệt"</span>.</p><p class="text-sm text-gray-500">2 giờ trước</p></div></div>
+                              <div class="flex items-start space-x-4"><div class="w-10 h-10 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-check-double text-blue-600"></i></div><div><p class="font-medium text-gray-800">Expert <span class="font-bold">Nguyễn Thị An</span> đã duyệt 50 sản phẩm.</p><p class="text-sm text-gray-500">Hôm qua</p></div></div>
+                               <div class="flex items-start space-x-4"><div class="w-10 h-10 bg-red-100 rounded-full flex-shrink-0 flex items-center justify-center mt-1"><i class="fas fa-exclamation-triangle text-red-600"></i></div><div><p class="font-medium text-gray-800">Hệ thống ghi nhận 5 lần đăng nhập thất bại vào tài khoản Admin.</p><p class="text-sm text-gray-500">Hôm qua</p></div></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+                <div id="admin-users" class="section hidden">
+                    <!-- Header & Action Button -->
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-1">Quản lý người dùng</h2>
+                            <p class="text-gray-500">Thêm, sửa, và quản lý tất cả người dùng trên hệ thống.</p>
+                        </div>
+                        <button class="px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all">
+                            <i class="fas fa-plus mr-2"></i>Thêm người dùng mới
+                        </button>
+                    </div>
+
+                    <!-- Filters and Search -->
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="relative flex-1">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" placeholder="Tìm kiếm theo tên hoặc email..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <select class="px-4 py-2 border rounded-lg">
+                                <option>Lọc theo vai trò</option>
+                                <option>Admin</option>
+                                <option>Expert</option>
+                                <option>Partner</option>
+                            </select>
+                            <select class="px-4 py-2 border rounded-lg">
+                                <option>Lọc theo trạng thái</option>
+                                <option>Hoạt động</option>
+                                <option>Bị khóa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase"><input type="checkbox" class="rounded"></th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Người dùng</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Vai trò</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Lần cuối hoạt động</th>
+                                    <th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <!-- Sample Row 1: Admin -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-4"><input type="checkbox" class="rounded"></td>
+                                    <td class="p-4"><div class="flex items-center"><img src="https://i.pravatar.cc/40?u=admin" class="w-10 h-10 rounded-full mr-3"><div class="font-medium text-gray-900">Trần Minh Tuấn</div></div></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Admin</span></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Hoạt động</span></td>
+                                    <td class="p-4 text-sm text-gray-700">2 phút trước</td>
+                                    <td class="p-4 text-center"><button class="text-gray-500 hover:text-blue-600 p-2"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                 <!-- Sample Row 2: Provider -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-4"><input type="checkbox" class="rounded"></td>
+                                    <td class="p-4"><div class="flex items-center"><img src="https://i.pravatar.cc/40?u=expert" class="w-10 h-10 rounded-full mr-3"><div class="font-medium text-gray-900">Nguyễn Thị An</div></div></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Expert</span></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Hoạt động</span></td>
+                                    <td class="p-4 text-sm text-gray-700">1 giờ trước</td>
+                                    <td class="p-4 text-center"><button class="text-gray-500 hover:text-blue-600 p-2"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                 <!-- Sample Row 3: Partner (Locked) -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="p-4"><input type="checkbox" class="rounded"></td>
+                                    <td class="p-4"><div class="flex items-center"><img src="https://i.pravatar.cc/40?u=locked" class="w-10 h-10 rounded-full mr-3"><div class="font-medium text-gray-900">Innisfree Official</div></div></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Partner</span></td>
+                                    <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Bị khóa</span></td>
+                                    <td class="p-4 text-sm text-gray-700">3 ngày trước</td>
+                                    <td class="p-4 text-center"><button class="text-gray-500 hover:text-blue-600 p-2"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex justify-between items-center mt-4">
+                        <p class="text-sm text-gray-600">Hiển thị <span class="font-semibold">1-3</span> trên <span class="font-semibold">1,204</span> kết quả</p>
+                        <div class="flex items-center space-x-1"><button class="px-3 py-1 border rounded-lg hover:bg-gray-100">Trước</button><button class="px-3 py-1 border rounded-lg bg-blue-600 text-white">1</button><button class="px-3 py-1 border rounded-lg hover:bg-gray-100">2</button><button class="px-3 py-1 border rounded-lg hover:bg-gray-100">3</button><button class="px-3 py-1 border rounded-lg hover:bg-gray-100">Sau</button></div>
+                    </div>
+                </div>
+                <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG QUẢN LÝ SẢN PHẨM CỦA ADMIN -->
+                <div id="admin-products" class="section hidden">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Quản lý Sản phẩm Toàn hệ thống</h2>
+                        <p class="text-gray-500">Xem, tìm kiếm và thực hiện các hành động quản trị trên tất cả sản phẩm.</p>
+                    </div>
+
+                    <!-- Bộ lọc nâng cao -->
+                    <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div class="md:col-span-2 relative">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input id="admin-product-search" type="text" placeholder="Tìm theo tên sản phẩm, ID, INCI..." class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <select id="admin-product-filter-partner" class="px-4 py-2 border rounded-lg">
+                                <option value="all">Tất cả Đối tác</option>
+                                <!-- JS sẽ điền các đối tác vào đây -->
+                            </select>
+                            <select id="admin-product-filter-expert" class="px-4 py-2 border rounded-lg">
+                                <option value="all">Tất cả Chuyên gia</option>
+                                 <option value="an_nguyen">Dr. Nguyễn An</option>
+                            </select>
+                             <select id="admin-product-filter-status" class="px-4 py-2 border rounded-lg">
+                                <option value="all">Tất cả trạng thái</option>
+                                <option value="approved">Đã phê duyệt</option>
+                                <option value="rejected">Đã từ chối</option>
+                                <option value="pending_review">Chờ Expert duyệt</option>
+                                <option value="pending_final_approval">Chờ Admin xác nhận</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Bảng sản phẩm toàn hệ thống -->
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm & Đối tác</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Ngày gửi</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Người duyệt/Xác nhận</th>
+                                    <th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <!-- Dữ liệu sẽ được JS render vào đây -->
+                            <tbody id="admin-products-table-body" class="divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Phân trang -->
+                    <div id="admin-products-pagination" class="flex justify-between items-center mt-4">
+                        <!-- JS sẽ render phân trang vào đây -->
+                    </div>
+                </div>
+                <!-- KẾT THÚC KHỐI CODE MỚI -->
+                <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG PHÂN TÍCH HỆ THỐNG CỦA ADMIN -->
+                <div id="admin-analytics" class="section hidden">
+                    <!-- Header & Bộ lọc thời gian chính -->
+                    <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-1">Phân tích Hệ thống</h2>
+                            <p class="text-gray-500">Xem các báo cáo và xu hướng tổng quan của nền tảng.</p>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm border">
+                            <i class="fas fa-calendar-alt text-gray-500 ml-2"></i>
+                            <select id="analytics-timeframe-selector" class="border-none bg-transparent focus:ring-0 font-medium text-gray-700">
+                                <option value="30d">30 ngày qua</option>
+                                <option value="90d">90 ngày qua</option>
+                                <option value="this_year">Năm nay</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Section 1: Tăng trưởng người dùng -->
+                    <div class="mb-12">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">1. Tăng trưởng Người dùng</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Card KPI -->
+                            <div class="bg-white p-6 rounded-xl shadow-md"><p class="text-sm font-medium text-gray-500">Tổng số Partner</p><p class="text-3xl font-bold text-indigo-600 mt-1">1,204</p></div>
+                            <div class="bg-white p-6 rounded-xl shadow-md"><p class="text-sm font-medium text-gray-500">Partner mới (kỳ này)</p><p class="text-3xl font-bold text-indigo-600 mt-1">+56</p></div>
+                            <div class="bg-white p-6 rounded-xl shadow-md"><p class="text-sm font-medium text-gray-500">Tổng số Expert</p><p class="text-3xl font-bold text-teal-600 mt-1">15</p></div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Hiệu suất Nội dung -->
+                    <div class="mb-12">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">2. Hiệu suất Nội dung</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Biểu đồ cột: Sản phẩm mới theo thời gian -->
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Sản phẩm mới được gửi lên</h4>
+                                <div class="chart-container h-64"><canvas id="analyticsNewProductsChart"></canvas></div>
+                            </div>
+                            <!-- Biểu đồ tròn: Phân loại trạng thái sản phẩm -->
+                             <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Tỉ lệ trạng thái sản phẩm</h4>
+                                <div class="chart-container h-64"><canvas id="analyticsProductStatusChart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Hiệu suất Vận hành -->
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">3. Hiệu suất Vận hành</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Biểu đồ đường: Thời gian duyệt trung bình -->
+                            <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Thời gian duyệt trung bình (giờ)</h4>
+                                 <div class="chart-container h-64"><canvas id="analyticsAvgReviewTimeChart"></canvas></div>
+                            </div>
+                            <!-- Bảng xếp hạng Expert -->
+                             <div class="bg-white p-6 rounded-xl shadow-md">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-4">Expert hoạt động tích cực nhất</h4>
+                                <div class="space-y-3 mt-4">
+                                    <!-- Expert 1 -->
+                                    <div class="flex items-center"><img src="https://i.pravatar.cc/40?u=expert" class="w-10 h-10 rounded-full mr-3"><div class="flex-1"><p class="font-semibold text-gray-800">Dr. Nguyễn An</p><p class="text-sm text-gray-500">Tỉ lệ chấp thuận: 85%</p></div><div class="text-right"><p class="font-bold text-lg text-blue-600">42</p><p class="text-xs text-gray-500">đề xuất/tháng</p></div></div>
+                                    <!-- Expert 2 -->
+                                     <div class="flex items-center"><img src="https://i.pravatar.cc/40?u=expert2" class="w-10 h-10 rounded-full mr-3"><div class="flex-1"><p class="font-semibold text-gray-800">Lê Minh Anh</p><p class="text-sm text-gray-500">Tỉ lệ chấp thuận: 92%</p></div><div class="text-right"><p class="font-bold text-lg text-gray-700">35</p><p class="text-xs text-gray-500">đề xuất/tháng</p></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- KẾT THÚC KHỐI CODE MỚI -->
+
+                <div id="admin-settings" class="section hidden">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Cài đặt nền tảng</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <!-- Settings Navigation -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white p-4 rounded-xl shadow-md">
+                                <nav class="space-y-1">
+                                    <a href="#" class="block px-4 py-2 rounded-lg font-medium bg-blue-50 text-blue-700">Chung</a>
+                                    <a href="#" class="block px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100">Bảo mật</a>
+                                    <a href="#" class="block px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100">Quy tắc nội dung</a>
+                                    <a href="#" class="block px-4 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100">Thông báo</a>
+                                </nav>
+                            </div>
+                        </div>
+                        <!-- Settings Content -->
+                        <div class="lg:col-span-3">
+                            <div class="bg-white p-8 rounded-xl shadow-md">
+                                <h3 class="text-xl font-semibold text-gray-800 mb-6">Cài đặt chung</h3>
+                                <form class="space-y-6">
+                                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Tên trang web</label><input type="text" value="Mỹ phẩm AI" class="w-full px-4 py-2 border rounded-lg"></div>
+                                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Khẩu hiệu</label><input type="text" value="Nền tảng phân tích mỹ phẩm" class="w-full px-4 py-2 border rounded-lg"></div>
+                                    <div class="flex items-center justify-between"><label class="text-sm font-medium text-gray-700">Bật chế độ bảo trì</label><div class="relative inline-block w-10 mr-2 align-middle select-none"><input type="checkbox" class="absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer right-4 checked:right-0"/><label class="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label></div></div>
+                                    <div class="flex justify-end pt-4"><button type="submit" class="px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">Lưu thay đổi</button></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="admin-approval-queue" class="section hidden">
+                    <!-- Header -->
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Hàng đợi xác nhận</h2>
+                        <p class="text-gray-500">Xem lại các đề xuất từ Chuyên gia và đưa ra quyết định cuối cùng.</p>
+                    </div>
+                    <!-- Bảng các đề xuất -->
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm & Đối tác</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Chuyên gia đề xuất</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Đề xuất</th>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Ghi chú của Chuyên gia</th>
+                                    <th class="p-4 text-center text-xs font-semibold text-gray-500 uppercase">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-queue-table-body" class="divide-y divide-gray-200">
+                                <!-- DỮ LIỆU SẼ ĐƯỢC JAVASCRIPT RENDER VÀO ĐÂY -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG THỐNG KÊ -->
+            <div id="insights" class="section hidden">
+                <!-- Header & Bộ lọc thời gian -->
+                <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-1">Phân tích hiệu suất</h2>
+                        <p class="text-gray-500">Phân tích chi tiết về hiệu quả của các sản phẩm của bạn.</p>
+                    </div>
+                    <!-- Bộ lọc thời gian thực tế -->
+                    <div class="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm border">
+                        <i class="fas fa-calendar-alt text-gray-500 ml-2"></i>
+                        <select id="insights-timeframe-selector" class="border-none bg-transparent focus:ring-0 font-medium text-gray-700">
+                            <option value="7d">7 ngày qua</option>
+                            <option value="30d" selected>30 ngày qua</option>
+                            <option value="90d">90 ngày qua</option>
+                            <option value="custom">Tùy chỉnh...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 1. Thẻ KPI tổng quan -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <p class="text-sm font-medium text-gray-500">Tổng lượt hiển thị</p>
+                        <p class="text-3xl font-bold text-blue-600 mt-1">68,456</p>
+                        <p class="text-xs text-green-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-up mr-1"></i> 12.5% so với kỳ trước</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <p class="text-sm font-medium text-gray-500">Tổng lượt click</p>
+                        <p class="text-3xl font-bold text-green-600 mt-1">8,789</p>
+                         <p class="text-xs text-green-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-up mr-1"></i> 15.2% so với kỳ trước</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <p class="text-sm font-medium text-gray-500">Tỉ lệ CTR trung bình</p>
+                        <p class="text-3xl font-bold text-yellow-500 mt-1">12.8%</p>
+                         <p class="text-xs text-red-600 font-semibold mt-2 flex items-center"><i class="fas fa-arrow-down mr-1"></i> 0.5% so với kỳ trước</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <p class="text-sm font-medium text-gray-500">Rating trung bình</p>
+                        <p class="text-3xl font-bold text-purple-600 mt-1">4.6 / 5</p>
+                         <p class="text-xs text-gray-500 font-semibold mt-2 flex items-center">Ổn định</p>
+                    </div>
+                </div>
+
+                <!-- 2. Biểu đồ chi tiết -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    <!-- Biểu đồ xu hướng chính -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Xu hướng tương tác</h3>
+                        <div class="chart-container h-72">
+                            <canvas id="partnerInsightsTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <!-- Biểu đồ phân bổ -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Phân bổ lượt xem</h3>
+                        <div class="chart-container h-72">
+                            <canvas id="partnerInsightsCategoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Bảng sản phẩm hiệu suất cao -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Sản phẩm hiệu suất cao nhất (30 ngày qua)</h3>
+                    <div class="bg-white rounded-xl shadow-md overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase">Sản phẩm</th>
+                                    <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase">Lượt xem</th>
+                                    <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase">Lượt click</th>
+                                    <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase">Tỉ lệ CTR</th>
+                                    <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase">Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <!-- Dữ liệu mẫu -->
+                                <tr>
+                                    <td class="p-4"><div class="font-semibold text-gray-900">Serum Niacinamide 10%</div></td>
+                                    <td class="p-4 text-right">11,000</td>
+                                    <td class="p-4 text-right">2,100</td>
+                                    <td class="p-4 text-right text-green-600 font-medium">19.1%</td>
+                                    <td class="p-4 text-right">4.8 / 5</td>
+                                </tr>
+                                 <tr>
+                                    <td class="p-4"><div class="font-semibold text-gray-900">Sữa rửa mặt dịu nhẹ</div></td>
+                                    <td class="p-4 text-right">9,100</td>
+                                    <td class="p-4 text-right">1,500</td>
+                                    <td class="p-4 text-right text-green-600 font-medium">16.5%</td>
+                                    <td class="p-4 text-right">4.7 / 5</td>
+                                </tr>
+                                 <tr>
+                                    <td class="p-4"><div class="font-semibold text-gray-900">Serum cấp nước B5</div></td>
+                                    <td class="p-4 text-right">8,500</td>
+                                    <td class="p-4 text-right">1,350</td>
+                                    <td class="p-4 text-right text-green-600 font-medium">15.9%</td>
+                                    <td class="p-4 text-right">4.8 / 5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- KẾT THÚC KHỐI CODE MỚI -->
+            <!-- BẮT ĐẦU KHỐI CODE MỚI CHO TRANG TIN NHẮN -->
+            <div id="messages" class="section hidden">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-1">Hộp thư</h2>
+                    <p class="text-gray-500">Giao tiếp với Admin và nhận phản hồi về sản phẩm của bạn.</p>
+                </div>
+
+                <!-- Layout 3 cột của trang Tin nhắn -->
+                <div class="h-[calc(100vh-200px)] grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <!-- Cột 1: Danh sách cuộc trò chuyện -->
+                    <div class="md:col-span-1 lg:col-span-1 bg-white rounded-xl shadow-md flex flex-col">
+                        <!-- Header cột 1 -->
+                        <div class="p-4 border-b">
+                            <h3 class="font-semibold text-gray-800">Cuộc trò chuyện</h3>
+                            <!-- Có thể thêm ô tìm kiếm ở đây sau -->
+                        </div>
+                        <!-- Danh sách -->
+                        <div class="flex-1 overflow-y-auto">
+                            <nav class="p-2 space-y-1">
+                                <!-- Tin nhắn 1 (Active & Unread) -->
+                                <a href="#" class="block p-3 rounded-lg bg-blue-100">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-semibold text-sm text-blue-800">Sản phẩm bị từ chối</p>
+                                        <span class="text-xs font-medium text-white bg-red-500 w-5 h-5 flex items-center justify-center rounded-full">1</span>
+                                    </div>
+                                    <p class="text-sm text-gray-700 truncate">Toner BHA 2%</p>
+                                    <p class="text-xs text-gray-500 mt-1">Admin • 2 giờ trước</p>
+                                </a>
+                                <!-- Tin nhắn 2 (Đã xem) -->
+                                <a href="#" class="block p-3 rounded-lg hover:bg-gray-50">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-semibold text-sm text-gray-800">Sản phẩm được duyệt</p>
+                                    </div>
+                                    <p class="text-sm text-gray-700 truncate">Serum Vitamin C Advanced</p>
+                                    <p class="text-xs text-gray-500 mt-1">Hệ thống • 1 ngày trước</p>
+                                </a>
+                                 <!-- Tin nhắn 3 (Đã xem) -->
+                                <a href="#" class="block p-3 rounded-lg hover:bg-gray-50">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <p class="font-semibold text-sm text-gray-800">Cập nhật chính sách</p>
+                                    </div>
+                                    <p class="text-sm text-gray-700 truncate">Về tiêu chuẩn thành phần...</p>
+                                    <p class="text-xs text-gray-500 mt-1">Admin • 3 ngày trước</p>
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- Cột 2: Nội dung chat -->
+                    <div class="md:col-span-3 lg:col-span-3 bg-white rounded-xl shadow-md flex flex-col">
+                        <!-- Header cuộc trò chuyện -->
+                        <div class="p-4 border-b flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-red-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Sản phẩm bị từ chối: Toner BHA 2%</h3>
+                                <p class="text-sm text-gray-600">Với Admin</p>
+                            </div>
+                        </div>
+                        <!-- Khung chat -->
+                        <div class="flex-1 p-6 overflow-y-auto space-y-6">
+                            <!-- Tin nhắn từ Admin -->
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">A</div>
+                                <div class="bg-gray-100 p-3 rounded-lg rounded-tl-none max-w-lg">
+                                    <p class="text-sm text-gray-800">Chào BeautyStore, sản phẩm "Toner BHA 2%" của bạn đã bị từ chối vì các lý do sau:</p>
+                                    <ul class="text-sm text-gray-800 mt-2 list-disc list-inside space-y-1">
+                                        <li>Thành phần <span class="font-semibold bg-red-200 px-1 rounded">Alcohol Denat</span> có khả năng gây khô da, cần có cảnh báo rõ ràng.</li>
+                                        <li>Thiếu thông tin về nồng độ % chính xác của BHA.</li>
+                                        <li>Chưa có chứng nhận từ cơ quan có thẩm quyền cho sản phẩm chứa acid.</li>
+                                    </ul>
+                                     <p class="text-sm text-gray-800 mt-2">Vui lòng cập nhật và gửi lại. Cảm ơn!</p>
+                                    <p class="text-xs text-gray-500 text-right mt-1">2 giờ trước</p>
+                                </div>
+                            </div>
+                            <!-- Tin nhắn từ Partner (bạn) -->
+                            <div class="flex items-start gap-3 justify-end">
+                                <div class="bg-blue-600 text-white p-3 rounded-lg rounded-br-none max-w-lg">
+                                    <p class="text-sm">Cảm ơn thông tin từ Admin. Chúng tôi sẽ bổ sung ngay.</p>
+                                    <p class="text-xs text-blue-200 text-right mt-1">1 phút trước</p>
+                                </div>
+                                <img src="https://i.pravatar.cc/40?u=partner" class="w-8 h-8 rounded-full flex-shrink-0">
+                            </div>
+                        </div>
+                        <!-- Ô nhập liệu -->
+                        <div class="p-4 border-t bg-white">
+                            <div class="relative">
+                                <textarea class="w-full px-4 py-2 pr-20 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none" rows="1" placeholder="Nhập tin nhắn..."></textarea>
+                                <button class="absolute right-3 top-1/2 -translate-y-1/2 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    <i class="fas fa-paper-plane mr-2"></i>Gửi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cột 3: Chi tiết ngữ cảnh -->
+                    <div class="hidden lg:block lg:col-span-1 bg-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Thông tin liên quan</h3>
+                        <div class="space-y-4">
+                            <!-- Card sản phẩm -->
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase">Sản phẩm</label>
+                                <div class="mt-2 p-3 border rounded-lg flex items-center space-x-3">
+                                    <div class="w-12 h-12 bg-gray-200 rounded-md flex-shrink-0"></div>
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-900">Toner BHA 2%</p>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-100 text-red-800">Bị từ chối</span>
+                                    </div>
+                                </div>
+                            </div>
+                             <!-- Card hành động -->
+                            <div>
+                                <label class="text-xs font-semibold text-gray-500 uppercase">Hành động nhanh</label>
+                                <div class="mt-2 space-y-2">
+                                     <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-700">
+                                        <i class="fas fa-history w-6 text-gray-400"></i> Xem lịch sử duyệt
+                                     </button>
+                                      <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 text-sm font-medium text-blue-600">
+                                        <i class="fas fa-edit w-6"></i> Chỉnh sửa sản phẩm
+                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- KẾT THÚC KHỐI CODE MỚI -->
+        </main>
+    </div>
+    <!-- ===== MÀN HÌNH ĐĂNG NHẬP GIẢ LẬP ===== -->
+    <div id="login-screen" class="fixed inset-0 bg-gray-200 z-50 flex items-center justify-center">
+        <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl text-center">
+            <div class="mx-auto w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/40 mb-6">
+                <i class="fas fa-user-shield text-white text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Đăng nhập vào hệ thống</h1>
+            <p class="text-gray-500 mb-8">Để phục vụ mục đích demo, hãy chọn vai trò bạn muốn đăng nhập.</p>
+
+            <div class="space-y-4">
+                <button onclick="simulateLogin('partner')" class="w-full flex items-center justify-center text-left p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                    <i class="fas fa-store text-blue-600 w-8 text-xl"></i>
+                    <div>
+                        <p class="font-semibold text-blue-800">Đăng nhập với vai trò Partner</p>
+                        <p class="text-sm text-blue-700">Quản lý sản phẩm và cửa hàng của bạn.</p>
+                    </div>
+                </button>
+                <button onclick="simulateLogin('expert')" class="w-full flex items-center justify-center text-left p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                     <i class="fas fa-clipboard-check text-green-600 w-8 text-xl"></i>
+                     <div>
+                        <p class="font-semibold text-green-800">Đăng nhập với vai trò Expert</p>
+                        <p class="text-sm text-green-700">Xác thực và duyệt các sản phẩm mới.</p>
+                    </div>
+                </button>
+                <button onclick="simulateLogin('admin')" class="w-full flex items-center justify-center text-left p-4 bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors">
+                    <i class="fas fa-user-shield text-white w-8 text-xl"></i>
+                     <div>
+                        <p class="font-semibold text-white">Đăng nhập với vai trò Admin</p>
+                        <p class="text-sm text-gray-300">Quản lý toàn bộ hệ thống.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BẮT ĐẦU KHỐI CODE MODAL XEM LÝ DO -->
+    <div id="reason-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+        <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-xl bg-white">
+            <!-- Header Modal -->
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Lý do từ Admin</h3>
+                    <p class="text-sm text-gray-500">Về việc ghi đè đề xuất của bạn</p>
+                </div>
+                 <button onclick="closeReasonModal()" class="p-2 -mt-2 -mr-2 rounded-full hover:bg-gray-200">
+                    <i class="fas fa-times text-xl text-gray-500"></i>
+                </button>
+            </div>
+
+            <!-- Nội dung Modal -->
+            <div class="space-y-4">
+                <!-- Thông tin sản phẩm -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase">Sản phẩm</p>
+                    <p id="modal-product-name" class="font-medium text-gray-900">Mặt nạ ngủ Aqua</p>
+                </div>
+                 <!-- Đề xuất của Expert -->
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase">Đề xuất của bạn</p>
+                    <p id="modal-expert-recommendation" class="text-gray-700">Phê duyệt</p>
+                </div>
+                <!-- Lý do của Admin -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                    <p class="text-xs font-semibold text-gray-500 uppercase">Lý do ghi đè của Admin</p>
+                    <p id="modal-admin-reason" class="text-sm text-gray-800 mt-2">
+                        Sản phẩm này chứa "Methylisothiazolinone", một chất bảo quản đã bị EU cấm sử dụng trong các sản phẩm lưu lại trên da (leave-on). Mặc dù vẫn được phép ở một số nơi, chúng ta nên ưu tiên tiêu chuẩn an toàn cao nhất. Vui lòng từ chối và thông báo cho Partner.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer Modal -->
+            <div class="mt-6 text-right">
+                <button onclick="closeReasonModal()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
+                    Đã hiểu
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- KẾT THÚC KHỐI CODE MODAL -->
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // =========================================================================
+        // == SECTION 1: GLOBAL CONSTANTS & STATE
+        // =========================================================================
+
+        // --- Dữ liệu giả lập ---
+        const USER_ROLES = {
+            partner: { name: "BeautyStore Official", role: "Partner", avatar: "https://i.pravatar.cc/40?u=partner", headerIcon: "fas fa-store text-white", headerTitle: "BeautyStore Official", headerSubtitle: "Store Partner Dashboard", defaultSection: "dashboard" },
+            expert: { name: "Dr. Nguyễn An", role: "Expert Validator", avatar: "https://i.pravatar.cc/40?u=expert", headerIcon: "fas fa-user-check text-white", headerTitle: "Expert Panel", headerSubtitle: "Product Validation Dashboard", defaultSection: "expert-dashboard" },
+            admin: { name: "Trần Minh Tuấn", role: "Admin", avatar: "https://i.pravatar.cc/40?u=admin", headerIcon: "fas fa-user-shield text-white", headerTitle: "Administrator", headerSubtitle: "System Management Dashboard", defaultSection: "admin-dashboard" }
+        };
+        const allPartnerProducts = [
+            // 18 sản phẩm đã duyệt
+            { id: 1, name: 'Serum Vitamin C Advanced', status: 'approved', views_7d: 1234, views_30d: 5678, views_90d: 15234, rating: 4.5 }, { id: 2, name: 'Kem chống nắng Physical', status: 'approved', views_7d: 980, views_30d: 4123, views_90d: 12890, rating: 4.8 }, { id: 3, name: 'Toner AHA 7%', status: 'approved', views_7d: 850, views_30d: 3800, views_90d: 11500, rating: 4.2 }, { id: 4, name: 'Kem dưỡng ẩm Hyaluronic Acid', status: 'approved', views_7d: 1500, views_30d: 6200, views_90d: 18000, rating: 4.9 }, { id: 5, name: 'Sữa rửa mặt dịu nhẹ', status: 'approved', views_7d: 2100, views_30d: 9100, views_90d: 28000, rating: 4.7 }, { id: 6, name: 'Mặt nạ đất sét', status: 'approved', views_7d: 730, views_30d: 3100, views_90d: 9500, rating: 4.4 }, { id: 7, name: 'Retinol 0.5% in Squalane', status: 'approved', views_7d: 1800, views_30d: 7900, views_90d: 24000, rating: 4.6 }, { id: 8, name: 'Dầu tẩy trang Deep Clean', status: 'approved', views_7d: 1150, views_30d: 5100, views_90d: 16000, rating: 4.5 }, { id: 9, name: 'Xịt khoáng cấp ẩm', status: 'approved', views_7d: 650, views_30d: 2900, views_90d: 9000, rating: 4.3 }, { id: 10, name: 'Serum Niacinamide 10%', status: 'approved', views_7d: 2500, views_30d: 11000, views_90d: 35000, rating: 4.8 }, { id: 11, name: 'Peeling Solution AHA/BHA', status: 'approved', views_7d: 990, views_30d: 4500, views_90d: 14000, rating: 4.1 }, { id: 12, name: 'Kem mắt Caffeine Solution', status: 'approved', views_7d: 1300, views_30d: 5800, views_90d: 18500, rating: 4.6 }, { id: 13, name: 'Dầu dưỡng Rose Hip Seed', status: 'approved', views_7d: 540, views_30d: 2400, views_90d: 7500, rating: 4.7 }, { id: 14, name: 'Kem lót kiềm dầu', status: 'approved', views_7d: 430, views_30d: 1900, views_90d: 6000, rating: 4.2 }, { id: 15, name: 'Phấn phủ không màu', status: 'approved', views_7d: 880, views_30d: 3900, views_90d: 12000, rating: 4.5 }, { id: 16, name: 'Son dưỡng có màu', status: 'approved', views_7d: 1600, views_30d: 7100, views_90d: 22000, rating: 4.9 }, { id: 17, name: 'Tẩy tế bào chết vật lý', status: 'approved', views_7d: 320, views_30d: 1400, views_90d: 4500, rating: 3.9 }, { id: 18, name: 'Serum cấp nước B5', status: 'approved', views_7d: 1950, views_30d: 8500, views_90d: 25000, rating: 4.8 },
+            // 3 sản phẩm chờ duyệt
+            { id: 19, name: 'Kem chống nắng SPF 50 mới', status: 'pending', views_7d: 0, views_30d: 0, views_90d: 0, rating: null }, { id: 20, name: 'Tinh chất phục hồi Peptide', status: 'pending', views_7d: 0, views_30d: 0, views_90d: 0, rating: null }, { id: 21, name: 'Mặt nạ ngủ Vitamin E', status: 'pending', views_7d: 0, views_30d: 0, views_90d: 0, rating: null },
+            // 3 sản phẩm bị từ chối
+            { id: 22, name: 'Toner BHA 2% (phiên bản cũ)', status: 'rejected', views_7d: 0, views_30d: 0, views_90d: 0, rating: null }, { id: 23, name: 'Serum chứa cồn khô', status: 'rejected', views_7d: 0, views_30d: 0, views_90d: 0, rating: null }, { id: 24, name: 'Sản phẩm không rõ nguồn gốc', status: 'rejected', views_7d: 0, views_30d: 0, views_90d: 0, rating: null },
+        ];
+
+        let openActionMenuId = null;
+
+        const loginScreen = document.getElementById('login-screen');
+        const mainApp = document.querySelector('.flex');
+        const header = document.querySelector('header');
+        const userMenu = document.getElementById('user-menu');
+
+        // =========================================================================
+        // == SECTION 2: CORE APP FUNCTIONS
+        // =========================================================================
+
+        const setupUIForRole = (role) => {
+            const userData = USER_ROLES[role];
+            if (!userData) return;
+            document.querySelectorAll('nav[id^="sidebar-"]').forEach(nav => nav.classList.add('hidden'));
+            document.querySelectorAll('div[id$="-view"]').forEach(view => view.classList.add('hidden'));
+            document.getElementById(`sidebar-${role}`).classList.remove('hidden');
+            document.getElementById(`${role}-view`).classList.remove('hidden');
+            document.getElementById('header-icon').className = userData.headerIcon;
+            document.getElementById('header-title').textContent = userData.headerTitle;
+            document.getElementById('header-subtitle').textContent = userData.headerSubtitle;
+            document.getElementById('user-avatar-img').src = userData.avatar;
+            document.getElementById('user-menu-name').textContent = userData.name;
+            document.getElementById('user-menu-role').textContent = `Vai trò: ${userData.role}`;
+            window.showSection(userData.defaultSection);
+        };
+
+        window.toggleUserMenu = () => { if(userMenu) userMenu.classList.toggle('hidden'); };
+        window.simulateLogin = (role) => {
+            if(loginScreen) loginScreen.classList.add('hidden');
+            if(header) header.classList.remove('hidden');
+            if(mainApp) mainApp.classList.remove('hidden');
+            setupUIForRole(role);
+            localStorage.setItem('currentUserRole', role);
+        };
+        window.logout = () => {
+            if(header) header.classList.add('hidden');
+            if(mainApp) mainApp.classList.add('hidden');
+            if(userMenu) userMenu.classList.add('hidden');
+            if(loginScreen) loginScreen.classList.remove('hidden');
+            localStorage.removeItem('currentUserRole');
+        };
+
+        // =========================================================================
+        // == SECTION 3: PAGE-SPECIFIC LOGIC & CONTROLLERS
+        // =========================================================================
+
+        // --- 3A: PRODUCTS PAGE LOGIC ---
+        const productPageState = {
+            currentPage: 1,
+            filters: { status: 'all', search: '', sort: 'newest', timeframe: '7d' }
+        };
+
+        window.renderActionMenuContent = (product) => {
+            let menuItems = '';
+            switch (product.status) {
+                case 'approved': menuItems = `<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-edit w-6 text-gray-400"></i>Chỉnh sửa</a><a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-chart-line w-6 text-gray-400"></i>Xem thống kê</a><a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-eye-slash w-6 text-gray-400"></i>Tạm ẩn</a>`; break;
+                case 'pending': menuItems = `<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-edit w-6 text-gray-400"></i>Chỉnh sửa</a><a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-ban w-6"></i>Hủy gửi duyệt</a>`; break;
+                case 'rejected': menuItems = `<a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><i class="fas fa-info-circle w-6 text-gray-400"></i>Xem lý do từ chối</a><a href="#" class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"><i class="fas fa-paper-plane w-6"></i>Chỉnh sửa & Gửi lại</a>`; break;
+            }
+            return `${menuItems}<div class="my-1 border-t"></div><a href="#" class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-trash-alt w-6"></i>Xóa sản phẩm</a>`;
+        };
+        window.toggleActionMenu = (productId) => {
+            const menu = document.getElementById(`action-menu-${productId}`);
+            if(openActionMenuId && openActionMenuId !== productId) {
+                const oldMenu = document.getElementById(`action-menu-${openActionMenuId}`);
+                if(oldMenu) oldMenu.classList.add('hidden');
+            }
+            if(menu) menu.classList.toggle('hidden');
+            openActionMenuId = menu && !menu.classList.contains('hidden') ? productId.toString() : null;
+        };
+        const renderProductTable = () => {
+            const tableBody = document.getElementById('products-table-body');
+            if (!tableBody) return;
+            let filteredProducts = allPartnerProducts.filter(p => (p.name.toLowerCase().includes(productPageState.filters.search.toLowerCase()) || `#sp${p.id}`.toLowerCase().includes(productPageState.filters.search.toLowerCase())) && (productPageState.filters.status === 'all' || p.status === productPageState.filters.status));
+            const sortKey = `views_${productPageState.filters.timeframe}`;
+            filteredProducts.sort((a, b) => { switch (productPageState.filters.sort) { case 'views_desc': return (b[sortKey] || 0) - (a[sortKey] || 0); case 'views_asc': return (a[sortKey] || 0) - (b[sortKey] || 0); default: return b.id - a.id; } });
+            const totalProducts = filteredProducts.length; const totalPages = Math.ceil(totalProducts / 5); productPageState.currentPage = Math.min(productPageState.currentPage, totalPages) || 1;
+            const startProduct = (productPageState.currentPage - 1) * 5; const endProduct = startProduct + 5; const productsForCurrentPage = filteredProducts.slice(startProduct, endProduct);
+            tableBody.innerHTML = productsForCurrentPage.map(product => { const viewsKey = `views_${productPageState.filters.timeframe}`; const productViews = product[viewsKey] || 0; let statusBadge; switch (product.status) { case 'approved': statusBadge = `<span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Đã duyệt</span>`; break; case 'pending': statusBadge = `<span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Chờ duyệt</span>`; break; case 'rejected': statusBadge = `<span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Bị từ chối</span>`; break; }
+                return `<tr class="hover:bg-gray-50"><td class="p-4"><input type="checkbox" value="${product.id}" class="rounded product-checkbox"></td><td class="p-4"><div class="flex items-center"><div class="w-12 h-12 bg-gray-200 rounded-lg mr-4 flex-shrink-0"></div><div><a href="#" class="text-sm font-semibold text-gray-900 hover:text-blue-600">${product.name}</a><div class="text-sm text-gray-500">ID: #SP${product.id}</div></div></div></td><td class="p-4">${statusBadge}</td><td class="p-4 text-right text-sm text-gray-800 font-medium">${productViews > 0 ? productViews.toLocaleString() : '-'}</td><td class="p-4 text-center text-sm text-gray-800">${product.rating ? `${product.rating}/5` : '-'}</td><td class="p-4 text-center"><div class="relative"><button onclick="toggleActionMenu('${product.id}')" class="text-gray-500 hover:text-blue-600 p-2 rounded-full"><i class="fas fa-ellipsis-h"></i></button><div id="action-menu-${product.id}" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg z-10 ring-1 ring-black ring-opacity-5 py-1 text-left">${renderActionMenuContent(product)}</div></div></td></tr>`;
+            }).join('');
+            document.getElementById('pagination-info').textContent = `Hiển thị ${productsForCurrentPage.length > 0 ? startProduct + 1 : 0}-${Math.min(endProduct, totalProducts)} trên ${totalProducts} sản phẩm`;
+            let paginationHTML = ''; for (let i = 1; i <= totalPages; i++) { paginationHTML += `<button onclick="changePartnerPage(${i})" class="px-3 py-1 border rounded-lg ${i === productPageState.currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}">${i}</button>`; } document.getElementById('pagination-controls').innerHTML = paginationHTML;
+        };
+        window.changePartnerPage = (page) => { productPageState.currentPage = page; renderProductTable(); };
+        window.navigateToProductsWithFilter = (filterStatus) => {
+            productPageState.filters.status = filterStatus; productPageState.currentPage = 1;
+            const statusDropdown = document.getElementById('product-filter-status');
+            if (statusDropdown) statusDropdown.value = filterStatus;
+            showSection('products');
+        };
+
+        // Đặt vào đầu SECTION 3
+        // --- 3D: EXPERT - HISTORY PAGE LOGIC ---
+        const expertHistoryData = [
+            { id: 1, productName: 'Serum Vitamin C ABC', partnerName: 'ABC Cosmetics', recommendation: 'approve', adminStatus: 'confirmed', decisionAt: '2023-10-26T14:30:00Z' },
+            { id: 2, productName: 'Kem chống nắng XYZ', partnerName: 'XYZ Skincare', recommendation: 'reject', adminStatus: 'confirmed', decisionAt: '2023-10-26T11:00:00Z' },
+            { id: 3, productName: 'Mặt nạ ngủ Aqua', partnerName: 'Aqua World', recommendation: 'approve', adminStatus: 'overridden', decisionAt: '2023-10-25T16:00:00Z' },
+            { id: 4, productName: 'Tẩy trang dầu Olive', partnerName: 'Olive House', recommendation: 'approve', adminStatus: 'confirmed', decisionAt: '2023-10-25T15:00:00Z' },
+            { id: 5, productName: 'Kem trị mụn Tea Tree', partnerName: 'Herbal Life', recommendation: 'reject', adminStatus: 'confirmed', decisionAt: '2023-10-25T10:00:00Z' },
+            { id: 6, productName: 'Phấn phủ khoáng', partnerName: 'Mineral Beauty', recommendation: 'approve', adminStatus: 'pending', decisionAt: '2023-10-27T17:00:00Z' },
+            { id: 7, productName: 'Son kem lì màu đỏ đất', partnerName: 'Lipstick Queen', recommendation: 'approve', adminStatus: 'pending', decisionAt: '2023-10-27T16:30:00Z' },
+        ];
+
+        const historyPageState = {
+            currentPage: 1,
+            itemsPerPage: 5,
+            filters: { search: '', recommendation: 'all', adminStatus: 'all' }
+        };
+
+        const renderExpertHistoryTable = () => {
+            const tableBody = document.getElementById('expert-history-table-body');
+            if (!tableBody) return;
+
+            // Lọc dữ liệu
+            let filteredData = expertHistoryData.filter(item => {
+                const matchesSearch = item.productName.toLowerCase().includes(historyPageState.filters.search.toLowerCase()) || item.partnerName.toLowerCase().includes(historyPageState.filters.search.toLowerCase());
+                const matchesRecommendation = historyPageState.filters.recommendation === 'all' || item.recommendation === historyPageState.filters.recommendation;
+                const matchesAdminStatus = historyPageState.filters.adminStatus === 'all' || item.adminStatus === historyPageState.filters.adminStatus;
+                return matchesSearch && matchesRecommendation && matchesAdminStatus;
+            });
+
+            // Phân trang
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / historyPageState.itemsPerPage);
+            historyPageState.currentPage = Math.min(historyPageState.currentPage, totalPages) || 1;
+            const startItem = (historyPageState.currentPage - 1) * historyPageState.itemsPerPage;
+            const endItem = startItem + historyPageState.itemsPerPage;
+            const itemsForCurrentPage = filteredData.slice(startItem, endItem);
+
+            // Render bảng
+            tableBody.innerHTML = itemsForCurrentPage.map(item => {
+                const recommendationBadge = item.recommendation === 'approve'
+                    ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Phê duyệt</span>`
+                    : `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Từ chối</span>`;
+
+                let adminStatusBadge;
+                if (item.adminStatus === 'overridden') {
+                    // Trường hợp Admin không đồng ý với đề xuất
+                    const adminDecision = item.recommendation === 'approve' ? 'Từ chối' : 'Phê duyệt';
+                    adminStatusBadge = `
+                        <div class="flex flex-col items-start">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Admin ${adminDecision}</span>
+                            <a href="#" onclick="event.preventDefault(); openReasonModal(${item.id})" class="text-xs text-blue-600 hover:underline mt-1">Xem lý do của Admin</a>
+                        </div>
+                    `;
+                } else {
+                    // Các trường hợp còn lại
+                    switch(item.adminStatus) {
+                        case 'confirmed': adminStatusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Đã xác nhận</span>`; break;
+                        case 'pending': adminStatusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Đang chờ</span>`; break;
+                    }
+                }
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900">${item.productName}</div>
+                            <div class="text-sm text-gray-500">từ <span class="font-semibold">${item.partnerName}</span></div>
+                        </td>
+                        <td class="p-4 text-sm text-gray-700">${new Date(item.decisionAt).toLocaleString('vi-VN')}</td>
+                        <td class="p-4">${recommendationBadge}</td>
+                        <td class="p-4">${adminStatusBadge}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Render phân trang
+            document.getElementById('history-pagination-info').textContent = `Hiển thị ${itemsForCurrentPage.length > 0 ? startItem + 1 : 0}-${Math.min(endItem, totalItems)} trên ${totalItems} kết quả`;
+            let paginationHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `<button onclick="changeHistoryPage(${i})" class="px-3 py-1 border rounded-lg ${i === historyPageState.currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}">${i}</button>`;
+            }
+            document.getElementById('history-pagination-controls').innerHTML = paginationHTML;
+        };
+
+        window.changeHistoryPage = (page) => {
+            historyPageState.currentPage = page;
+            renderExpertHistoryTable();
+        };
+
+        // Gắn các Event Listeners cho bộ lọc của trang Lịch sử
+        const historySearchInput = document.getElementById('history-search-input');
+        const historyRecommendationFilter = document.getElementById('history-filter-recommendation');
+        const historyAdminStatusFilter = document.getElementById('history-filter-admin-status');
+
+        if (historySearchInput) historySearchInput.addEventListener('input', e => { historyPageState.filters.search = e.target.value; historyPageState.currentPage = 1; renderExpertHistoryTable(); });
+        if (historyRecommendationFilter) historyRecommendationFilter.addEventListener('change', e => { historyPageState.filters.recommendation = e.target.value; historyPageState.currentPage = 1; renderExpertHistoryTable(); });
+        if (historyAdminStatusFilter) historyAdminStatusFilter.addEventListener('change', e => { historyPageState.filters.adminStatus = e.target.value; historyPageState.currentPage = 1; renderExpertHistoryTable(); });
+
+        // --- 3B: PARTNER - ADD PRODUCT PAGE ---
+        const addProductElements = { name: document.getElementById('add-product-name'), brand: document.getElementById('add-product-brand'), inci: document.getElementById('add-product-inci'), link: document.getElementById('add-product-link'), tagsContainer: document.getElementById('inci-tags-container'), summary: document.getElementById('inci-analysis-summary'), checklist: document.getElementById('submission-checklist'), submitButton: document.getElementById('submit-product-button'), imageContainer: document.getElementById('image-previews-container') };
+        const handleInciInput = () => { if (!addProductElements.inci || !addProductElements.tagsContainer) return; const rawText = addProductElements.inci.value; const ingredients = rawText.split(',').map(i => i.trim()).filter(i => i.length > 0); addProductElements.tagsContainer.innerHTML = ''; let concerningCount = 0; ingredients.forEach(ingredient => { let tagColor = 'bg-gray-200 text-gray-800'; if (ingredient.toLowerCase().includes('alcohol denat') || ingredient.toLowerCase().includes('parfum')) { tagColor = 'bg-red-100 text-red-800'; concerningCount++; } else if (ingredient.toLowerCase().includes('fragrance') || ingredient.toLowerCase().includes('limonene')) { tagColor = 'bg-yellow-100 text-yellow-800'; concerningCount++; } addProductElements.tagsContainer.innerHTML += `<span class="px-2 py-1 text-sm rounded-full ${tagColor}">${ingredient}</span>`; }); if (ingredients.length > 0) { addProductElements.summary.textContent = `AI đã phân tích ${ingredients.length} thành phần.`; if (concerningCount > 0) addProductElements.summary.innerHTML += ` <span class="font-semibold text-red-600">Tìm thấy ${concerningCount} thành phần cần lưu ý.</span>`; } else { addProductElements.summary.textContent = ''; } };
+        const updateSubmissionChecklist = () => { if (!addProductElements.checklist) return; const checks = { name: addProductElements.name.value.length >= 5, brand: addProductElements.brand.value.length >= 2, images: addProductElements.imageContainer.children.length > 0, inci: addProductElements.inci.value.split(',').filter(i => i.trim().length > 0).length >= 5, link: addProductElements.link.value.startsWith('http'), docs: false }; let allChecked = true; for (const [key, isChecked] of Object.entries(checks)) { const li = document.getElementById(`check-${key}`); if (!li) continue; const icon = li.querySelector('i'); if (isChecked) { li.classList.remove('text-gray-500'); li.classList.add('text-green-600'); icon.className = 'fas fa-check-circle w-6'; } else { li.classList.remove('text-green-600'); li.classList.add('text-gray-500'); icon.className = 'far fa-circle w-6'; allChecked = false; } } addProductElements.submitButton.disabled = !allChecked; };
+
+        // =========================================================================
+        // SECTION 4: MASTER NAVIGATION & INITIALIZATION CONTROLLER
+        // =========================================================================
+
+        // Đặt hàm này vào Section 4
+        const initializeAdminAnalyticsCharts = () => {
+            // Biểu đồ Sản phẩm mới (Cột)
+            const newProductsEl = document.getElementById('analyticsNewProductsChart');
+            if (newProductsEl && !Chart.getChart(newProductsEl)) {
+                new Chart(newProductsEl.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Tháng 8', 'Tháng 9', 'Tháng 10'],
+                        datasets: [{
+                            label: 'Sản phẩm mới',
+                            data: [1200, 1550, 1300],
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+
+            // Biểu đồ Trạng thái sản phẩm (Tròn)
+            const statusChartEl = document.getElementById('analyticsProductStatusChart');
+            if (statusChartEl && !Chart.getChart(statusChartEl)) {
+                new Chart(statusChartEl.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Đã duyệt', 'Chờ duyệt', 'Từ chối'],
+                        datasets: [{
+                            data: [25839, 12, 1250], // Dữ liệu tổng quan
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            // Biểu đồ Thời gian duyệt (Đường)
+            const reviewTimeEl = document.getElementById('analyticsAvgReviewTimeChart');
+            if (reviewTimeEl && !Chart.getChart(reviewTimeEl)) {
+                new Chart(reviewTimeEl.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Tháng 8', 'Tháng 9', 'Tháng 10'],
+                        datasets: [{
+                            label: 'Thời gian duyệt TB (giờ)',
+                            data: [12.5, 10.2, 9.8],
+                            borderColor: '#8b5cf6',
+                            tension: 0.2,
+                            fill: false
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        };
+
+        const initializeAdminChart = () => { const el = document.getElementById('adminGrowthChart'); if (el && !Chart.getChart(el)) { new Chart(el.getContext('2d'), { type: 'line', data: { labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'], datasets: [ { label: 'Đối tác mới', data: [65, 59, 80, 81, 106, 125], borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)', tension: 0.4, fill: true, yAxisID: 'yPartners' }, { label: 'Sản phẩm mới', data: [280, 480, 400, 790, 860, 970], borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', tension: 0.4, fill: true, yAxisID: 'yProducts' } ] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false, }, scales: { yPartners: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Đối tác' } }, yProducts: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Sản phẩm' }, grid: { drawOnChartArea: false } } } } }); } };
+        const initializePartnerDashboardChart = () => { const el = document.getElementById('partnerPerformanceChart'); if (el && !Chart.getChart(el)) { const data = { labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], views: [320, 450, 380, 520, 680, 590, 720], clicks: [48, 67, 57, 78, 102, 89, 108] }; const chart = new Chart(el.getContext('2d'), { type: 'line', data: { labels: data.labels, datasets: [{ label: 'Lượt xem', data: data.views, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', tension: 0.4, fill: true }] }, options: { responsive: true, maintainAspectRatio: false } }); const btnViews = document.getElementById('perf-btn-views'); const btnClicks = document.getElementById('perf-btn-clicks'); if(btnViews && btnClicks) { btnViews.addEventListener('click', () => { chart.data.datasets[0].label = 'Lượt xem'; chart.data.datasets[0].data = data.views; chart.data.datasets[0].borderColor = '#3b82f6'; chart.data.datasets[0].backgroundColor = 'rgba(59, 130, 246, 0.1)'; chart.update(); btnViews.classList.add('bg-white', 'text-blue-600', 'shadow-sm'); btnClicks.classList.remove('bg-white', 'text-blue-600', 'shadow-sm'); }); btnClicks.addEventListener('click', () => { chart.data.datasets[0].label = 'Lượt click'; chart.data.datasets[0].data = data.clicks; chart.data.datasets[0].borderColor = '#10b981'; chart.data.datasets[0].backgroundColor = 'rgba(16, 185, 129, 0.1)'; chart.update(); btnClicks.classList.add('bg-white', 'text-blue-600', 'shadow-sm'); btnViews.classList.remove('bg-white', 'text-blue-600', 'shadow-sm'); }); } } };
+        const initializePartnerInsightsCharts = () => {
+            // --- Biểu đồ xu hướng (Line Chart) ---
+            const trendChartEl = document.getElementById('partnerInsightsTrendChart');
+            if (trendChartEl && !Chart.getChart(trendChartEl)) { // Chỉ khởi tạo nếu chưa có
+                new Chart(trendChartEl.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'], // Sample labels for 30d
+                        datasets: [
+                            {
+                                label: 'Lượt xem',
+                                data: [15000, 18000, 16500, 18956],
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                yAxisID: 'yViews'
+                            },
+                            {
+                                label: 'Lượt click',
+                                data: [1800, 2200, 1950, 2839],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                                yAxisID: 'yClicks'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            yViews: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Lượt xem' } },
+                            yClicks: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Lượt click' }, grid: { drawOnChartArea: false } }
+                        }
+                    }
+                });
+            }
+
+            // --- Biểu đồ phân bổ (Doughnut Chart) ---
+            const categoryChartEl = document.getElementById('partnerInsightsCategoryChart');
+            if (categoryChartEl && !Chart.getChart(categoryChartEl)) { // Chỉ khởi tạo nếu chưa có
+                new Chart(categoryChartEl.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Serum', 'Kem chống nắng', 'Sữa rửa mặt', 'Toner', 'Khác'],
+                        datasets: [{
+                            label: 'Phân bổ lượt xem',
+                            data: [45, 25, 15, 10, 5],
+                            backgroundColor: ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#6b7280'],
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        };
+        // --- 3C: EXPERT - QUEUE PAGE LOGIC ---
+        const expertQueueData = [
+            { id: 1, productName: 'Serum Retinol 1% nồng độ cao', partnerName: "Paula's Choice Official", submittedAt: '2023-10-25T10:00:00Z', complexity: 'high' },
+            { id: 2, productName: 'Son dưỡng môi không màu', partnerName: 'DHC Vietnam', submittedAt: '2023-10-27T11:00:00Z', complexity: 'low' },
+            // Thêm 10 sản phẩm nữa để đủ 12
+            { id: 3, productName: 'Kem dưỡng B5 phục hồi', partnerName: 'La Roche-Posay', submittedAt: '2023-10-27T09:00:00Z', complexity: 'medium' },
+            { id: 4, productName: 'Mặt nạ giấy cấp ẩm tức thì', partnerName: 'Mediheal', submittedAt: '2023-10-27T08:30:00Z', complexity: 'low' },
+            { id: 5, productName: 'Tẩy da chết hóa học AHA 30%', partnerName: 'The Ordinary', submittedAt: '2023-10-26T15:00:00Z', complexity: 'high' },
+            { id: 6, productName: 'Phấn nước kiềm dầu', partnerName: 'Aprilskin', submittedAt: '2023-10-27T12:00:00Z', complexity: 'low' },
+            { id: 7, name: 'Serum trị thâm mụn', partnerName: 'Some By Mi', submittedAt: '2023-10-26T20:00:00Z', complexity: 'medium' },
+            { id: 8, name: 'Kem chống nắng nâng tone', partnerName: 'Innisfree', submittedAt: '2023-10-27T13:00:00Z', complexity: 'low' },
+            { id: 9, name: 'Dầu gội thảo dược', partnerName: 'Nature Queen', submittedAt: '2023-10-25T18:00:00Z', complexity: 'low' },
+            { id: 10, name: 'Tinh chất chống lão hóa CoQ10', partnerName: 'Timeless', submittedAt: '2023-10-26T11:00:00Z', complexity: 'medium' },
+            { id: 11, name: 'Mascara làm dài mi', partnerName: 'Kiss Me Heroine', submittedAt: '2023-10-27T14:00:00Z', complexity: 'low' },
+            { id: 12, name: 'Sữa tắm dưỡng thể', partnerName: 'Hatomugi', submittedAt: '2023-10-27T10:30:00Z', complexity: 'low' },
+        ];
+
+        const renderExpertQueueTable = () => {
+            const tableBody = document.getElementById('expert-queue-table-body');
+            if (!tableBody) return;
+
+            // Logic lọc (bạn có thể thêm sau)
+            // const complexityFilter = document.getElementById('queue-filter-complexity').value;
+            // const filteredData = expertQueueData.filter(item => complexityFilter === 'all' || item.complexity === complexityFilter);
+
+            tableBody.innerHTML = expertQueueData.map(item => {
+                const complexityBadges = {
+                    high: '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Cao</span>',
+                    medium: '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Trung bình</span>',
+                    low: '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Thấp</span>'
+                };
+                // Giả lập chỉ 2 sản phẩm đầu có thể duyệt
+                const actionButton = (item.id <= 2)
+                    ? `<button onclick="showSection('expert-review-detail')" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 text-sm">Xem & Duyệt</button>`
+                    : `<button class="px-4 py-2 bg-gray-300 text-gray-500 font-semibold rounded-lg cursor-not-allowed text-sm">Xem & Duyệt</button>`;
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4"><div class="font-medium text-gray-900">${item.productName}</div><div class="text-sm text-gray-500">từ <span class="font-semibold">${item.partnerName}</span></div></td>
+                        <td class="p-4 text-sm text-gray-700">${new Date(item.submittedAt).toLocaleString('vi-VN')}</td>
+                        <td class="p-4 text-center">${complexityBadges[item.complexity] || ''}</td>
+                        <td class="p-4 text-center">${actionButton}</td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
+        // Đặt vào đầu SECTION 3
+        // --- 3E: ADMIN - APPROVAL QUEUE LOGIC ---
+
+        // Dữ liệu này được lấy từ lịch sử của Expert
+        const adminQueueData = expertHistoryData.filter(item => item.adminStatus === 'pending');
+
+        const renderAdminQueueTable = () => {
+            const tableBody = document.getElementById('admin-queue-table-body');
+            if (!tableBody) return;
+
+            // Cập nhật số lượng chờ duyệt trên sidebar
+            const adminQueueBadge = document.querySelector('#sidebar-admin a[onclick*="admin-approval-queue"] span:last-child');
+            if(adminQueueBadge) {
+                adminQueueBadge.textContent = adminQueueData.length;
+                if (adminQueueData.length === 0) {
+                    adminQueueBadge.classList.add('hidden');
+                } else {
+                    adminQueueBadge.classList.remove('hidden');
+                }
+            }
+
+            if (adminQueueData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-500">Không có đề xuất nào đang chờ xác nhận.</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = adminQueueData.map(item => {
+                const recommendationBadge = item.recommendation === 'approve'
+                    ? `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Phê duyệt</span>`
+                    : `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Từ chối</span>`;
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900">${item.productName}</div>
+                            <div class="text-sm text-gray-500">từ ${item.partnerName}</div>
+                        </td>
+                        <td class="p-4 text-sm text-gray-700">Dr. Nguyễn An</td> <!-- Giả lập tên Expert -->
+                        <td class="p-4">${recommendationBadge}</td>
+                        <td class="p-4 text-sm text-gray-600 italic">...</td> <!-- Ghi chú của Expert -->
+                        <td class="p-4 text-center space-x-2">
+                            <button class="px-3 py-1.5 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 text-xs">Xác nhận</button>
+                            <button class="px-3 py-1.5 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 text-xs">Từ chối</button>
+                            <button class="px-3 py-1.5 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300 text-xs">Yêu cầu xem lại</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        };
+
+        // Đặt vào trong SECTION 3
+        // --- 3F: REASON MODAL LOGIC ---
+        const reasonModal = document.getElementById('reason-modal');
+        const modalProductName = document.getElementById('modal-product-name');
+        const modalExpertRecommendation = document.getElementById('modal-expert-recommendation');
+        const modalAdminReason = document.getElementById('modal-admin-reason');
+
+        // Dữ liệu giả lập cho lý do của Admin
+
+        const adminOverrideReasons = {
+            3: "Đề xuất 'Phê duyệt' của bạn đã được xem xét. Tuy nhiên, tôi đã quyết định Từ chối sản phẩm này vì thành phần Methylisothiazolinone có rủi ro gây dị ứng cao và đã bị hạn chế tại EU. Lưu ý cho lần sau: với các thành phần trong 'vùng xám', chúng ta sẽ ưu tiên áp dụng tiêu chuẩn an toàn cao nhất. Cảm ơn bạn."
+        };
+
+        window.openReasonModal = (itemId) => {
+            const item = expertHistoryData.find(i => i.id == itemId);
+            if (!item || !reasonModal) return;
+
+            // Điền dữ liệu vào modal
+            modalProductName.textContent = item.productName;
+            modalExpertRecommendation.textContent = item.recommendation === 'approve' ? 'Phê duyệt' : 'Từ chối';
+            modalAdminReason.textContent = adminOverrideReasons[itemId] || "Không có lý do chi tiết.";
+
+            // Hiển thị modal
+            reasonModal.classList.remove('hidden');
+        };
+
+        window.closeReasonModal = () => {
+            if (reasonModal) reasonModal.classList.add('hidden');
+        };
+
+        // Đặt vào đầu SECTION 3
+        // --- 3F: ADMIN - PRODUCTS MANAGEMENT PAGE LOGIC ---
+
+        // Giả lập dữ liệu cho toàn bộ sản phẩm trên hệ thống
+        // Ta có thể dùng lại dữ liệu của Partner và thêm thông tin người duyệt
+        const allSystemProducts = allPartnerProducts.map((p, index) => ({
+            ...p,
+            partnerName: 'BeautyStore Official', // Giả sử chỉ có 1 partner cho đơn giản
+            submittedAt: `2023-10-${27 - Math.floor(index / 2)}T10:00:00Z`,
+            expertName: (p.status === 'approved' || p.status === 'rejected') ? 'Dr. Nguyễn An' : null,
+            adminName: (p.status === 'approved' || p.status === 'rejected') ? 'Trần Minh Tuấn' : null,
+        }));
+
+        const adminProductsState = {
+            currentPage: 1,
+            itemsPerPage: 10,
+            filters: { search: '', partner: 'all', expert: 'all', status: 'all' }
+        };
+
+        const renderAdminProductsTable = () => {
+            const tableBody = document.getElementById('admin-products-table-body');
+            if (!tableBody) return;
+
+            // Logic lọc (đơn giản hóa)
+            let filteredData = allSystemProducts.filter(p => {
+                const searchLower = adminProductsState.filters.search.toLowerCase();
+                const matchesSearch = p.name.toLowerCase().includes(searchLower) || p.partnerName.toLowerCase().includes(searchLower);
+                const matchesStatus = adminProductsState.filters.status === 'all' || p.status === adminProductsState.filters.status;
+                return matchesSearch && matchesStatus;
+            });
+
+            // Logic phân trang
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / adminProductsState.itemsPerPage);
+            adminProductsState.currentPage = Math.min(adminProductsState.currentPage, totalPages) || 1;
+            const startItem = (adminProductsState.currentPage - 1) * adminProductsState.itemsPerPage;
+            const endItem = startItem + adminProductsState.itemsPerPage;
+            const itemsForCurrentPage = filteredData.slice(startItem, endItem);
+
+            // Render bảng
+            tableBody.innerHTML = itemsForCurrentPage.map(item => {
+                let statusBadge;
+                // Trạng thái chi tiết hơn cho Admin
+                switch (item.status) {
+                    case 'approved': statusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Đã phê duyệt</span>`; break;
+                    case 'rejected': statusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Đã từ chối</span>`; break;
+                    // Giả lập các trạng thái khác
+                    case 'pending':
+                    default: statusBadge = `<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Chờ Expert</span>`; break;
+                }
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            <div class="font-medium text-gray-900">${item.name}</div>
+                            <div class="text-sm text-gray-500">từ <span class="font-semibold">${item.partnerName}</span></div>
+                        </td>
+                        <td class="p-4 text-sm text-gray-700">${new Date(item.submittedAt).toLocaleDateString('vi-VN')}</td>
+                        <td class="p-4">${statusBadge}</td>
+                        <td class="p-4 text-sm text-gray-700">${item.expertName || 'N/A'}</td>
+                        <td class="p-4 text-center">
+                            <button class="text-gray-400 hover:text-blue-600 p-2 text-sm" title="Xem chi tiết"><i class="fas fa-eye"></i></button>
+                            <button class="text-gray-400 hover:text-green-600 p-2 text-sm" title="Chỉnh sửa"><i class="fas fa-edit"></i></button>
+                            <button class="text-gray-400 hover:text-red-600 p-2 text-sm" title="Gỡ khẩn cấp"><i class="fas fa-shield-alt"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Render phân trang
+            const paginationContainer = document.getElementById('admin-products-pagination');
+            if(paginationContainer) {
+                let paginationHTML = `<p class="text-sm text-gray-600">Hiển thị ${itemsForCurrentPage.length > 0 ? startItem + 1 : 0}-${Math.min(endItem, totalItems)} trên ${totalItems} sản phẩm</p>`;
+                let paginationControlsHTML = '<div class="flex items-center space-x-1">';
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationControlsHTML += `<button onclick="changeAdminProductsPage(${i})" class="px-3 py-1 border rounded-lg ${i === adminProductsState.currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}">${i}</button>`;
+                }
+                paginationControlsHTML += '</div>';
+                paginationContainer.innerHTML = paginationHTML + paginationControlsHTML;
+            }
+        };
+
+        window.changeAdminProductsPage = (page) => {
+            adminProductsState.currentPage = page;
+            renderAdminProductsTable();
+        };
+
+        window.showSection = (sectionId) => {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            const activeSidebar = document.querySelector('nav:not(.hidden)');
+            if (activeSidebar) { activeSidebar.querySelectorAll('.sidebar-link').forEach(link => { link.classList.remove('active'); if (link.getAttribute('onclick')?.includes(`'${sectionId}'`)) { link.classList.add('active'); } }); }
+
+            // Trigger page-specific initializers/renderers
+            if (sectionId === 'dashboard') initializePartnerDashboardChart();
+            if (sectionId === 'products') renderProductTable();
+            if (sectionId === 'add-product') updateSubmissionChecklist();
+            if (sectionId === 'admin-dashboard') initializeAdminChart();
+            if (sectionId === 'admin-approval-queue') renderAdminQueueTable();
+            if (sectionId === 'insights') initializePartnerInsightsCharts();
+            if (sectionId === 'expert-queue') renderExpertQueueTable();
+            if (sectionId === 'expert-history') renderExpertHistoryTable();
+            if (sectionId === 'expert-history') renderExpertHistoryTable();
+            if (sectionId === 'admin-products') renderAdminProductsTable();
+            if (sectionId === 'admin-analytics') initializeAdminAnalyticsCharts();
+        };
+
+        // =========================================================================
+        // SECTION 5: APP INITIALIZATION & GLOBAL EVENT LISTENERS
+        // =========================================================================
+        const loggedInRole = localStorage.getItem('currentUserRole');
+        if (loggedInRole && USER_ROLES[loggedInRole]) { simulateLogin(loggedInRole); }
+        else { if(loginScreen) loginScreen.classList.remove('hidden'); }
+
+        window.addEventListener('click', (e) => {
+            if (userMenu && !userMenu.classList.contains('hidden')) { const btn = document.querySelector('button[onclick="toggleUserMenu()"]'); if (btn && !btn.contains(e.target) && !userMenu.contains(e.target)) { userMenu.classList.add('hidden'); } }
+            if (openActionMenuId) { const btn = document.querySelector(`button[onclick="toggleActionMenu('${openActionMenuId}')"]`); if (btn && !btn.closest('div.relative').contains(e.target)) { document.getElementById(`action-menu-${openActionMenuId}`).classList.add('hidden'); openActionMenuId = null; } }
+        });
+
+        const statusFilter = document.getElementById('product-filter-status');
+        const searchInput = document.getElementById('product-search-input');
+        const sortByFilter = document.getElementById('product-sort-by');
+        const timeframeFilter = document.getElementById('product-views-timeframe');
+        if (statusFilter) statusFilter.addEventListener('change', e => { productPageState.filters.status = e.target.value; productPageState.currentPage = 1; renderProductTable(); });
+        if (searchInput) searchInput.addEventListener('input', e => { productPageState.filters.search = e.target.value; productPageState.currentPage = 1; renderProductTable(); });
+        if (sortByFilter) sortByFilter.addEventListener('change', e => { productPageState.filters.sort = e.target.value; productPageState.currentPage = 1; renderProductTable(); });
+        if (timeframeFilter) timeframeFilter.addEventListener('change', e => { productPageState.filters.timeframe = e.target.value; const header = document.getElementById('views-column-header'); if(header) header.textContent = `Lượt xem (${e.target.value})`; productPageState.currentPage = 1; renderProductTable(); });
+
+        const addProductInputs = [addProductElements.name, addProductElements.brand, addProductElements.link];
+        addProductInputs.forEach(input => { if (input) input.addEventListener('input', updateSubmissionChecklist); });
+        if (addProductElements.inci) addProductElements.inci.addEventListener('input', handleInciInput);
+
+    });
+    </script>
+</body>
+</html>

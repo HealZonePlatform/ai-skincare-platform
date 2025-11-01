@@ -22,7 +22,7 @@ Chúng tôi sử dụng mô hình Git Flow kết hợp với GitHub Flow để p
 - **Quy tắc**:
   - Là nhánh chính cho phát triển
   - Nhận merge từ các feature branch
-  - Code trên nhánh này phải qua kiểm thử đơn vị
+ - Code trên nhánh này phải qua kiểm thử đơn vị
 
 ### 3. Feature Branches
 - **Tên nhánh**: `feature/[tên-tính-năng]`
@@ -44,9 +44,9 @@ Chúng tôi sử dụng mô hình Git Flow kết hợp với GitHub Flow để p
 - **Tên nhánh**: `hotfix/[tên-sửa-lỗi]`
 - **Mô tả**: Dùng để sửa lỗi khẩn cấp trên sản phẩm
 - **Quy tắc**:
-  - Tạo từ nhánh `main`
+ - Tạo từ nhánh `main`
   - Merge vào cả `main` và `develop`
- - Phải được kiểm thử kỹ lưỡng trước khi merge
+  - Phải được kiểm thử kỹ lưỡng trước khi merge
 
 ## Quy trình làm việc chi tiết
 
@@ -138,3 +138,14 @@ feat: Add user authentication service
 - Gán labels phù hợp (bug, feature, enhancement, v.v.)
 - Gán assignee và milestone
 - Liên kết issue với PR tương ứng
+
+## Continuous Integration
+- Tất cả các PR phải vượt qua các bước kiểm tra CI
+- Bao gồm: linting, unit tests, security scans
+- Không được merge PR nếu CI failed
+
+## Best Practices
+- Giữ các PR nhỏ và tập trung vào một mục tiêu cụ thể
+- Cập nhật nhánh feature từ develop thường xuyên để tránh xung đột
+- Viết test cho các thay đổi logic kinh doanh
+- Sử dụng rebase cục bộ để giữ lịch sử commit sạch sẽ trước khi tạo PR

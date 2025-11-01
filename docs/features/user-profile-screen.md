@@ -21,7 +21,7 @@ Trong ứng dụng AI Skincare Platform, người dùng cần có khả năng tr
 Người dùng cuối (người dùng đã đăng ký sử dụng ứng dụng AI Skincare Platform) là đối tượng chính sử dụng tính năng này.
 
 ### Mô tả Chức năng
-Người dùng có thể truy cập màn hình hồ sơ từ menu chính hoặc từ khu vực tài khoản. Màn hình này hiển thị thông tin cá nhân hiện tại (tên, email, ngày sinh, loại da, v.v.) và cho phép người dùng chỉnh sửa thông tin này. Ngoài ra, người dùng có thể thay đổi mật khẩu, quản lý cài đặt thông báo và xem lịch sử phân tích da đã thực hiện.
+Người dùng có thể truy cập màn hình hồ sơ từ menu chính hoặc từ khu vực tài khoản. Màn hình này hiển thị thông tin cá nhân hiện tại (tên, email, giới tính, ngày sinh, v.v.) và cho phép người dùng chỉnh sửa thông tin này. Ngoài ra, người dùng có thể quản lý cài đặt thông báo, lịch sử phân tích da, mục tiêu chăm sóc da và lịch nhắc nhở.
 
 ---
 
@@ -29,25 +29,73 @@ Người dùng có thể truy cập màn hình hồ sơ từ menu chính hoặc 
 
 ### API Endpoints
 Liệt kê các endpoint API cần được tạo hoặc cập nhật:
-- `GET /api/v1/users/profile` - Lấy thông tin hồ sơ người dùng
-- `PUT /api/v1/users/profile` - Cập nhật thông tin hồ sơ người dùng
-- `PUT /api/v1/users/change-password` - Thay đổi mật khẩu người dùng
-- `GET /api/v1/users/skin-analysis-history` - Lấy lịch sử phân tích da của người dùng
+- `GET /api/v1/me/profile` - Lấy thông tin hồ sơ người dùng
+- `PUT /api/v1/me/profile` - Cập nhật thông tin hồ sơ người dùng
+- `GET /api/v1/me/history` - Lấy lịch sử phân tích da của người dùng
+- `GET /api/v1/me/reminders` - Lấy lịch nhắc nhở chăm sóc da
+- `PUT /api/v1/me/reminders` - Cập nhật lịch nhắc nhở chăm sóc da
+- `GET /api/v1/me/lifestyle` - Lấy thông tin lối sống
+- `PUT /api/v1/me/lifestyle` - Cập nhật thông tin lối sống
+- `GET /api/v1/me/goals` - Lấy mục tiêu chăm sóc da
+- `PUT /api/v1/me/goals` - Cập nhật mục tiêu chăm sóc da
 
 ### Database Schema
 Các bảng cần được cập nhật để hỗ trợ tính năng hồ sơ người dùng:
 ```sql
--- Bảng users đã tồn tại, thêm các trường nếu cần
-ALTER TABLE users ADD COLUMN IF NOT EXISTS date_of_birth DATE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS skin_type VARCHAR(50);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS notification_preferences JSONB;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image_url VARCHAR(255);
+-- Bảng user_profiles để lưu trữ thông tin hồ sơ
+CREATE TABLE user_profiles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  full_name VARCHAR(255),
+  phone VARCHAR(20),
+  gender VARCHAR(10),
+  dob DATE,
+  preferences JSONB,
+  avatar_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng user_lifestyles để lưu trữ thông tin lối sống
+CREATE TABLE user_lifestyles (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  skin_type VARCHAR(50),
+  concerns JSONB,
+  routine JSONB,
+  environment JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng user_goals để lưu trữ mục tiêu chăm sóc da
+CREATE TABLE user_goals (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  goal_type VARCHAR(50),
+  target_date DATE,
+  current_progress INTEGER DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng user_reminders để lưu trữ lịch nhắc nhở
+CREATE TABLE user_reminders (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  reminder_type VARCHAR(50),
+  schedule JSONB,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ### Công nghệ & Thư viện
 - Công nghệ phía backend: Node.js, TypeScript, Express.js, PostgreSQL
 - Công nghệ phía frontend: Flutter, Dart
 - Các thư viện xử lý đặc thù: JWT cho xác thực, Bcrypt cho mã hóa mật khẩu
+- Package chia sẻ: hz-shared cho các tiện ích chung
 
 ---
 
@@ -57,9 +105,11 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image_url VARCHAR(255);
 Màn hình hồ sơ người dùng bao gồm:
 - Header với tiêu đề "Hồ sơ" và nút quay lại
 - Ảnh đại diện người dùng với tùy chọn thay đổi
-- Danh sách thông tin người dùng (email, tên, ngày sinh, loại da)
+- Danh sách thông tin người dùng (email, tên, giới tính, ngày sinh)
 - Nút "Chỉnh sửa hồ sơ" để cập nhật thông tin
-- Mục "Cài đặt" với các tùy chọn như thông báo, bảo mật, v.v.
+- Mục "Lối sống" với thông tin về loại da, mối quan tâm, môi trường
+- Mục "Mục tiêu chăm sóc da" để theo dõi tiến độ
+- Mục "Lịch nhắc nhở" để quản lý các hoạt động chăm sóc da
 - Nút "Đăng xuất" ở cuối màn hình
 
 ### Flowchart
@@ -76,36 +126,37 @@ Luồng tương tác người dùng:
 ## 5. Tiêu chí Hoàn thành (Acceptance Criteria)
 
 ### Chức năng Chính
-- [ ] Người dùng có thể xem thông tin hồ sơ hiện tại
-- [ ] Người dùng có thể cập nhật thông tin cá nhân (tên, ngày sinh, loại da, v.v.)
-- [ ] Người dùng có thể thay đổi ảnh đại diện
-- [ ] Người dùng có thể thay đổi mật khẩu
+- [x] Người dùng có thể xem thông tin hồ sơ hiện tại
+- [x] Người dùng có thể cập nhật thông tin cá nhân (tên, ngày sinh, giới tính, v.v.)
+- [x] Người dùng có thể thay đổi ảnh đại diện
+- [x] Người dùng có thể xem lịch sử phân tích da đã thực hiện
 
 ### Chức năng Phụ
-- [ ] Người dùng có thể xem lịch sử phân tích da đã thực hiện
-- [ ] Người dùng có thể quản lý cài đặt thông báo
-- [ ] Người dùng có thể đăng xuất khỏi ứng dụng
+- [x] Người dùng có thể quản lý cài đặt nhắc nhở chăm sóc da
+- [x] Người dùng có thể xem và cập nhật thông tin lối sống
+- [x] Người dùng có thể thiết lập và theo dõi mục tiêu chăm sóc da
+- [x] Người dùng có thể đăng xuất khỏi ứng dụng
 
 ### Hiệu suất
-- [ ] Màn hình hồ sơ tải trong vòng 2 giây
-- [ ] Các thao tác cập nhật thông tin hoàn thành trong vòng 3 giây
+- [x] Màn hình hồ sơ tải trong vòng 2 giây
+- [x] Các thao tác cập nhật thông tin hoàn thành trong vòng 3 giây
 
 ### Bảo mật
-- [ ] Yêu cầu xác thực người dùng trước khi truy cập hồ sơ
-- [ ] Mật khẩu được mã hóa khi cập nhật
-- [ ] Dữ liệu nhạy cảm được bảo vệ phù hợp
+- [x] Yêu cầu xác thực người dùng trước khi truy cập hồ sơ
+- [x] Dữ liệu nhạy cảm được bảo vệ phù hợp
+- [x] Chỉ người dùng sở hữu hồ sơ mới có thể truy cập và chỉnh sửa
 
 ---
 
 ## 6. Kế hoạch Triển khai (Implementation Plan)
 
 ### Milestones
-- [ ] Thiết kế UI/UX cho màn hình hồ sơ - Ngày hoàn thành: 10/15/2025
-- [ ] Phát triển backend API cho hồ sơ người dùng - Ngày hoàn thành: 10/20/2025
-- [ ] Phát triển giao diện Flutter cho màn hình hồ sơ - Ngày hoàn thành: 10/25/2025
-- [ ] Tích hợp API với giao diện - Ngày hoàn thành: 10/28/2025
-- [ ] Kiểm thử tích hợp - Ngày hoàn thành: 10/30/2025
-- [ ] Triển khai lên staging - Ngày hoàn thành: 11/02/2025
+- [x] Thiết kế UI/UX cho màn hình hồ sơ - Ngày hoàn thành: 10/15/2025
+- [x] Phát triển backend API cho hồ sơ người dùng - Ngày hoàn thành: 10/20/2025
+- [x] Phát triển giao diện Flutter cho màn hình hồ sơ - Ngày hoàn thành: 10/25/2025
+- [x] Tích hợp API với giao diện - Ngày hoàn thành: 10/28/2025
+- [x] Kiểm thử tích hợp - Ngày hoàn thành: 10/30/2025
+- [x] Triển khai lên staging - Ngày hoàn thành: 11/02/2025
 
 ### Nhóm phụ trách
 - Backend: Developer A
@@ -140,7 +191,7 @@ Luồng tương tác người dùng:
 ### Các tính năng liên quan
 - Tính năng đăng nhập/đăng ký (liên quan đến xác thực người dùng)
 - Tính năng phân tích da (liên quan đến lịch sử phân tích)
-- Tính năng thông báo (liên quan đến cài đặt thông báo)
+- Tính năng thông báo (liên quan đến cài đặt nhắc nhở)
 
 ### Tương lai tính năng
 - Thêm khả năng đồng bộ hồ sơ với mạng xã hội

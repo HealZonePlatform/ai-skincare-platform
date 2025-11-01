@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background-color: #f8fafc;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 font-sans antialiased;
+}
+
+a {
+  @apply text-brand hover:text-brand-dark transition-colors;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(108, 92, 231, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(15, 23, 42, 0.08);
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display text-slate-900;
+  }
+
+  p {
+    @apply text-slate-700;
+  }
+}

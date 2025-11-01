@@ -7,9 +7,9 @@ Tài liệu này mô tả các quy chuẩn lập trình áp dụng cho toàn b�
 
 ### 1.1. Ngôn ngữ lập trình
 - **Backend Services**: TypeScript cho các service Node.js, Python cho các service AI
-- **Frontend**: TypeScript cho React web dashboard, Dart cho Flutter mobile app
+- **Frontend**: TypeScript cho Next.js web dashboard, Dart cho Flutter mobile app
 - **Database**: SQL cho PostgreSQL, JavaScript cho MongoDB queries
-- **Infrastructure**: YAML cho Kubernetes configs, JSON cho config files
+- **Infrastructure**: YAML cho Docker Compose configs, JSON cho config files
 
 ### 1.2. Quản lý phụ thuộc
 - Sử dụng package managers chính thức (npm, yarn, pub, pip)
@@ -30,6 +30,7 @@ Tài liệu này mô tả các quy chuẩn lập trình áp dụng cho toàn b�
 - Đặt tên class theo chuẩn PascalCase
 - Sử dụng const cho biến không thay đổi, let cho biến có thay đổi
 - Tránh biến toàn cục, sử dụng module pattern hoặc dependency injection
+- Sử dụng import/export thay vì require/module.exports
 
 ### 2.2. Python
 - Tuân thủ PEP 8 style guide
@@ -41,6 +42,7 @@ Tài liệu này mô tả các quy chuẩn lập trình áp dụng cho toàn b�
 - Sử dụng f-string thay vì .format() hoặc %
 - Đặt tên biến mô tả rõ ràng mục đích
 - Sử dụng docstring cho tất cả các hàm và class
+- Sử dụng Google hoặc NumPy docstring format cho tài liệu
 
 ### 2.3. Dart (Flutter)
 - Tuân thủ Dart style guide
@@ -48,9 +50,10 @@ Tài liệu này mô tả các quy chuẩn lập trình áp dụng cho toàn b�
 - Sử dụng camelCase cho tên biến và hàm
 - Sử dụng PascalCase cho tên class và enum
 - Sử dụng snake_case cho tên file
-- Tổ chức code theo pattern (MVC, BLoC, Provider)
+- Tổ chức code theo pattern (BLoC, Provider)
 - Sử dụng widget riêng biệt cho các thành phần UI phức tạp
 - Quản lý state một cách rõ ràng và hiệu quả
+- Tuân thủ cấu trúc thư mục Flutter chuẩn
 
 ### 2.4. SQL
 - Sử dụng UPPER CASE cho từ khóa SQL (SELECT, FROM, WHERE, v.v.)
@@ -73,20 +76,22 @@ src/
 ├── utils/           # Hàm tiện ích
 ├── config/          # Cấu hình ứng dụng
 ├── types/           # Type definitions
+├── repositories/    # Database operations
 └── app.ts           # Entry point
 ```
 
-### 3.2. Frontend React
+### 3.2. Frontend Next.js
 ```
 src/
 ├── components/      # UI components
 ├── pages/           # Page components
+├── lib/             # API calls và utilities
 ├── hooks/           # Custom hooks
-├── services/        # API calls
 ├── utils/           # Utility functions
 ├── types/           # Type definitions
 ├── styles/          # CSS/SCSS files
-└── App.tsx          # Entry point
+├── providers/       # Context providers
+└── app/             # App Router structure
 ```
 
 ### 3.3. Frontend Flutter
@@ -99,6 +104,7 @@ lib/
 ├── providers/       # State management
 ├── utils/           # Utility functions
 ├── theme/           # UI theme
+├── routes/          # Navigation routes
 └── main.dart        # Entry point
 ```
 
@@ -111,7 +117,7 @@ lib/
 - Sử dụng tên danh từ cho biến (userName, productList)
 
 ### 4.2. Tên file
-- Sử dụng kebab-case cho tên file
+- Sử dụng kebab-case cho tên file TypeScript/JavaScript
 - Tên file phản ánh nội dung chính
 - Giữ tên file ngắn gọn nhưng mô tả
 
@@ -222,3 +228,8 @@ lib/
 - Sử dụng custom error classes để phân biệt các loại lỗi
 - Cung cấp thông tin lỗi đầy đủ cho việc debug
 - Không tiết lộ thông tin nội bộ hệ thống cho client
+
+## 11. Shared Package (hz-shared)
+- Sử dụng package chung `hz-shared` cho các tiện ích được chia sẻ giữa các dịch vụ
+- Bao gồm: xử lý lỗi chung, JWT utilities, PostgreSQL utilities, validation utilities
+- Cập nhật package chung khi cần thêm tiện ích mới được sử dụng ở nhiều dịch vụ

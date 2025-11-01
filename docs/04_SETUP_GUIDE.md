@@ -127,13 +127,19 @@ pip install -r requirements.txt
 
 #### Mobile App
 ```
-cd frontend/mobile-app
+cd frontend/mobile_app
 flutter pub get
 ```
 
 #### Web Dashboard
 ```
-cd frontend/web-dashboard
+cd frontend/deploy
+npm install
+```
+
+#### Shared Package
+```
+cd services/hz-shared
 npm install
 ```
 
@@ -212,14 +218,14 @@ python app/main.py
 
 #### Web Dashboard
 ```
-cd frontend/web-dashboard
-npm start
+cd frontend/deploy
+npm run dev
 ```
 
 ## Cấu hình Flutter Mobile App
 
 ### 1. Cấu hình API endpoint
-1. Mở file `frontend/mobile-app/lib/utils/api_constants.dart`
+1. Mở file `frontend/mobile_app/lib/utils/api_constants.dart`
 2. Cập nhật các endpoint URL để trỏ đến API Gateway đang chạy
 
 ### 2. Chạy ứng dụng
@@ -237,6 +243,8 @@ flutter run
   - TypeScript và JavaScript
   - Docker
   - GitLens
+ - ESLint
+  - Prettier
 
 ### 2. Cấu hình ESLint và Prettier
 1. Cài đặt các extension ESLint và Prettier trong IDE
@@ -262,7 +270,7 @@ Tạo file `.env.local` để ghi đè các biến môi trường cho môi trư�
 
 ### 3. Testing
 - Chạy test cho auth service: `cd services/auth-service && npm test`
-- Chạy test cho web dashboard: `cd frontend/web-dashboard && npm test`
+- Chạy test cho web dashboard: `cd frontend/deploy && npm test`
 - Chạy test cho mobile app: `cd frontend/mobile-app && flutter test`
 
 ## Khắc phục sự cố
@@ -283,6 +291,10 @@ Tạo file `.env.local` để ghi đè các biến môi trường cho môi trư�
 - Chạy `flutter clean` để xóa cache
 - Chạy `flutter pub get` để tải lại dependencies
 - Kiểm tra kết nối mạng nếu sử dụng emulator
+
+### 5. Lỗi Python
+- Đảm bảo môi trường ảo được kích hoạt trước khi cài đặt dependencies
+- Kiểm tra phiên bản Python có phù hợp với yêu cầu của dự án
 
 ## Môi trường staging và production
 
@@ -309,3 +321,12 @@ docker-compose up -d
 ### 3. Kiểm tra trạng thái
 ```
 docker-compose ps
+```
+
+## Cấu hình Google Gemini API
+Dịch vụ AI trong hệ thống sử dụng Google Gemini API để phân tích hình ảnh da. Để chạy dịch vụ AI, bạn cần:
+
+1. Tạo tài khoản Google Cloud Platform
+2. Kích hoạt Gemini API
+3. Tạo API key
+4. Cập nhật biến `GEMINI_API_KEY` trong file `.env` với giá trị API key đã tạo
