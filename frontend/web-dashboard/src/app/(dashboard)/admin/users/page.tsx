@@ -25,6 +25,22 @@ const STATUS_LABELS: Record<'all' | 'active' | 'invited' | 'suspended', string> 
   suspended: 'Tam khoa'
 };
 
+const LoadingState = () => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-sm text-slate-500">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-brand" />
+    <p>Dang tai danh sach nguoi dung...</p>
+  </div>
+);
+
+const ErrorState = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-center text-sm text-slate-500">
+    <p>{message}</p>
+    <Button variant="outline" onClick={onRetry}>
+      Thu lai
+    </Button>
+  </div>
+);
+
 export default function AdminUsersPage() {
   const {
     users,
@@ -34,7 +50,12 @@ export default function AdminUsersPage() {
     setRoleFilter,
     statusFilter,
     setStatusFilter,
-    summary
+    summary,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch
   } = useUsers();
 
   const columns = useMemo<ColumnConfig<DashboardUser>[]>(
@@ -103,6 +124,12 @@ export default function AdminUsersPage() {
               className="max-w-sm"
             />
             <Badge className="bg-brand/10 text-brand">{summary.total} tai khoan</Badge>
+            {isFetching ? (
+              <span className="inline-flex items-center gap-2 text-xs text-slate-400">
+                <span className="h-2 w-2 animate-ping rounded-full bg-brand" />
+                Dang dong bo...
+              </span>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-3">
             {(Object.keys(ROLE_LABELS) as Array<DashboardUserRole | 'all'>).map((role) => (
@@ -139,12 +166,21 @@ export default function AdminUsersPage() {
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          <DataTable
-            data={users}
-            columns={columns}
-            emptyMessage="Khong co nguoi dung nao phu hop voi bo loc."
-          />
+        <CardContent className="min-h-[260px]">
+          {isError ? (
+            <ErrorState
+              message={error instanceof Error ? error.message : 'Khong the tai danh sach nguoi dung.'}
+              onRetry={() => refetch()}
+            />
+          ) : isLoading ? (
+            <LoadingState />
+          ) : (
+            <DataTable
+              data={users}
+              columns={columns}
+              emptyMessage="Khong co nguoi dung nao phu hop voi bo loc."
+            />
+          )}
         </CardContent>
       </Card>
     </div>

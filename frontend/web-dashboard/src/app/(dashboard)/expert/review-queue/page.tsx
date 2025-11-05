@@ -3,43 +3,99 @@
 import { Filter } from 'lucide-react';
 import { ReviewQueueCard } from '@/components/dashboard/ReviewQueueCard';
 import { StatusPill } from '@/components/common/StatusPill';
-import { DataTable } from '@/components/table/DataTable';
+import { DataTable, type ColumnConfig } from '@/components/table/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useReviews } from '@/hooks/useReviews';
+import type { ReviewEntry } from '@/types/review';
 
 const PRIORITY_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'urgent', label: 'Khẩn cấp' },
-  { value: 'high', label: 'Ưu tiên cao' },
-  { value: 'medium', label: 'Ưu tiên vừa' },
-  { value: 'low', label: 'Ưu tiên thấp' }
+  { value: 'all', label: 'Tat ca' },
+  { value: 'urgent', label: 'Khan cap' },
+  { value: 'high', label: 'Uu tien cao' },
+  { value: 'medium', label: 'Uu tien vua' },
+  { value: 'low', label: 'Uu tien thap' }
 ] as const;
 
 const STATUS_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'pending_review', label: 'Chờ chuyên gia' },
-  { value: 'pending_approval', label: 'Chờ admin' },
-  { value: 'approved', label: 'Đã duyệt' },
-  { value: 'rejected', label: 'Từ chối' }
+  { value: 'all', label: 'Tat ca' },
+  { value: 'pending_review', label: 'Cho chuyen gia' },
+  { value: 'pending_approval', label: 'Cho admin' },
+  { value: 'approved', label: 'Da duyet' },
+  { value: 'rejected', label: 'Tu choi' }
 ] as const;
 
+const LoadingState = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-sm text-slate-500">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-brand" />
+    <p>{message}</p>
+  </div>
+);
+
+const ErrorState = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-center text-sm text-slate-500">
+    <p>{message}</p>
+    <Button variant="outline" onClick={onRetry}>
+      Thu lai
+    </Button>
+  </div>
+);
+
+const TABLE_COLUMNS: ColumnConfig<ReviewEntry>[] = [
+  {
+    key: 'productName',
+    label: 'San pham',
+    render: (item) => (
+      <div className="flex flex-col">
+        <span className="font-medium text-slate-800">{item.productName}</span>
+        <span className="text-xs text-slate-500">{item.partnerName}</span>
+      </div>
+    )
+  },
+  {
+    key: 'priority',
+    label: 'Uu tien',
+    render: (item) => <Badge className="bg-brand/10 text-brand capitalize">{item.priority}</Badge>
+  },
+  {
+    key: 'status',
+    label: 'Trang thai',
+    render: (item) => <StatusPill status={item.status} />
+  },
+  {
+    key: 'submittedAt',
+    label: 'Ngay gui',
+    render: (item) => new Date(item.submittedAt).toLocaleString('vi-VN')
+  }
+];
+
 export default function ExpertReviewQueuePage() {
-  const { queue, upcoming, filters, setPriorityFilter, setStatusFilter } = useReviews();
+  const {
+    queue,
+    upcoming,
+    filters,
+    setPriorityFilter,
+    setStatusFilter,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch
+  } = useReviews();
 
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Hàng đợi ưu tiên</h1>
+          <h1 className="text-2xl font-semibold text-slate-900">Hang doi danh gia</h1>
           <p className="text-sm text-slate-500">
-            Lọc theo mức độ ưu tiên và trạng thái để xử lý các sản phẩm mới.
+            Loc theo muc uu tien va trang thai xu ly de tap trung vao cac ho so can thiet.
           </p>
         </div>
         <Button variant="secondary">
           <Filter className="h-4 w-4" />
-          Bộ lọc nâng cao
+          Bo loc nang cao
         </Button>
       </section>
 
@@ -80,78 +136,86 @@ export default function ExpertReviewQueuePage() {
             </div>
           </CardHeader>
           <CardContent className="grid gap-4">
-            {queue.map((review) => (
-              <ReviewQueueCard key={review.id} review={review} />
-            ))}
-            {queue.length === 0 ? (
+            {isError ? (
+              <ErrorState
+                message={error instanceof Error ? error.message : 'Khong the tai hang doi danh gia.'}
+                onRetry={() => refetch()}
+              />
+            ) : isLoading ? (
+              <LoadingState message="Dang tai hang doi danh gia..." />
+            ) : queue.length === 0 ? (
               <p className="rounded-2xl bg-slate-100 p-6 text-center text-sm text-slate-500">
-                Không có sản phẩm nào phù hợp với bộ lọc hiện tại.
+                Khong co san pham nao phu hop voi bo loc hien tai.
               </p>
-            ) : null}
+            ) : (
+              queue.map((review) => <ReviewQueueCard key={review.id} review={review} />)
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Sản phẩm sắp review</CardTitle>
-            <CardDescription>AI gợi ý thứ tự ưu tiên dựa trên rủi ro và tiềm năng.</CardDescription>
+            <CardTitle>San pham sap den han</CardTitle>
+            <CardDescription>
+              AI goi y thu tu uu tien dua tren rui ro va tiem nang cua tung ho so.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {upcoming.map((review) => (
-              <div key={review.id} className="rounded-2xl border border-slate-100 p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800">{review.productName}</p>
-                    <p className="text-xs text-slate-500">{review.partnerName}</p>
+            {upcoming.length === 0 ? (
+              <p className="rounded-2xl border border-slate-100 p-4 text-sm text-slate-500">
+                Hien tai khong co de xuat nao tu he thong.
+              </p>
+            ) : (
+              upcoming.map((review) => (
+                <div key={review.id} className="rounded-2xl border border-slate-100 p-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">{review.productName}</p>
+                      <p className="text-xs text-slate-500">{review.partnerName}</p>
+                    </div>
+                    <Badge className="bg-brand/10 text-brand">AI score {review.aiScore}</Badge>
                   </div>
-                  <Badge className="bg-brand/10 text-brand">AI score {review.aiScore}</Badge>
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                    <span>Gui: {new Date(review.submittedAt).toLocaleString('vi-VN')}</span>
+                    <StatusPill status={review.status} />
+                  </div>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                  <span>Gửi: {new Date(review.submittedAt).toLocaleString('vi-VN')}</span>
-                  <StatusPill status={review.status} />
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>Nhật ký tương tác gần nhất</CardTitle>
-          <CardDescription>Các cập nhật quan trọng sau mỗi lần đánh giá.</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Ho so gan day</CardTitle>
+              <CardDescription>Cac lan tuong tac gan nhat cua chuyen gia.</CardDescription>
+            </div>
+            {isFetching ? (
+              <span className="inline-flex items-center gap-2 text-xs text-slate-400">
+                <span className="h-2 w-2 animate-ping rounded-full bg-brand" />
+                Dang dong bo...
+              </span>
+            ) : null}
+          </div>
         </CardHeader>
         <CardContent>
-          <DataTable
-            data={queue}
-            columns={[
-              {
-                key: 'productName',
-                label: 'Sản phẩm',
-                render: (item) => (
-                  <div className="flex flex-col">
-                    <span className="font-medium text-slate-800">{item.productName}</span>
-                    <span className="text-xs text-slate-500">{item.partnerName}</span>
-                  </div>
-                )
-              },
-              {
-                key: 'priority',
-                label: 'Ưu tiên',
-                render: (item) => <Badge className="bg-brand/10 text-brand">{item.priority}</Badge>
-              },
-              {
-                key: 'status',
-                label: 'Trạng thái',
-                render: (item) => <StatusPill status={item.status} />
-              },
-              {
-                key: 'submittedAt',
-                label: 'Ngày gửi',
-                render: (item) => new Date(item.submittedAt).toLocaleString('vi-VN')
-              }
-            ]}
-          />
+          {isError ? (
+            <ErrorState
+              message={error instanceof Error ? error.message : 'Khong the tai nhat ky tuong tac.'}
+              onRetry={() => refetch()}
+            />
+          ) : isLoading ? (
+            <LoadingState message="Dang tai nhat ky tuong tac..." />
+          ) : (
+            <DataTable
+              data={queue}
+              columns={TABLE_COLUMNS}
+              emptyMessage="Khong co ban ghi nao phu hop."
+            />
+          )}
         </CardContent>
       </Card>
     </div>

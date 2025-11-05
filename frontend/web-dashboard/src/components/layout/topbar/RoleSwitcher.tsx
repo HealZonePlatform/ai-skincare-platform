@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent } from 'react';
+import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { navigation } from '@/config/navigation';
 import { type DashboardRole, useRole } from '@/providers/RoleProvider';
@@ -23,7 +24,7 @@ export const RoleSwitcher = () => {
 
     setRole(nextRole);
     const defaultRoute = navigation[nextRole]?.[0]?.items?.[0]?.href ?? '/';
-    router.push(defaultRoute);
+    router.push(defaultRoute as Route);
   };
 
   return (

@@ -20,9 +20,36 @@ const STATUS_LABELS: Record<ProductStatus | 'all', string> = {
   rejected: 'Tu choi'
 };
 
+const LoadingState = () => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-sm text-slate-500">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-brand" />
+    <p>Dang tai du lieu san pham...</p>
+  </div>
+);
+
+const ErrorState = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+  <div className="flex flex-col items-center justify-center gap-3 py-10 text-center text-sm text-slate-500">
+    <p>{message}</p>
+    <Button variant="outline" onClick={onRetry}>
+      Thu lai
+    </Button>
+  </div>
+);
+
 export default function PartnerProductsPage() {
-  const { products, search, setSearch, statusFilter, setStatusFilter, statusSummary } =
-    useProducts();
+  const {
+    products,
+    search,
+    setSearch,
+    statusFilter,
+    setStatusFilter,
+    statusSummary,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch
+  } = useProducts();
 
   const columns = useMemo<ColumnConfig<Product>[]>(
     () => [
@@ -101,6 +128,12 @@ export default function PartnerProductsPage() {
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <Filter className="h-4 w-4" />
               Loc nhanh theo trang thai
+              {isFetching ? (
+                <span className="ml-2 inline-flex items-center gap-2 text-xs text-slate-400">
+                  <span className="h-2 w-2 animate-ping rounded-full bg-brand" />
+                  Dang dong bo...
+                </span>
+              ) : null}
             </div>
             <Input
               value={search}
@@ -129,12 +162,21 @@ export default function PartnerProductsPage() {
             ))}
           </div>
         </CardHeader>
-        <CardContent>
-          <DataTable
-            data={products}
-            columns={columns}
-            emptyMessage="Khong tim thay san pham phu hop voi bo loc."
-          />
+        <CardContent className="min-h-[260px]">
+          {isError ? (
+            <ErrorState
+              message={error instanceof Error ? error.message : 'Khong the tai du lieu san pham.'}
+              onRetry={() => refetch()}
+            />
+          ) : isLoading ? (
+            <LoadingState />
+          ) : (
+            <DataTable
+              data={products}
+              columns={columns}
+              emptyMessage="Khong tim thay san pham phu hop voi bo loc."
+            />
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { Route } from 'next';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
@@ -59,7 +60,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
                   return (
                     <li key={item.href}>
                       <Link
-                        href={item.href}
+                        href={item.href as Route}
                         className={cn(
                           'group block rounded-2xl border border-transparent bg-white/70 p-4 shadow-sm transition hover:border-brand hover:bg-white',
                           isActive && 'border-brand bg-white ring-2 ring-brand/20'
