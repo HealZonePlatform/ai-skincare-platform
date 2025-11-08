@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import 'package:ai_skincare_platform/core/demo/demo_session.dart';
 import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
+import 'package:ai_skincare_platform/core/session/auth_session_observer.dart';
 import 'package:ai_skincare_platform/data/profile/datasources/profile_local_cache.dart';
 import 'package:ai_skincare_platform/data/profile/repositories/profile_repository_impl.dart';
 import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
@@ -33,6 +37,16 @@ class UserProfileProvider with ChangeNotifier {
         _changePasswordUseCase = changePasswordUseCase ??
             ChangePasswordUseCase(repository: profileRepository ?? ProfileRepositoryImpl()) {
     loadUserProfile();
+    _authSubscription = AuthSessionObserver.instance.events.listen((event) {
+      if (event == AuthSessionEvent.signedIn) {
+        loadUserProfile(forceRefresh: true);
+      } else if (event == AuthSessionEvent.signedOut) {
+        _userProfile = null;
+        _history.clear();
+        _filteredHistory.clear();
+        notifyListeners();
+      }
+    });
   }
 
   final ProfileLocalCache _cache;
@@ -41,6 +55,7 @@ class UserProfileProvider with ChangeNotifier {
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
   final UploadAvatarUseCase _uploadAvatarUseCase;
   final ChangePasswordUseCase _changePasswordUseCase;
+  StreamSubscription<AuthSessionEvent>? _authSubscription;
 
   UserProfile? _userProfile;
   final List<SkinAnalysisHistory> _history = [];
@@ -72,6 +87,13 @@ class UserProfileProvider with ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
+
+    if (DemoSession.isActive) {
+      _applyDemoData();
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
 
     if (!forceRefresh) {
       await _loadFromCache();
@@ -105,6 +127,10 @@ class UserProfileProvider with ChangeNotifier {
   }
 
   Future<void> _initialiseHistory() async {
+    if (DemoSession.isActive) {
+      _applyDemoData();
+      return;
+    }
     try {
       _historyLoading = true;
       notifyListeners();
@@ -135,6 +161,15 @@ class UserProfileProvider with ChangeNotifier {
     _historyLoading = true;
     _errorMessage = null;
     notifyListeners();
+
+    if (DemoSession.isActive) {
+      if (!loadMore) {
+        _applyDemoData();
+      }
+      _historyLoading = false;
+      notifyListeners();
+      return;
+    }
 
     try {
       final nextPage = loadMore ? _currentPage + 1 : 1;
@@ -178,6 +213,20 @@ class UserProfileProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    if (DemoSession.isActive) {
+      final current = _userProfile ?? DemoSession.profile;
+      final updated = current.copyWith(
+        fullName: fullName ?? current.fullName,
+        phoneNumber: phoneNumber ?? current.phoneNumber,
+        avatarUrl: avatarUrl ?? current.avatarUrl,
+      );
+      _userProfile = updated;
+      DemoSession.updateProfile(updated);
+      _isUpdating = false;
+      notifyListeners();
+      return true;
+    }
+
     try {
       final payload = <String, dynamic>{};
       if (fullName != null) payload['fullName'] = fullName;
@@ -201,6 +250,16 @@ class UserProfileProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
+    if (DemoSession.isActive) {
+      final current = _userProfile ?? DemoSession.profile;
+      final updated = current.copyWith(avatarUrl: filePath);
+      _userProfile = updated;
+      DemoSession.updateProfile(updated);
+      _isUpdating = false;
+      notifyListeners();
+      return true;
+    }
+
     try {
       _userProfile = await _uploadAvatarUseCase.execute(filePath);
       await _cache.cacheProfile(_userProfile!);
@@ -221,6 +280,12 @@ class UserProfileProvider with ChangeNotifier {
     _isUpdating = true;
     _errorMessage = null;
     notifyListeners();
+
+    if (DemoSession.isActive) {
+      _isUpdating = false;
+      notifyListeners();
+      return true;
+    }
 
     try {
       await _changePasswordUseCase.execute(
@@ -257,6 +322,18 @@ class UserProfileProvider with ChangeNotifier {
       );
   }
 
+  void _applyDemoData() {
+    _userProfile = DemoSession.profile;
+    final demoHistory = DemoSession.history;
+    _history
+      ..clear()
+      ..addAll(demoHistory);
+    _filteredHistory
+      ..clear()
+      ..addAll(demoHistory);
+    _hasMoreHistory = false;
+  }
+
   void _handleError(Object error, StackTrace stackTrace) {
     ErrorHandler.logError(error, stackTrace);
     final message = ErrorHandler.getUserMessage(error);
@@ -267,5 +344,11 @@ class UserProfileProvider with ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 }

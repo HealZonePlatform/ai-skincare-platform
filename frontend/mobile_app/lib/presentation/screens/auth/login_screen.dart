@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Image.asset(
                 AppAssets.heroWave,
                 fit: BoxFit.cover,
-                color: Colors.black.withOpacityFraction(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 colorBlendMode: BlendMode.darken,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
@@ -201,12 +201,12 @@ class _BackgroundGradient extends StatelessWidget {
         Positioned(
           top: 90,
           left: -40,
-          child: _BlurBlob(color: Colors.white.withOpacityFraction(0.2), size: 180),
+          child: _BlurBlob(color: Colors.white.withValues(alpha: 0.2), size: 180),
         ),
         Positioned(
           bottom: 160,
           right: -60,
-          child: _BlurBlob(color: Colors.white.withOpacityFraction(0.15), size: 210),
+          child: _BlurBlob(color: Colors.white.withValues(alpha: 0.15), size: 210),
         ),
       ],
     );
@@ -249,7 +249,7 @@ class _FrostedContainer extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.l),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacityFraction(0.86),
+            color: Colors.white.withValues(alpha: 0.86),
             borderRadius: BorderRadius.circular(AppRadius.l),
             boxShadow: const [
               BoxShadow(color: Color(0x2A000000), blurRadius: 20, offset: Offset(0, 8)),

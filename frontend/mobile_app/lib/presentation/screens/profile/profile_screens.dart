@@ -90,7 +90,7 @@ class _ProfileHeader extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s / 2),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacityFraction(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.s),
                   ),
                   child: Text('Skin type: $skinType'),
@@ -177,7 +177,7 @@ class _ProfileBasicScreenState extends State<ProfileBasicScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _gender,
+                      initialValue: _gender,
                       decoration: const InputDecoration(labelText: 'Gender'),
                       items: const [
                         DropdownMenuItem(value: 'female', child: Text('Female')),
@@ -236,6 +236,8 @@ class ProfileRemindersScreen extends StatefulWidget {
 class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
   bool _dailyCare = true;
   TimeOfDay _dailyTime = const TimeOfDay(hour: 7, minute: 0);
+  bool _nightCare = true;
+  TimeOfDay _nightTime = const TimeOfDay(hour: 21, minute: 0);
   String _scanFrequency = 'weekly';
 
   @override
@@ -260,11 +262,25 @@ class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
                 if (picked != null) setState(() => _dailyTime = picked);
               },
             ),
+            SwitchListTile(
+              title: const Text('Nightly treatment reminder'),
+              subtitle: Text('Reminder time: ${_nightTime.format(context)}'),
+              value: _nightCare,
+              onChanged: (value) => setState(() => _nightCare = value),
+            ),
+            ListTile(
+              title: const Text('Choose night reminder time'),
+              trailing: const Icon(Icons.access_time),
+              onTap: () async {
+                final picked = await showTimePicker(context: context, initialTime: _nightTime);
+                if (picked != null) setState(() => _nightTime = picked);
+              },
+            ),
             const Divider(),
             const Text('Scheduled skin scans'),
             const SizedBox(height: AppSpacing.s),
             DropdownButtonFormField<String>(
-              value: _scanFrequency,
+              initialValue: _scanFrequency,
               decoration: const InputDecoration(labelText: 'Frequency'),
               items: const [
                 DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
@@ -277,17 +293,19 @@ class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
             HzPrimaryButton(
               label: 'Save changes',
               icon: Icons.save_outlined,
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Reminders updated.')),
-                );
-                context.pop();
-              },
+              onPressed: _saveChanges,
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _saveChanges() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Reminders saved (demo mode).')),
+    );
+    context.pop();
   }
 }
 

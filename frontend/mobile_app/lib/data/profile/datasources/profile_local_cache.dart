@@ -1,45 +1,33 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:ai_skincare_platform/core/security/secure_preferences.dart';
 import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
 
 class ProfileLocalCache {
-  ProfileLocalCache({SharedPreferences? preferences})
-      : _preferencesFuture = preferences != null
-            ? Future.value(preferences)
-            : SharedPreferences.getInstance();
+  ProfileLocalCache({
+    SecurePreferences? securePreferences,
+  }) : _securePreferences = securePreferences ?? SecurePreferences();
 
   static const _profileKey = 'cached_user_profile';
   static const _historyKey = 'cached_skin_history';
 
-  final Future<SharedPreferences> _preferencesFuture;
+  final SecurePreferences _securePreferences;
 
   Future<void> cacheProfile(UserProfile profile) async {
-    final prefs = await _preferencesFuture;
-    await prefs.setString(_profileKey, jsonEncode(profile.toJson()));
+    await _securePreferences.saveJson(_profileKey, profile.toJson());
   }
 
   Future<UserProfile?> readProfile() async {
-    final prefs = await _preferencesFuture;
-    final data = prefs.getString(_profileKey);
+    final data = await _securePreferences.readJson(_profileKey);
     if (data == null) return null;
-    return UserProfile.fromJson(jsonDecode(data) as Map<String, dynamic>);
+    return UserProfile.fromJson(data);
   }
 
   Future<void> cacheHistory(List<SkinAnalysisHistory> history) async {
-    final prefs = await _preferencesFuture;
     final serialized = history.map((item) => item.toJson()).toList();
-    await prefs.setString(_historyKey, jsonEncode(serialized));
+    await _securePreferences.saveList(_historyKey, serialized);
   }
 
   Future<List<SkinAnalysisHistory>> readHistory() async {
-    final prefs = await _preferencesFuture;
-    final data = prefs.getString(_historyKey);
-    if (data == null) return [];
-    final decoded = jsonDecode(data) as List<dynamic>;
-    return decoded
-        .map((item) => SkinAnalysisHistory.fromJson(item as Map<String, dynamic>))
-        .toList();
+    final data = await _securePreferences.readList(_historyKey);
+    return data.map(SkinAnalysisHistory.fromJson).toList();
   }
 }

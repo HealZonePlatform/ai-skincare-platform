@@ -7,6 +7,7 @@ import 'package:dio/io.dart';
 
 import 'package:ai_skincare_platform/config/environment.dart';
 import 'package:ai_skincare_platform/core/network/interceptors/retry_interceptor.dart';
+import 'package:ai_skincare_platform/core/network/interceptors/security_interceptor.dart';
 import 'package:ai_skincare_platform/core/session/auth_session_observer.dart';
 import 'package:ai_skincare_platform/data/auth/repositories/auth_repository_impl.dart';
 import 'package:ai_skincare_platform/data/auth/repositories/token_repository_impl.dart';
@@ -55,16 +56,16 @@ class ApiClient {
 
     final adapter = _dio.httpClientAdapter;
     if (adapter is IOHttpClientAdapter) {
-      adapter.onHttpClientCreate = (client) {
-        client.badCertificateCallback = (cert, host, port) {
-          if (Environment.strictSSL) {
-            return false;
-          }
-          return true;
-        };
+      adapter.createHttpClient = () {
+        final client = HttpClient();
+        if (!Environment.strictSSL) {
+          client.badCertificateCallback = (cert, host, port) => true;
+        }
         return client;
       };
     }
+
+    _dio.interceptors.add(SecurityInterceptor());
 
     _dio.interceptors.add(
       QueuedInterceptorsWrapper(

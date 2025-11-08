@@ -28,55 +28,111 @@
 ```
 lib/
 ├── main.dart                           # Điểm vào ứng dụng, khởi tạo theme và router
-├── config/                           # Cấu hình ứng dụng
-│   └── environment.dart              # Cấu hình runtime cho các môi trường
-├── core/                             # Lõi hệ thống
-│   ├── network/                      # Quản lý mạng
-│   │   ├── api_client.dart          # API client singleton với interceptors
-│   │   └── interceptors/            # Các interceptor (retry, auth, logging)
-│   ├── session/                      # Quản lý phiên làm việc
-│   │   └── auth_session_observer.dart # Observer cho các sự kiện phiên
-│   ├── analytics/                    # Analytics service
-│   ├── error/                        # Xử lý lỗi toàn cục
+├── api/                                # Các service API
+│   └── analyses_api_service.dart      # Service cho phân tích da
+├── config/                            # Cấu hình ứng dụng
+│   └── environment.dart               # Cấu hình runtime cho các môi trường
+├── core/                              # Lõi hệ thống
+│   ├── analytics/                     # Analytics service
+│   │   └── analytics_service.dart     # Dịch vụ analytics
+│   ├── config/                        # Cấu hình chung
+│   ├── constants/                     # Hằng số ứng dụng
+│   │   └── app_assets.dart            # Đường dẫn tài nguyên
+│   ├── demo/                          # Chức năng demo
+│   │   └── demo_session.dart          # Session demo
+│   ├── error/                         # Xử lý lỗi toàn cục
 │   │   └── global_error_notifier.dart # Notifier lỗi toàn cục
-│   └── validation/                   # Xác thực đầu vào
-├── theme/                            # Theme và thiết kế
-│   └── app_theme.dart                # Định nghĩa màu sắc, khoảng cách, kiểu dáng
-├── domain/                           # Lớp domain (entities, usecases, repositories)
-│   ├── auth/                         # Xác thực domain
-│   │   ├── entities/                 # Entities xác thực (AuthTokens, UserCredentials)
-│   │   ├── repositories/             # Interface repositories xác thực
-│   │   └── usecases/                 # Use cases xác thực (login, register, logout)
-│   └── profile/                      # Hồ sơ người dùng domain
-│       ├── entities/                 # Entities hồ sơ (UserProfile, SkinAnalysisHistory)
-│       ├── repositories/             # Interface repositories hồ sơ
-│       └── usecases/                 # Use cases hồ sơ (get, update, change password)
-├── data/                             # Lớp dữ liệu (implement repositories, data sources)
-│   ├── auth/                         # Xác thực data
-│   │   ├── datasources/              # Remote và local data sources xác thực
-│   │   └── repositories/             # Implementation repositories xác thực
-│   └── profile/                      # Hồ sơ người dùng data
-│       ├── datasources/              # Remote và local data sources hồ sơ
-│       └── repositories/             # Implementation repositories hồ sơ
-├── presentation/                     # Lớp presentation (UI, providers, screens, widgets)
-│   ├── providers/                    # Provider quản lý trạng thái
-│   │   ├── auth_provider.dart        # Quản lý trạng thái xác thực
+│   ├── logging/                       # Logging service
+│   │   └── app_logger.dart            # Logger ứng dụng
+│   ├── network/                       # Quản lý mạng
+│   │   ├── api_client.dart           # API client singleton với interceptors
+│   │   ├── network_config.dart       # Cấu hình mạng
+│   │   └── interceptors/             # Các interceptor (retry, auth, logging)
+│   │       ├── retry_interceptor.dart # Interceptor retry
+│   │       └── security_interceptor.dart # Interceptor bảo mật
+│   ├── notifications/                 # Quản lý thông báo
+│   ├── security/                      # Bảo mật ứng dụng
+│   │   └── secure_preferences.dart    # Lưu trữ an toàn
+│   ├── session/                       # Quản lý phiên làm việc
+│   │   └── auth_session_observer.dart # Observer cho các sự kiện phiên
+│   ├── utils/                         # Tiện ích chung
+│   └── validation/                    # Xác thực đầu vào
+│       └── input_validators.dart      # Các hàm xác thực đầu vào
+├── data/                              # Lớp dữ liệu (implement repositories, data sources)
+│   ├── analysis/                      # Dữ liệu phân tích da
+│   │   ├── datasources/               # Data sources cho phân tích
+│   │   └── repositories/              # Repository cho phân tích
+│   ├── auth/                          # Xác thực data
+│   │   ├── datasources/               # Remote và local data sources xác thực
+│   │   │   ├── auth_remote_data_source.dart # Data source xác thực từ xa
+│   │   │   └── token_local_data_source.dart # Data source token cục bộ
+│   │   └── repositories/              # Implementation repositories xác thực
+│   │       ├── auth_repository_impl.dart # Implementation repository xác thực
+│   │       └── token_repository_impl.dart # Implementation repository token
+│   └── profile/                       # Hồ sơ người dùng data
+│       ├── datasources/               # Remote và local data sources hồ sơ
+│       │   ├── profile_local_cache.dart # Cache hồ sơ cục bộ
+│       │   └── profile_remote_data_source.dart # Data source hồ sơ từ xa
+│       └── repositories/              # Implementation repositories hồ sơ
+│           └── profile_repository_impl.dart # Implementation repository hồ sơ
+├── domain/                            # Lớp domain (entities, usecases, repositories)
+│   ├── analysis/                      # Domain phân tích da
+│   │   ├── entities/                  # Entities phân tích
+│   │   ├── repositories/              # Interface repositories phân tích
+│   │   └── usecases/                  # Use cases phân tích
+│   ├── auth/                          # Xác thực domain
+│   │   ├── entities/                  # Entities xác thực (AuthTokens, UserCredentials)
+│   │   ├── repositories/              # Interface repositories xác thực
+│   │   └── usecases/                  # Use cases xác thực (login, register, logout)
+│   ├── common/                        # Các thành phần chung
+│   └── profile/                       # Hồ sơ người dùng domain
+│       ├── entities/                  # Entities hồ sơ (UserProfile, SkinAnalysisHistory)
+│       ├── repositories/              # Interface repositories hồ sơ
+│       └── usecases/                  # Use cases hồ sơ (get, update, change password)
+├── l10n/                              # Hỗ trợ đa ngôn ngữ
+│   └── app_localizations.dart         # Localization
+├── presentation/                      # Lớp presentation (UI, providers, screens, widgets)
+│   ├── providers/                     # Provider quản lý trạng thái
+│   │   ├── auth_provider.dart         # Quản lý trạng thái xác thực
 │   │   └── user_profile_provider.dart # Quản lý hồ sơ người dùng
-│   ├── screens/                      # Các màn hình ứng dụng
-│   │   ├── auth/                     # Màn hình xác thực
-│   │   ├── profile/                  # Màn hình hồ sơ
-│   │   ├── scan/                     # Màn hình quét da
-│   │   └── ...                       # Các màn hình khác
-│   ├── widgets/                      # Widget tái sử dụng
-│   │   ├── hz_buttons.dart           # Nút tùy chỉnh
-│   │   └── shell_scaffold.dart       # Giao diện chính với bottom navigation
-│   └── router/                       # Định tuyến
-│       └── app_router.dart           # Cấu hình điều hướng
-├── utils/                            # Tiện ích
-│   ├── api_constants.dart            # Hằng số API
-│   └── exceptions.dart               # Định nghĩa exception
-└── l10n/                             # Hỗ trợ đa ngôn ngữ
-    └── app_localizations.dart        # Localization
+│   ├── router/                        # Định tuyến
+│   │   ├── app_router.dart            # Cấu hình điều hướng
+│   │   └── router_observer.dart       # Observer cho router
+│   ├── screens/                       # Các màn hình ứng dụng
+│   │   ├── advice/                    # Màn hình lời khuyên
+│   │   ├── auth/                      # Màn hình xác thực
+│   │   ├── checkout/                  # Màn hình thanh toán
+│   │   ├── community/                 # Màn hình cộng đồng
+│   │   ├── history/                   # Màn hình lịch sử
+│   │   ├── home_screen.dart           # Màn hình chính
+│   │   ├── lifestyle/                 # Màn hình lối sống
+│   │   ├── onboarding/                # Màn hình hướng dẫn
+│   │   ├── paywall/                   # Màn hình thanh toán
+│   │   ├── products/                  # Màn hình sản phẩm
+│   │   ├── profile/                   # Màn hình hồ sơ
+│   │   ├── routine/                   # Màn hình lịch trình
+│   │   ├── scan/                      # Màn hình quét da
+│   │   └── survey/                    # Màn hình khảo sát
+│   ├── widgets/                       # Widget tái sử dụng
+│   │   ├── app_loading_overlay.dart   # Overlay loading
+│   │   ├── brand_logo.dart            # Logo thương hiệu
+│   │   ├── hz_buttons.dart            # Nút tùy chỉnh
+│   │   ├── hz_loading_skeleton.dart   # Skeleton loading
+│   │   ├── hz_skeleton.dart           # Skeleton chung
+│   │   ├── optimized_network_image.dart # Ảnh mạng tối ưu
+│   │   ├── shell_scaffold.dart        # Giao diện chính với bottom navigation
+│   │   └── ui_kit/                    # Bộ widget UI
+│   │       ├── hz_responsive_layout.dart # Layout responsive
+│   │       ├── hz_section_header.dart # Header section
+│   │       ├── hz_stat_chip.dart      # Chip trạng thái
+│   │       └── hz_surface_card.dart   # Card bề mặt
+│   └── spec/                          # Spec cho UI components
+├── theme/                             # Theme và thiết kế
+│   └── app_theme.dart                 # Định nghĩa màu sắc, khoảng cách, kiểu dáng
+└── utils/                             # Tiện ích
+    ├── api_constants.dart             # Hằng số API
+    ├── error_handler.dart             # Xử lý lỗi
+    └── exceptions.dart                # Định nghĩa exception
 ```
 
 ### Kiến trúc dữ liệu
@@ -143,7 +199,7 @@ lib/
 - Mobile app tuân thủ các quy tắc lập trình trong `AGENTS.md`:
   - Sử dụng camelCase cho biến và hàm trong Dart
   - Có cơ chế xác thực JWT với refresh token
-  - Sử dụng Provider pattern cho quản lý state
+ - Sử dụng Provider pattern cho quản lý state
   - Có logging và error handling
 
 ### Tính tương thích với hệ sinh thái:

@@ -3,6 +3,7 @@
 import 'dart:async';
 
 enum AuthSessionEvent {
+  signedIn,
   signedOut,
 }
 

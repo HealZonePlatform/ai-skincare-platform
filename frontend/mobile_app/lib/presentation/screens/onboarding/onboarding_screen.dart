@@ -150,7 +150,7 @@ class _StepHighlight extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 20,
-          backgroundColor: AppColors.primary.withOpacityFraction(0.12),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.12),
           child: Icon(icon, color: AppColors.primary),
         ),
         const SizedBox(width: AppSpacing.m),

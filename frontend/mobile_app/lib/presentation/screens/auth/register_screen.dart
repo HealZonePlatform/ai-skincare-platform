@@ -65,7 +65,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Image.asset(
                 AppAssets.onboardingIllustration,
                 fit: BoxFit.cover,
-                color: Colors.black.withOpacityFraction(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 colorBlendMode: BlendMode.darken,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
@@ -205,12 +205,12 @@ class _RegisterBackground extends StatelessWidget {
         Positioned(
           top: 80,
           right: -50,
-          child: _GradientCircle(size: 220, colors: [Colors.white.withOpacityFraction(0.18), Colors.white.withOpacityFraction(0.08)]),
+          child: _GradientCircle(size: 220, colors: [Colors.white.withValues(alpha: 0.18), Colors.white.withValues(alpha: 0.08)]),
         ),
         Positioned(
           bottom: 140,
           left: -40,
-          child: _GradientCircle(size: 180, colors: [Colors.white.withOpacityFraction(0.12), Colors.transparent]),
+          child: _GradientCircle(size: 180, colors: [Colors.white.withValues(alpha: 0.12), Colors.transparent]),
         ),
       ],
     );
@@ -249,7 +249,7 @@ class _GlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacityFraction(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(AppRadius.l),
             boxShadow: const [
               BoxShadow(color: Color(0x26000000), blurRadius: 24, offset: Offset(0, 12)),

@@ -26,7 +26,7 @@ class BrandLogo extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacityFraction(0.12),
+          color: AppColors.primary.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(size / 3),
         ),
         alignment: Alignment.center,

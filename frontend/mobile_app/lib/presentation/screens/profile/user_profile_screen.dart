@@ -334,7 +334,7 @@ class _ProfileHero extends StatelessWidget {
           child: Image.asset(
             AppAssets.analysisPlaceholder,
             fit: BoxFit.cover,
-            color: Colors.black.withOpacityFraction(0.35),
+            color: Colors.black.withValues(alpha: 0.35),
             colorBlendMode: BlendMode.darken,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
@@ -347,7 +347,7 @@ class _ProfileHero extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 32,
-                backgroundColor: Colors.white.withOpacityFraction(0.18),
+                backgroundColor: Colors.white.withValues(alpha: 0.18),
                 child: Text(
                   name.isNotEmpty ? name.characters.first.toUpperCase() : 'U',
                   style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
@@ -361,7 +361,7 @@ class _ProfileHero extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Healing journey with HealZone since $since',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacityFraction(0.85)),
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85)),
               ),
               const SizedBox(height: AppSpacing.m),
               Wrap(
@@ -369,14 +369,14 @@ class _ProfileHero extends StatelessWidget {
                 runSpacing: AppSpacing.s,
                 children: [
                   InputChip(
-                    backgroundColor: Colors.white.withOpacityFraction(0.16),
+                    backgroundColor: Colors.white.withValues(alpha: 0.16),
                     avatar: const Icon(Icons.email_outlined, size: 18, color: Colors.white),
                     label: Text(profile?.email ?? 'Syncing email...', style: const TextStyle(color: Colors.white)),
                     onPressed: () {},
                   ),
                   if (onEditPressed != null)
                     InputChip(
-                      backgroundColor: Colors.white.withOpacityFraction(0.16),
+                      backgroundColor: Colors.white.withValues(alpha: 0.16),
                       avatar: const Icon(Icons.edit_outlined, size: 18, color: Colors.white),
                       label: const Text('Edit profile', style: TextStyle(color: Colors.white)),
                       onPressed: onEditPressed,
@@ -605,7 +605,7 @@ class _HistoryTile extends StatelessWidget {
                   AppAssets.analysisPlaceholder,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    color: statusColor.withOpacityFraction(0.12),
+                    color: statusColor.withValues(alpha: 0.12),
                     alignment: Alignment.center,
                     child: Icon(Icons.image_outlined, color: statusColor),
                   ),
@@ -632,7 +632,7 @@ class _HistoryTile extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Chip(
-                      backgroundColor: statusColor.withOpacityFraction(0.18),
+                      backgroundColor: statusColor.withValues(alpha: 0.18),
                       labelStyle: theme.textTheme.labelSmall?.copyWith(color: statusColor, fontWeight: FontWeight.w600),
                       visualDensity: VisualDensity.compact,
                       label: Text(item.status?.toUpperCase() ?? 'UNKNOWN'),

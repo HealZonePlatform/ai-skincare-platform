@@ -1,11 +1,33 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
+import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_stat_chip.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_surface_card.dart';
+import 'package:ai_skincare_platform/theme/app_theme.dart';
 
-class ScanPrepareScreen extends StatelessWidget {
+class ScanPrepareScreen extends StatefulWidget {
   const ScanPrepareScreen({super.key});
+
+  @override
+  State<ScanPrepareScreen> createState() => _ScanPrepareScreenState();
+}
+
+class _ScanPrepareScreenState extends State<ScanPrepareScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 6),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +39,31 @@ class ScanPrepareScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _InstructionRow(icon: Icons.sunny, text: 'Đứng gần nguồn sáng tự nhiên hoặc ánh sáng trắng'),
-              const _InstructionRow(icon: Icons.clean_hands, text: 'Làm sạch mặt và lau khô trước khi quét'),
-              const _InstructionRow(icon: Icons.center_focus_strong, text: 'Giữ điện thoại cách mặt 15-20cm, canh giữa khung'),
+              HzSurfaceCard(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Row(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        return Transform.rotate(
+                          angle: _controller.value * math.pi * 2,
+                          child: child,
+                        );
+                      },
+                      child: const Icon(Icons.sunny, size: 48, color: AppColors.secondary),
+                    ),
+                    const SizedBox(width: AppSpacing.l),
+                    const Expanded(
+                      child: Text(
+                        'Đảm bảo ánh sáng tự nhiên hoặc đèn trắng dịu. Tránh ánh sáng vàng để AI nhận diện tốt nhất.',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.l),
+              const _AnimatedInstructionList(),
               const Spacer(),
               HzPrimaryButton(
                 label: 'Bắt đầu quét',
@@ -34,36 +78,110 @@ class ScanPrepareScreen extends StatelessWidget {
   }
 }
 
-class ScanCaptureScreen extends StatelessWidget {
+class _AnimatedInstructionList extends StatefulWidget {
+  const _AnimatedInstructionList();
+
+  @override
+  State<_AnimatedInstructionList> createState() => _AnimatedInstructionListState();
+}
+
+class _AnimatedInstructionListState extends State<_AnimatedInstructionList> {
+  final instructions = const [
+    _InstructionRow(icon: Icons.clean_hands, text: 'Làm sạch da mặt và lau khô trước khi quét.'),
+    _InstructionRow(icon: Icons.center_focus_strong, text: 'Giữ máy cách mặt 15-20cm, căn chỉnh trán giữa khung.'),
+    _InstructionRow(icon: Icons.spa_outlined, text: 'Thả lỏng khuôn mặt và giữ yên trong 5 giây.'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Các bước nhanh',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: AppSpacing.m),
+        ...instructions.asMap().entries.map(
+          (entry) => TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: Duration(milliseconds: 400 + entry.key * 120),
+            builder: (context, value, child) => Opacity(opacity: value, child: child),
+            child: entry.value,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ScanCaptureScreen extends StatefulWidget {
   const ScanCaptureScreen({super.key});
+
+  @override
+  State<ScanCaptureScreen> createState() => _ScanCaptureScreenState();
+}
+
+class _ScanCaptureScreenState extends State<ScanCaptureScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 5),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Đang quét gương mặt')),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              margin: const EdgeInsets.all(AppSpacing.xl),
-              height: 280,
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.circular(AppRadius.l),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child) {
+                      final scale = 1 + (_controller.value * 0.05);
+                      return Transform.scale(scale: scale, child: child);
+                    },
+                    child: Container(
+                      width: 280,
+                      height: 280,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(280),
+                        gradient: RadialGradient(
+                          colors: [
+                            AppColors.primary.withValues(alpha: 0.15),
+                            AppColors.primary.withValues(alpha: 0.05),
+                          ],
+                        ),
+                      ),
+                      child: const Icon(Icons.face_retouching_natural, size: 120, color: AppColors.primary),
+                    ),
+                  ),
+                ),
               ),
-              alignment: Alignment.center,
-              child: const Icon(Icons.photo_camera_front_outlined, size: 96, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.m),
-            const Text('Giữ yên trong vài giây...'),
-            const SizedBox(height: AppSpacing.xl),
-            HzPrimaryButton(
-              label: 'Xem kết quả mẫu',
-              icon: Icons.visibility_outlined,
-              onPressed: () => context.push('/scan/result'),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.l),
+              LinearProgressIndicator(
+                value: _controller.value,
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(AppRadius.m),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              HzPrimaryButton(
+                label: 'Xem kết quả mẫu',
+                icon: Icons.visibility_outlined,
+                onPressed: () => context.push('/scan/result'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -76,53 +194,61 @@ class ScanResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kết quả quét da')), 
+      appBar: AppBar(title: const Text('Kết quả gần nhất')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.xl),
           children: [
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.l),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(AppRadius.l),
-                boxShadow: AppShadows.mild,
-              ),
+            HzSurfaceCard(
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 32,
-                    backgroundColor: AppColors.success.withOpacityFraction(0.15),
-                    child: const Text('86', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                    radius: 40,
+                    backgroundColor: AppColors.success.withValues(alpha: 0.1),
+                    child: const Text(
+                      '86',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.l),
                   const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Da khá ổn định!', style: TextStyle(fontWeight: FontWeight.w600)),
-                        SizedBox(height: AppSpacing.s),
-                        Text('Làn da của bạn đang ở mức tốt, duy trì dưỡng ẩm và chống nắng hằng ngày.'),
-                      ],
+                    child: Text(
+                      'Da khỏe ổn định! Tiếp tục duy trì routine hiện tại để cải thiện vùng chữ T.',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
+            HzSectionHeader(
+              title: 'Chỉ số chính',
+              subtitle: 'Cập nhật dựa trên lần quét mới nhất',
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: AppSpacing.m),
             Wrap(
               spacing: AppSpacing.s,
               runSpacing: AppSpacing.s,
               children: const [
-                _ScoreTile(label: 'Mụn', value: '72'),
-                _ScoreTile(label: 'Thâm', value: '80'),
-                _ScoreTile(label: 'Độ ẩm', value: '68'),
-                _ScoreTile(label: 'Dầu', value: '62'),
+                HzStatChip(label: 'Độ ẩm', value: '72', icon: Icons.water_drop),
+                HzStatChip(label: 'Độ đàn hồi', value: '80', icon: Icons.auto_graph),
+                HzStatChip(label: 'Thâm mụn', value: '65', icon: Icons.blur_on),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
+            HzSectionHeader(
+              title: 'Ảnh đối chiếu',
+              padding: const EdgeInsets.only(bottom: AppSpacing.m),
+            ),
+            OptimizedNetworkImage(
+              imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800',
+              height: 220,
+              borderRadius: AppRadius.l,
+            ),
+            const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
-              label: 'Xem phân tích & gợi ý',
+              label: 'Xem phân tích chi tiết',
               icon: Icons.analytics_outlined,
               onPressed: () => context.push('/advice'),
             ),
@@ -142,40 +268,16 @@ class _InstructionRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.l),
+      padding: const EdgeInsets.only(bottom: AppSpacing.m),
       child: Row(
         children: [
-          CircleAvatar(radius: 24, backgroundColor: AppColors.primary.withOpacityFraction(0.15), child: Icon(icon, color: AppColors.primary)),
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+            child: Icon(icon, color: AppColors.primary),
+          ),
           const SizedBox(width: AppSpacing.m),
           Expanded(child: Text(text)),
-        ],
-      ),
-    );
-  }
-}
-
-class _ScoreTile extends StatelessWidget {
-  const _ScoreTile({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 160,
-      padding: const EdgeInsets.all(AppSpacing.m),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.m),
-        boxShadow: AppShadows.mild,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-          const SizedBox(height: AppSpacing.s),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         ],
       ),
     );

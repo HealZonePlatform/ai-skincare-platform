@@ -140,7 +140,6 @@ class AnalysesApiService {
         return NetworkException('SSL certificate verification failed');
 
       case DioExceptionType.unknown:
-      default:
         return NetworkException(
           'Network error occurred. Please try again.',
         );

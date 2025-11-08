@@ -22,8 +22,6 @@ class ErrorHandler {
       error: error,
       stackTrace: stackTrace,
     );
-
-    // TODO: integrate Crashlytics/Sentry when available.
   }
 
   /// Get user-friendly error message

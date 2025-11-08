@@ -15,7 +15,7 @@ class HistoryScreen extends StatelessWidget {
           final score = 80 - index * 3;
           return ListTile(
             leading: CircleAvatar(
-              backgroundColor: AppColors.primary.withOpacityFraction(0.2),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.2),
               child: Text('${index + 1}'),
             ),
             title: Text('Scan session ${index + 1}'),

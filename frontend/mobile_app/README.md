@@ -120,3 +120,13 @@ lib/
 ## Giấy phép
 
 Dự án này được cấp phép theo giấy phép MIT - xem tệp [LICENSE](LICENSE) để biết thêm chi tiết.
+
+## Demo login (local only)
+
+Để kiểm tra nhanh UI/UX mà không cần backend, dùng tài khoản mẫu:
+
+- **Email**: `demo@healzone.app`
+- **Mật khẩu**: `Demo123`
+
+Tài khoản này chạy hoàn toàn offline, dữ liệu (hồ sơ + lịch sử phân tích) được mock ngay trong app. Đừng quên xoá đoạn demo này trước khi phát hành production.
+

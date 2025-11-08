@@ -30,22 +30,32 @@ class _CheckoutMethodScreenState extends State<CheckoutMethodScreen> {
             children: [
               const _PlanSummary(),
               const SizedBox(height: AppSpacing.xl),
-              ..._methods.map(
-                (method) => Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.s),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppRadius.m),
-                    border: Border.all(
-                      color: method.id == _selected ? AppColors.primary : AppColors.chipBg,
-                    ),
-                  ),
-                  child: RadioListTile<String>(
-                    value: method.id,
-                    groupValue: _selected,
-                    title: Text(method.label),
-                    onChanged: (value) => setState(() => _selected = value ?? _selected),
-                  ),
+              RadioGroup<String>(
+                groupValue: _selected,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _selected = value);
+                  }
+                },
+                child: Column(
+                  children: _methods
+                      .map(
+                        (method) => Container(
+                          margin: const EdgeInsets.only(bottom: AppSpacing.s),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(AppRadius.m),
+                            border: Border.all(
+                              color: method.id == _selected ? AppColors.primary : AppColors.chipBg,
+                            ),
+                          ),
+                          child: RadioListTile<String>(
+                            value: method.id,
+                            title: Text(method.label),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               const Spacer(),
@@ -205,7 +215,7 @@ class CheckoutSuccessScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: AppColors.success.withOpacityFraction(0.15),
+              backgroundColor: AppColors.success.withValues(alpha: 0.15),
               child: const Icon(Icons.check_circle, color: AppColors.success, size: 48),
             ),
             const SizedBox(height: AppSpacing.l),

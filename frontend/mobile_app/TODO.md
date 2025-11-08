@@ -1,73 +1,73 @@
-﻿# TODO - Mobile App (Flutter)
+# TODO - Mobile App (Flutter)
 
-## Kiến trúc ứng dụng
-- [x] Tách riêng rõ ràng các layer (presentation, domain, data)
-- [x] Thêm lớp use case trong domain layer theo clean architecture
-- [x] Tạo interface/abstract class cho các service để dễ test & mock
+## Ki?n tr�c ?ng d?ng
+- [x] T�ch ri�ng r� r�ng c�c layer (presentation, domain, data)
+- [x] Th�m l?p use case trong domain layer theo clean architecture
+- [x] T?o interface/abstract class cho c�c service d? d? test & mock
 
-## Xử lý token tự động
-- [x] Thêm interceptor tự động gắn Authorization header
-- [x] Triển khai cơ chế refresh token tự động khi access token hết hạn
-- [x] Xử lý trường hợp refresh token thất bại (đăng xuất người dùng)
+## X? l� token t? d?ng
+- [x] Th�m interceptor t? d?ng g?n Authorization header
+- [x] Tri?n khai co ch? refresh token t? d?ng khi access token h?t h?n
+- [x] X? l� tru?ng h?p refresh token th?t b?i (dang xu?t ngu?i d�ng)
 
-## Quản lý API
-- [x] Thay thế hard-code base URL bằng cấu hình môi trường linh hoạt
-- [x] Thêm API interceptors để xử lý request/response chung
-- [x] Triển khai retry mechanism cho các request thất bại
-- [x] Thêm cấu hình timeout linh hoạt cho các loại request khác nhau
+## Qu?n l� API
+- [x] Thay th? hard-code base URL b?ng c?u h�nh m�i tru?ng linh ho?t
+- [x] Th�m API interceptors d? x? l� request/response chung
+- [x] Tri?n khai retry mechanism cho c�c request th?t b?i
+- [x] Th�m c?u h�nh timeout linh ho?t cho c�c lo?i request kh�c nhau
 
-## Xử lý lỗi toàn cục
-- [x] Thiết kế hệ thống xử lý lỗi toàn cục với UI thông báo thân thiện
-- [x] Tạo custom exception handler cho các loại lỗi khác nhau
-- [x] Hiển thị thông báo lỗi phù hợp với từng ngữ cảnh
+## X? l� l?i to�n c?c
+- [x] Thi?t k? h? th?ng x? l� l?i to�n c?c v?i UI th�ng b�o th�n thi?n
+- [x] T?o custom exception handler cho c�c lo?i l?i kh�c nhau
+- [x] Hi?n th? th�ng b�o l?i ph� h?p v?i t?ng ng? c?nh
 
-## Kiểm thử
-- [x] Thêm unit test cho các lớp business logic
-- [x] Viết widget test cho các màn hình chính
-- [x] Tạo integration test cho các flow chính (đăng nhập, phân tích da, v.v.)
-- [ ] Thiết lập mock API cho việc test
+## Ki?m th?
+- [x] Th�m unit test cho c�c l?p business logic
+- [x] Vi?t widget test cho c�c m�n h�nh ch�nh
+- [x] T?o integration test cho c�c flow ch�nh (dang nh?p, ph�n t�ch da, v.v.)
+- [x] Thi?t l?p mock API cho vi?c test
 
-## Tối ưu hiệu suất
-- [x] Thêm lazy loading cho các danh sách dài (lịch sử phân tích da)
-- [x] Tối ưu pagination cho danh sách lịch sử
-- [ ] Cải thiện hiệu suất hiển thị hình ảnh lớn
-- [x] Áp dụng caching hiệu quả hơn cho dữ liệu thường xuyên truy cập
+## T?i uu hi?u su?t
+- [x] Th�m lazy loading cho c�c danh s�ch d�i (l?ch s? ph�n t�ch da)
+- [x] T?i uu pagination cho danh s�ch l?ch s?
+- [x] C?i thi?n hi?u su?t hi?n th? h�nh ?nh l?n
+- [x] �p d?ng caching hi?u qu? hon cho d? li?u thu?ng xuy�n truy c?p
 
-## Kiểm tra và xác thực đầu vào
-- [x] Thêm hệ thống validation tập trung cho form
-- [x] Xác thực dữ liệu đầu vào trước khi gửi lên API
-- [x] Hiển thị thông báo lỗi validation thân thiện với người dùng
+## Ki?m tra v� x�c th?c d?u v�o
+- [x] Th�m h? th?ng validation t?p trung cho form
+- [x] X�c th?c d? li?u d?u v�o tru?c khi g?i l�n API
+- [x] Hi?n th? th�ng b�o l?i validation th�n thi?n v?i ngu?i d�ng
 
-## Logging và giám sát
-- [x] Thêm hệ thống logging toàn cục
-- [x] Tích hợp analytics (Google Analytics) dạng lightweight
-- [x] Ghi log lỗi và hành vi người dùng để phân tích
-- [ ] Thiết lập crash reporting (Firebase Crashlytics)
+## Logging v� gi�m s�t
+- [x] Th�m h? th?ng logging to�n c?c
+- [x] T�ch h?p analytics (Google Analytics) d?ng lightweight
+- [x] Ghi log l?i v� h�nh vi ngu?i d�ng d? ph�n t�ch
+- [x] Thi?t l?p crash reporting (Firebase Crashlytics)
 
-## Cấu hình môi trường
-- [x] Thêm cơ chế cấu hình riêng cho các môi trường dev/staging/prod
-- [ ] Tạo file cấu hình riêng biệt cho từng môi trường
-- [x] Tự động chọn API base URL theo môi trường
+## C?u h�nh m�i tru?ng
+- [x] Th�m co ch? c?u h�nh ri�ng cho c�c m�i tru?ng dev/staging/prod
+- [x] T?o file c?u h�nh ri�ng bi?t cho t?ng m�i tru?ng
+- [x] T? d?ng ch?n API base URL theo m�i tru?ng
 
-## Tái sử dụng mã nguồn
-- [ ] Thiết kế lại một số widget để tăng khả năng tái sử dụng
-- [ ] Tạo thư viện widget chung cho toàn ứng dụng
-- [ ] Tái sử dụng các component UI giữa các màn hình
+## T�i s? d?ng m� ngu?n
+- [x] Thi?t k? l?i m?t s? widget d? tang kh? nang t�i s? d?ng
+- [x] T?o thu vi?n widget chung cho to�n ?ng d?ng
+- [x] T�i s? d?ng c�c component UI gi?a c�c m�n h�nh
 
-## Tính năng mới cần phát triển
-- [x] Thêm tính năng đa ngôn ngữ (i18n)
-- [ ] Cải thiện trải nghiệm người dùng với animation/micro-interaction
-- [x] Thêm cơ chế offline-first cho một số tính năng cơ bản
-- [ ] Triển khai push notification cho lời nhắc chăm sóc da
-- [ ] Thêm tính năng chia sẻ kết quả phân tích da
+## T�nh nang m?i c?n ph�t tri?n
+- [x] Th�m t�nh nang da ng�n ng? (i18n)
+- [x] C?i thi?n tr?i nghi?m ngu?i d�ng v?i animation/micro-interaction
+- [x] Th�m co ch? offline-first cho m?t s? t�nh nang co b?n
+- [x] Tri?n khai push notification cho l?i nh?c cham s�c da
+- [x] Th�m t�nh nang chia s? k?t qu? ph�n t�ch da
 
-## Tối ưu UI/UX
-- [ ] Cải thiện giao diện màn hình loading
-- [ ] Thêm skeleton screen cho trải nghiệm mượt mà hơn
-- [ ] Tối ưu layout cho các kích thước màn hình khác nhau
-- [ ] Cải thiện trải nghiệm người dùng trong quá trình quét da
+## T?i uu UI/UX
+- [x] C?i thi?n giao di?n m�n h�nh loading
+- [x] Th�m skeleton screen cho tr?i nghi?m mu?t m� hon
+- [x] T?i uu layout cho c�c k�ch thu?c m�n h�nh kh�c nhau
+- [x] C?i thi?n tr?i nghi?m ngu?i d�ng trong qu� tr�nh qu�t da
 
-## Bảo mật
-- [ ] Kiểm tra lỗi tiềm ẩn có thể bị khai thác (insecure storage, v.v.)
-- [ ] Thêm kiểm tra bảo mật cho các API endpoints
-- [ ] Đảm bảo dữ liệu nhạy cảm được mã hóa đúng cách
+## B?o m?t
+- [x] Ki?m tra l?i ti?m ?n c� th? b? khai th�c (insecure storage, v.v.)
+- [x] Th�m ki?m tra b?o m?t cho c�c API endpoints
+- [x] �?m b?o d? li?u nh?y c?m du?c m� h�a d�ng c�ch

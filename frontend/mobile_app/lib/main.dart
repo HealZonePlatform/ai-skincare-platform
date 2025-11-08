@@ -10,6 +10,7 @@ import 'package:ai_skincare_platform/l10n/app_localizations.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/router/app_router.dart';
+import 'package:ai_skincare_platform/presentation/widgets/app_loading_overlay.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/utils/error_handler.dart';
 
@@ -58,6 +59,12 @@ class MyApp extends StatelessWidget {
               supportedLocales: AppLocalizations.supportedLocales,
             ),
             builder: (context, errorMessage, child) {
+              Widget composed = Stack(alignment: Alignment.topLeft,
+                children: [
+                  child!,
+                  AppLoadingOverlay(visible: auth.isLoading, message: 'Dang xac thuc phien lam viec...'),
+                ],
+              );
               if (errorMessage != null && errorMessage.isNotEmpty) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   final messenger = _scaffoldMessengerKey.currentState;
@@ -69,7 +76,7 @@ class MyApp extends StatelessWidget {
                   GlobalErrorNotifier.clear();
                 });
               }
-              return child!;
+              return composed;
             },
           );
         },
@@ -77,3 +84,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

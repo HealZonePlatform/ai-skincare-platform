@@ -44,8 +44,8 @@ class _HzSkeletonState extends State<HzSkeleton> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).colorScheme.surface.withOpacityFraction(0.45);
-    final highlight = Colors.white.withOpacityFraction(0.85);
+    final baseColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.45);
+    final highlight = Colors.white.withValues(alpha: 0.85);
 
     return Container(
       width: widget.width,

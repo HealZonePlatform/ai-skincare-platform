@@ -65,7 +65,7 @@ class _PlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: highlight ? AppColors.primary.withOpacityFraction(0.08) : Colors.white,
+      color: highlight ? AppColors.primary.withValues(alpha: 0.08) : Colors.white,
       margin: const EdgeInsets.only(bottom: AppSpacing.l),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
       child: Padding(

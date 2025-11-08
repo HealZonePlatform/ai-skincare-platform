@@ -6,17 +6,38 @@ import 'package:provider/provider.dart';
 
 import 'package:ai_skincare_platform/core/constants/app_assets.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/widgets/brand_logo.dart';
+import 'package:ai_skincare_platform/presentation/widgets/hz_skeleton.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_responsive_layout.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
+import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_surface_card.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final profileProvider = context.watch<UserProfileProvider>();
+    final showSkeleton = profileProvider.isLoading && profileProvider.userProfile == null;
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
@@ -45,22 +66,18 @@ class HomeScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  SizedBox(height: AppSpacing.xl),
-                  _InsightCards(),
-                  SizedBox(height: AppSpacing.xl),
-                  _RoutineCarousel(),
-                  SizedBox(height: AppSpacing.xl),
-                ],
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: showSkeleton ? const _HomeSkeleton() : const _HomeContent(),
               ),
             ),
           ),
-          const _SectionHeading(
-            title: 'Latest stories',
-            actionLabel: 'See all',
-            route: '/community',
+          SliverToBoxAdapter(
+            child: HzSectionHeader(
+              title: 'Latest stories',
+              actionLabel: 'See all',
+              route: '/community',
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.m),
@@ -70,10 +87,12 @@ class HomeScreen extends StatelessWidget {
               itemBuilder: (context, index) => _ArticleCard(article: _articles[index]),
             ),
           ),
-          const _SectionHeading(
-            title: 'Recommended products',
-            actionLabel: 'Browse',
-            route: '/products',
+          SliverToBoxAdapter(
+            child: HzSectionHeader(
+              title: 'Recommended products',
+              actionLabel: 'Browse',
+              route: '/products',
+            ),
           ),
           SliverToBoxAdapter(
             child: SizedBox(
@@ -85,6 +104,7 @@ class HomeScreen extends StatelessWidget {
                 itemCount: _products.length,
                 separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.l),
                 itemBuilder: (context, index) => _ProductCard(product: _products[index]),
+                cacheExtent: 1000, // Improve performance for horizontal scrolling
               ),
             ),
           ),
@@ -106,8 +126,8 @@ class _HeroHeader extends StatelessWidget {
     final gradient = LinearGradient(
       colors: [
         AppColors.primary,
-        AppColors.primary.withOpacityFraction(0.75),
-        AppColors.secondary.withOpacityFraction(0.6),
+        AppColors.primary.withValues(alpha: 0.75),
+        AppColors.secondary.withValues(alpha: 0.6),
       ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
@@ -121,7 +141,7 @@ class _HeroHeader extends StatelessWidget {
           child: Image.asset(
             AppAssets.heroWave,
             fit: BoxFit.cover,
-            color: Colors.black.withOpacityFraction(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             colorBlendMode: BlendMode.darken,
             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
@@ -136,7 +156,7 @@ class _HeroHeader extends StatelessWidget {
               height: 120,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppRadius.l),
-                border: Border.all(color: Colors.white.withOpacityFraction(0.35), width: 1.4),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.35), width: 1.4),
               ),
             ),
           ),
@@ -149,8 +169,8 @@ class _HeroHeader extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacityFraction(0.18),
-              border: Border.all(color: Colors.white.withOpacityFraction(0.35)),
+              color: Colors.white.withValues(alpha: 0.18),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
             ),
             alignment: Alignment.center,
             child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
@@ -169,17 +189,53 @@ class _HeroHeader extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Your moisture level is trending lower today. Remember to scan at 9 PM for updated insights.',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withOpacityFraction(0.85)),
+                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85)),
               ),
               const SizedBox(height: AppSpacing.l),
               FilledButton.tonal(
                 onPressed: () => context.push('/scan/prepare'),
-                style: FilledButton.styleFrom(backgroundColor: Colors.white.withOpacityFraction(0.2)),
+                style: FilledButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.2)),
                 child: const Text('Start quick scan'),
               ),
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _HomeContent extends StatelessWidget {
+  const _HomeContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        SizedBox(height: AppSpacing.xl),
+        _InsightCards(),
+        SizedBox(height: AppSpacing.xl),
+        _RoutineCarousel(),
+        SizedBox(height: AppSpacing.xl),
+      ],
+    );
+  }
+}
+
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        SizedBox(height: AppSpacing.xl),
+        HzSkeleton.rect(height: 140, margin: EdgeInsets.symmetric(vertical: AppSpacing.s)),
+        HzSkeleton.rect(height: 140, margin: EdgeInsets.symmetric(vertical: AppSpacing.s)),
+        SizedBox(height: AppSpacing.l),
+        HzSkeleton.rect(height: 220),
+        SizedBox(height: AppSpacing.xl),
       ],
     );
   }
@@ -204,45 +260,42 @@ class _InsightCards extends StatelessWidget {
                     horizontal: isWide ? AppSpacing.m : 0,
                     vertical: isWide ? 0 : AppSpacing.m / 2,
                   ),
-                  padding: const EdgeInsets.all(AppSpacing.l),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(AppRadius.l),
-                    boxShadow: AppShadows.mild,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(insight.icon, color: insight.iconColor, size: 26),
-                      const SizedBox(height: AppSpacing.m),
-                      Text(
-                        insight.title,
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: AppSpacing.s),
-                      TweenAnimationBuilder<double>(
-                        tween: Tween(begin: 0, end: insight.progress),
-                        duration: const Duration(milliseconds: 900),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, value, _) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            LinearProgressIndicator(
-                              value: value,
-                              minHeight: 6,
-                              backgroundColor: AppColors.chipBg,
-                              color: insight.iconColor,
-                              borderRadius: BorderRadius.circular(AppRadius.s),
-                            ),
-                            const SizedBox(height: AppSpacing.s),
-                            Text(
-                              insight.caption,
-                              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-                            ),
-                          ],
+                  child: HzSurfaceCard(
+                    padding: const EdgeInsets.all(AppSpacing.l),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(insight.icon, color: insight.iconColor, size: 26),
+                        const SizedBox(height: AppSpacing.m),
+                        Text(
+                          insight.title,
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: AppSpacing.s),
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0, end: insight.progress),
+                          duration: const Duration(milliseconds: 900),
+                          curve: Curves.easeOutCubic,
+                          builder: (context, value, _) => Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              LinearProgressIndicator(
+                                value: value,
+                                minHeight: 6,
+                                backgroundColor: AppColors.chipBg,
+                                color: insight.iconColor,
+                                borderRadius: BorderRadius.circular(AppRadius.s),
+                              ),
+                              const SizedBox(height: AppSpacing.s),
+                              Text(
+                                insight.caption,
+                                style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -250,9 +303,15 @@ class _InsightCards extends StatelessWidget {
             .toList();
 
         if (isWide) {
-          return Row(children: children);
+          return SizedBox(
+            height: 160, // Đặt chiều cao cụ thể cho Row chứa các insight cards
+            child: Row(children: children),
+          );
         }
-        return Column(children: children);
+        return SizedBox(
+          height: 240, // Đặt chiều cao cụ thể cho Column chứa các insight cards
+          child: Column(children: children),
+        );
       },
     );
   }
@@ -269,15 +328,48 @@ class _RoutineCarousel extends StatelessWidget {
       children: [
         Text('Today\'s routines', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
         const SizedBox(height: AppSpacing.m),
-        SizedBox(
-          height: 180,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: _routines.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.l),
-            itemBuilder: (context, index) => _RoutineCard(routine: _routines[index]),
+        HzResponsiveLayout(
+          mobile: (_, __) => SizedBox(
+            height: 180,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _routines.length,
+              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.l),
+              itemBuilder: (context, index) => _RoutineCard(routine: _routines[index]),
+            ),
           ),
+          tablet: (_, constraints) {
+            final itemWidth = (constraints.maxWidth - AppSpacing.l) / 2;
+            return Wrap(
+              spacing: AppSpacing.l,
+              runSpacing: AppSpacing.l,
+              children: _routines
+                  .map(
+                    (routine) => SizedBox(
+                      width: itemWidth,
+                      child: _RoutineCard(routine: routine),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+          desktop: (_, constraints) {
+            final rawWidth = (constraints.maxWidth - AppSpacing.l * 2) / 3;
+            final itemWidth = rawWidth.clamp(260, 320).toDouble();
+            return Wrap(
+              spacing: AppSpacing.l,
+              runSpacing: AppSpacing.l,
+              children: _routines
+                  .map(
+                    (routine) => SizedBox(
+                      width: itemWidth,
+                      child: _RoutineCard(routine: routine),
+                    ),
+                  )
+                  .toList(),
+            );
+          },
         ),
       ],
     );
@@ -313,7 +405,7 @@ class _RoutineCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.m),
-          Expanded(
+          Flexible(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: routine.steps
@@ -325,7 +417,7 @@ class _RoutineCard extends StatelessWidget {
                         children: [
                           const Icon(Icons.circle, size: 6, color: AppColors.primary),
                           const SizedBox(width: AppSpacing.s),
-                          Expanded(
+                          Flexible(
                             child: Text(
                               step,
                               style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
@@ -343,7 +435,7 @@ class _RoutineCard extends StatelessWidget {
             onPressed: () => context.push('/routine'),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.s),
-              backgroundColor: AppColors.secondary.withOpacityFraction(0.16),
+              backgroundColor: AppColors.secondary.withValues(alpha: 0.16),
               foregroundColor: AppColors.secondary,
             ),
             child: const Text('See details'),
@@ -353,39 +445,7 @@ class _RoutineCard extends StatelessWidget {
     );
   }
 }
-
-class _SectionHeading extends StatelessWidget {
-  const _SectionHeading({
-    required this.title,
-    required this.route,
-    this.actionLabel = 'See all',
-  });
-
-  final String title;
-  final String actionLabel;
-  final String route;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.l, AppSpacing.xl, AppSpacing.s),
-      sliver: SliverToBoxAdapter(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-            TextButton(
-              onPressed: () => context.push(route),
-              child: Text(actionLabel),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+ 
 class _ArticleCard extends StatelessWidget {
   const _ArticleCard({required this.article});
 
@@ -413,8 +473,8 @@ class _ArticleCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.m),
                 gradient: LinearGradient(
                   colors: [
-                    article.heroColor.withOpacityFraction(0.16),
-                    AppColors.primary.withOpacityFraction(0.08),
+                    article.heroColor.withValues(alpha: 0.16),
+                    AppColors.primary.withValues(alpha: 0.08),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -423,7 +483,7 @@ class _ArticleCard extends StatelessWidget {
               child: Icon(article.icon, color: article.heroColor, size: 32),
             ),
             const SizedBox(width: AppSpacing.l),
-            Expanded(
+            Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -438,7 +498,7 @@ class _ArticleCard extends StatelessWidget {
                   const SizedBox(height: AppSpacing.s),
                   Row(
                     children: [
-                      Icon(Icons.timer_outlined, size: 16, color: AppColors.textSecondary.withOpacityFraction(0.7)),
+                      Icon(Icons.timer_outlined, size: 16, color: AppColors.textSecondary.withValues(alpha: 0.7)),
                       const SizedBox(width: AppSpacing.xs),
                       Text(article.readingTime, style: theme.textTheme.labelSmall),
                     ],
@@ -481,7 +541,7 @@ class _ProductCard extends StatelessWidget {
                 product.imageAsset,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
-                  color: product.color.withOpacityFraction(0.12),
+                  color: product.color.withValues(alpha: 0.12),
                   alignment: Alignment.center,
                   child: Icon(product.icon, color: product.color, size: 42),
                 ),
@@ -500,7 +560,7 @@ class _ProductCard extends StatelessWidget {
           const Spacer(),
           Row(
             children: [
-              Icon(Icons.star_rounded, color: AppColors.secondary.withOpacityFraction(0.9), size: 18),
+              Icon(Icons.star_rounded, color: AppColors.secondary.withValues(alpha: 0.9), size: 18),
               const SizedBox(width: AppSpacing.xs),
               Text('${product.rating.toStringAsFixed(1)} / 5', style: theme.textTheme.labelSmall),
               const Spacer(),
