@@ -1,5 +1,4 @@
 // Package imports
-import 'dart:io';
 import 'package:dio/dio.dart';
 
 // Local imports
@@ -15,7 +14,7 @@ class AnalysesApiService {
 
   /// Upload skin analysis image with progress tracking
   Future<Response> uploadSkinAnalysis(
-    File imageFile, {
+    dynamic imageFile, {
     Function(int, int)? onProgress,
   }) async {
     try {

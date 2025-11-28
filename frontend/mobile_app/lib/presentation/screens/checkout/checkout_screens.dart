@@ -247,9 +247,9 @@ class _PlanSummary extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.l),
         boxShadow: AppShadows.mild,
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text('Gói Chuyên Gia', style: TextStyle(fontWeight: FontWeight.w600)),
           SizedBox(height: AppSpacing.s),
           Text('99.000đ / tháng'),

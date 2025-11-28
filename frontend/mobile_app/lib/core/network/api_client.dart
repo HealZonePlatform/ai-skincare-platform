@@ -1,6 +1,7 @@
 // lib/core/network/api_client.dart
 
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -54,15 +55,17 @@ class ApiClient {
       },
     );
 
-    final adapter = _dio.httpClientAdapter;
-    if (adapter is IOHttpClientAdapter) {
-      adapter.createHttpClient = () {
-        final client = HttpClient();
-        if (!Environment.strictSSL) {
-          client.badCertificateCallback = (cert, host, port) => true;
-        }
-        return client;
-      };
+    if (!kIsWeb) {
+      final adapter = _dio.httpClientAdapter;
+      if (adapter is IOHttpClientAdapter) {
+        adapter.createHttpClient = () {
+          final client = HttpClient();
+          if (!Environment.strictSSL) {
+            client.badCertificateCallback = (cert, host, port) => true;
+          }
+          return client;
+        };
+      }
     }
 
     _dio.interceptors.add(SecurityInterceptor());

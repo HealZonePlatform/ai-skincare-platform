@@ -2,60 +2,60 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Brand Colors
-  static const primary = Color(0xFF8A8E5A);
-  static const primaryLight = Color(0xFFA5AA7E);
-  static const primaryDark = Color(0xFF6B6F43);
+  // Brand Colors - Earthy & Natural
+  static const primary = Color(0xFF6B705C); // Olive Green - More grounded
+  static const primaryLight = Color(0xFFA5A58D); // Sage
+  static const primaryDark = Color(0xFF484A3E); // Deep Olive
+
+  static const secondary = Color(0xFFDDBEA9); // Beige/Peach - Softer
+  static const secondaryLight = Color(0xFFFFE8D6); // Champagne
+  static const secondaryDark = Color(0xFFCB997E); // Terracotta
+
+  // Surface & Background - Clean & Warm
+  static const surface = Color(0xFFFFFFFF);
+  static const surfaceLight = Color(0xFFFBFBF9); // Off-white
+  static const background = Color(0xFFF7F7F5); // Very light grey/beige
   
-  static const secondary = Color(0xFFF4A259);
-  static const secondaryLight = Color(0xFFF6B77D);
-  static const secondaryDark = Color(0xFFE08A3A);
-  
-  // Surface & Background
-  static const surface = Color(0xFFFAF7F2);
-  static const surfaceLight = Color(0xFFFFFFFF);
-  static const background = Color(0xFFF5F2ED);
-  
-  // Text Colors
-  static const textPrimary = Color(0xFF222222);
-  static const textSecondary = Color(0xFF666666);
-  static const textTertiary = Color(0xFF999999);
-  static const textDisabled = Color(0xFFCCCCCC);
+  // Text Colors - High Contrast but Soft
+  static const textPrimary = Color(0xFF2F3128); // Almost black, slightly green-tinted
+  static const textSecondary = Color(0xFF6C7064); // Dark Grey/Green
+  static const textTertiary = Color(0xFFA0A498);
+  static const textDisabled = Color(0xFFD6D8D1);
   
   // Semantic Colors
-  static const success = Color(0xFF4CAF50);
-  static const successLight = Color(0xFF81C784);
-  static const warning = Color(0xFFFFB300);
-  static const warningLight = Color(0xFFFFCA28);
-  static const danger = Color(0xFFE53935);
-  static const dangerLight = Color(0xFFEF5350);
-  static const info = Color(0xFF2196F3);
-  static const infoLight = Color(0xFF64B5F6);
+  static const success = Color(0xFF606C38); // Forest Green
+  static const successLight = Color(0xFF8F9E58);
+  static const warning = Color(0xFFD4A373); // Muted Orange
+  static const warningLight = Color(0xFFE9C496);
+  static const danger = Color(0xFFBC6C25); // Burnt Orange/Red
+  static const dangerLight = Color(0xFFDDA15E);
+  static const info = Color(0xFF7F9CA2); // Muted Blue/Green
+  static const infoLight = Color(0xFFA8C0C4);
   
   // UI Elements
-  static const chipBg = Color(0xFFEEF0E6);
-  static const border = Color(0xFFE0E0E0);
-  static const divider = Color(0xFFEEEEEE);
-  static const overlay = Color(0x80000000);
+  static const chipBg = Color(0xFFF0F2EB);
+  static const border = Color(0xFFE6E8E0);
+  static const divider = Color(0xFFF0F2EB);
+  static const overlay = Color(0x662F3128);
   
   // Gradients
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFF8A8E5A), Color(0xFFA5AA7E)],
+    colors: [Color(0xFF6B705C), Color(0xFF888C75)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
   static const secondaryGradient = LinearGradient(
-    colors: [Color(0xFFF4A259), Color(0xFFE08A3A)],
+    colors: [Color(0xFFDDBEA9), Color(0xFFCB997E)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
   
   static const heroGradient = LinearGradient(
     colors: [
-      Color(0xFF8A8E5A),
-      Color(0xFFA5AA7E),
-      Color(0xFFF4A259),
+      Color(0xFF6B705C),
+      Color(0xFF888C75),
+      Color(0xFFDDBEA9),
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

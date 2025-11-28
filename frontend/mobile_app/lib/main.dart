@@ -26,7 +26,8 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -44,39 +45,45 @@ class MyApp extends StatelessWidget {
           final router = AppRouter(isLoggedIn: auth.isLoggedIn).router;
           return ValueListenableBuilder<String?>(
             valueListenable: GlobalErrorNotifier.notifier,
-            child: MaterialApp.router(
-              title: 'HealZone',
-              debugShowCheckedModeBanner: false,
-              theme: theme,
-              routerConfig: router,
-              scaffoldMessengerKey: _scaffoldMessengerKey,
-              localizationsDelegates: const [
-                AppLocalizationsDelegate(),
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-            ),
-            builder: (context, errorMessage, child) {
-              Widget composed = Stack(alignment: Alignment.topLeft,
-                children: [
-                  child!,
-                  AppLoadingOverlay(visible: auth.isLoading, message: 'Dang xac thuc phien lam viec...'),
+            builder: (context, errorMessage, _) {
+              return MaterialApp.router(
+                title: 'HealZone',
+                debugShowCheckedModeBanner: false,
+                theme: theme,
+                routerConfig: router,
+                scaffoldMessengerKey: _scaffoldMessengerKey,
+                localizationsDelegates: const [
+                  AppLocalizationsDelegate(),
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
                 ],
-              );
-              if (errorMessage != null && errorMessage.isNotEmpty) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  final messenger = _scaffoldMessengerKey.currentState;
-                  if (messenger != null) {
-                    messenger
-                      ..removeCurrentSnackBar()
-                      ..showSnackBar(SnackBar(content: Text(errorMessage)));
+                supportedLocales: AppLocalizations.supportedLocales,
+                builder: (context, child) {
+                  final overlay = AppLoadingOverlay(
+                    visible: auth.isLoading,
+                    message: 'Đang xác thực phiên làm việc...',
+                  );
+                  if (errorMessage != null && errorMessage.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      final messenger = _scaffoldMessengerKey.currentState;
+                      if (messenger != null) {
+                        messenger
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(SnackBar(content: Text(errorMessage)));
+                      }
+                      GlobalErrorNotifier.clear();
+                    });
                   }
-                  GlobalErrorNotifier.clear();
-                });
-              }
-              return composed;
+                  return Stack(
+                    alignment: Alignment.topLeft,
+                    children: [
+                      if (child != null) child,
+                      overlay,
+                    ],
+                  );
+                },
+              );
             },
           );
         },
@@ -84,4 +91,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

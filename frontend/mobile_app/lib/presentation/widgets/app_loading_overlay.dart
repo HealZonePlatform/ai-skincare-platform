@@ -5,7 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class AppLoadingOverlay extends StatelessWidget {
-  const AppLoadingOverlay({super.key, required this.visible, this.message = 'Đang xử lý...'});
+  const AppLoadingOverlay({
+    super.key,
+    required this.visible,
+    this.message = 'Đang xử lý...',
+  });
 
   final bool visible;
   final String message;

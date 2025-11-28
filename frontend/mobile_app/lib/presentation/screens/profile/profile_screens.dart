@@ -9,7 +9,7 @@ class ProfileOverviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final actions = const [
+    const actions = [
       _ProfileAction(
         icon: Icons.person_outline,
         title: 'Basic information',

@@ -32,7 +32,10 @@ class _ScanPrepareScreenState extends State<ScanPrepareScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chuẩn bị quét da')),
+      appBar: AppBar(
+        title: const Text('Chuẩn bị quét da'),
+        leading: const BackButton(color: AppColors.textPrimary),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -221,27 +224,27 @@ class ScanResultScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            HzSectionHeader(
+            const HzSectionHeader(
               title: 'Chỉ số chính',
               subtitle: 'Cập nhật dựa trên lần quét mới nhất',
               padding: EdgeInsets.zero,
             ),
             const SizedBox(height: AppSpacing.m),
-            Wrap(
+            const Wrap(
               spacing: AppSpacing.s,
               runSpacing: AppSpacing.s,
-              children: const [
+              children: [
                 HzStatChip(label: 'Độ ẩm', value: '72', icon: Icons.water_drop),
                 HzStatChip(label: 'Độ đàn hồi', value: '80', icon: Icons.auto_graph),
                 HzStatChip(label: 'Thâm mụn', value: '65', icon: Icons.blur_on),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
-            HzSectionHeader(
+            const HzSectionHeader(
               title: 'Ảnh đối chiếu',
-              padding: const EdgeInsets.only(bottom: AppSpacing.m),
+              padding: EdgeInsets.only(bottom: AppSpacing.m),
             ),
-            OptimizedNetworkImage(
+            const OptimizedNetworkImage(
               imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800',
               height: 220,
               borderRadius: AppRadius.l,

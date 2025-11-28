@@ -1,6 +1,7 @@
 // lib/core/network/interceptors/security_interceptor.dart
 
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
 
@@ -24,7 +25,9 @@ class SecurityInterceptor extends Interceptor {
         ),
       );
     }
-    options.headers.putIfAbsent('X-Client-Platform', () => Platform.operatingSystem);
+    if (!kIsWeb) {
+      options.headers.putIfAbsent('X-Client-Platform', () => Platform.operatingSystem);
+    }
     handler.next(options);
   }
 

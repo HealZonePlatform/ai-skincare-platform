@@ -160,9 +160,13 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<bool> _handleDemoLogin(UserCredentials credentials) async {
-    final emailMatches = credentials.email.toLowerCase() == DemoSession.demoEmail;
-    final passwordMatches = credentials.password == DemoSession.demoPassword;
-    if (!emailMatches || !passwordMatches) {
+    final inputEmail = credentials.email.toLowerCase();
+    final inputPassword = credentials.password;
+    
+    final isDefaultDemo = inputEmail == DemoSession.demoEmail && inputPassword == DemoSession.demoPassword;
+    final isUserDemo = inputEmail == DemoSession.userDemoEmail && inputPassword == DemoSession.userDemoPassword;
+
+    if (!isDefaultDemo && !isUserDemo) {
       return false;
     }
     DemoSession.activate();

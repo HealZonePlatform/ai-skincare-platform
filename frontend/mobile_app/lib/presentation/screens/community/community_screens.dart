@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:ai_skincare_platform/theme/app_theme.dart';
@@ -57,7 +57,7 @@ class CommunityFeedScreen extends StatelessWidget {
                         const Spacer(),
                         const Icon(Icons.favorite_border, size: 18),
                         const SizedBox(width: 4),
-                        Text('')
+                        const Text('')
                       ],
                     ),
                   ],
@@ -95,8 +95,8 @@ class CommunityDetailScreen extends StatelessWidget {
             children: [
               Text('Skincare everyday #', style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.s),
-              Row(
-                children: const [
+              const Row(
+                children: [
                   CircleAvatar(radius: 20, child: Icon(Icons.person)),
                   SizedBox(width: AppSpacing.s),
                   Text('Ngoc Anh • 2 hours ago'),

@@ -8,7 +8,7 @@ class ProductsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = const [
+    const products = [
       _ProductSummary(id: '1', name: 'Senka Perfect Whip', price: '96.000đ', tags: ['Làm sạch', 'Chiết xuất tơ tằm']),
       _ProductSummary(id: '2', name: 'Paula’s Choice BHA 2%', price: '335.000đ', tags: ['Tẩy tế bào chết', 'Giảm mụn']),
       _ProductSummary(id: '3', name: 'Skin1004 Ampoule', price: '420.000đ', tags: ['Phục hồi', 'Giảm đỏ']),

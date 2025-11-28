@@ -9,56 +9,103 @@ class OnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Welcome to HealZone')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'Personalize your skincare routine',
-                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
-                    ),
-                    SizedBox(height: AppSpacing.l),
-                    Text(
-                      'Answer a few short questions about your skin and daily habits. HealZone will craft routines and reminders tailored to you.',
-                    ),
-                    Spacer(),
-                    _StepHighlight(
-                      icon: Icons.recommend_outlined,
-                      title: 'Smart routines',
-                      caption: 'Morning and evening steps with flexible alternatives.',
-                    ),
-                    SizedBox(height: AppSpacing.m),
-                    _StepHighlight(
-                      icon: Icons.camera_enhance_outlined,
-                      title: 'AI skin analysis',
-                      caption: 'Track scan history and monitor progress.',
-                    ),
-                    SizedBox(height: AppSpacing.m),
-                    _StepHighlight(
-                      icon: Icons.notifications_active_outlined,
-                      title: 'Right-time reminders',
-                      caption: 'Never miss a routine or follow-up appointment.',
-                    ),
-                    Spacer(),
-                  ],
-                ),
-              ),
-              HzPrimaryButton(
-                label: 'Get started',
-                icon: Icons.arrow_forward,
-                onPressed: () => context.push('/preferences/categories'),
-              ),
-            ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background Image
+          Image.asset(
+            'assets/images/onboarding_1.png',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: AppColors.background),
           ),
-        ),
+          // Gradient Overlay
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.1),
+                  Colors.black.withValues(alpha: 0.6),
+                  Colors.black.withValues(alpha: 0.9),
+                ],
+                stops: const [0.0, 0.4, 0.7, 1.0],
+              ),
+            ),
+          ),
+          // Content
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.m,
+                      vertical: AppSpacing.s,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
+                        const SizedBox(width: AppSpacing.s),
+                        Text(
+                          'AI-Powered Analysis',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                  Text(
+                    'Your Personal\nSkincare Expert',
+                    style: theme.textTheme.displayMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.m),
+                  Text(
+                    'HealZone analyzes your skin to create a personalized routine that evolves with you.',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => context.push('/preferences/categories'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        foregroundColor: AppColors.textPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.l),
+                      ),
+                      child: const Text('Get Started'),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.l),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -132,39 +179,6 @@ class _PreferencesCategoriesScreenState extends State<PreferencesCategoriesScree
           ),
         ),
       ),
-    );
-  }
-}
-
-class _StepHighlight extends StatelessWidget {
-  const _StepHighlight({required this.icon, required this.title, required this.caption});
-
-  final IconData icon;
-  final String title;
-  final String caption;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-          child: Icon(icon, color: AppColors.primary),
-        ),
-        const SizedBox(width: AppSpacing.m),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: AppSpacing.xs),
-              Text(caption),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

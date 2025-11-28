@@ -38,7 +38,7 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
             _buildBasicInfoCard(context, createdDate),
             const SizedBox(height: AppSpacing.xl),
-            HzSectionHeader(
+            const HzSectionHeader(
               title: 'Điểm nổi bật',
               subtitle: 'Các chỉ số chính mà AI đánh giá được',
               padding: EdgeInsets.zero,

@@ -10,6 +10,10 @@ class DemoSession {
 
   static const String demoEmail = 'demo@healzone.app';
   static const String demoPassword = 'Demo123';
+  
+  // User's preferred demo credentials
+  static const String userDemoEmail = 'healzone@example.com';
+  static const String userDemoPassword = 'demo123';
   static const AuthTokens tokens = AuthTokens(
     accessToken: 'demo-access-token',
     refreshToken: 'demo-refresh-token',

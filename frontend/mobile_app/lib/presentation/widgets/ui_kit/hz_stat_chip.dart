@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:ai_skincare_platform/theme/app_colors.dart';
 import 'package:ai_skincare_platform/theme/app_dimensions.dart';
-import 'package:ai_skincare_platform/theme/app_typography.dart';
 
 class HzStatChip extends StatelessWidget {
   const HzStatChip({
@@ -29,7 +28,7 @@ class HzStatChip extends StatelessWidget {
         vertical: AppSpacing.m,
       ),
       decoration: BoxDecoration(
-        color: chipColor.withValues(alpha: 0.08), // ✅ FIX: withOpacity thay vì withOpacityFraction
+        color: chipColor.withValues(alpha: 0.08), // subtle tint based on the provided color
         borderRadius: AppRadius.chipRadius,
       ),
       child: Row(
