@@ -8,7 +8,7 @@
 
 ## Phase 2 - Enhanced (Week 3-4)
 - [x] Theme/dark mode: them palette dark trong `theme/app_theme.dart` + `AppColors`, toggle/persist `ThemeProvider` (`shared_preferences`), default `ThemeMode.system`, UI toggle trong Profile Overview.
-- [ ] Accessibility: them `Semantics`/tooltip cho button/icon, kiem tra focus order, contrast. Quet cac widget trong `presentation/widgets/` va `ui_kit/`.
+- [x] Accessibility: bo sung `Semantics`/tooltip cho quick scan, article card, product card, routine actions, pulse highlight; History tile co semantics; de nghi tiep tuc review contrast/colorScheme cho cac widget khac.
 - [ ] Testing: them unit test cho usecases/repositories (`test/domain`, `test/data`), provider tests (`test/presentation/providers`), widget tests cho UI kit, integration test luong auth + scan fake backend.
 
 ## Phase 3 - UX (Week 5-6)

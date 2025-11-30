@@ -105,7 +105,12 @@ class PulseCard extends StatelessWidget {
             spacing: AppSpacing.s,
             runSpacing: AppSpacing.s,
             children: highlights
-                .map((highlight) => PulseHighlightPill(highlight: highlight))
+                .map(
+                  (highlight) => Semantics(
+                    label: '${highlight.label}: ${highlight.value}',
+                    child: PulseHighlightPill(highlight: highlight),
+                  ),
+                )
                 .toList(),
           ),
         ],

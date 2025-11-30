@@ -206,15 +206,18 @@ class RoutineCard extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              FilledButton.tonal(
-                onPressed: () => context.push('/routine'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.s, horizontal: AppSpacing.m),
-                  backgroundColor: routine.accentColor.withValues(alpha: 0.2),
-                  foregroundColor: routine.accentColor,
+              Tooltip(
+                message: 'See routine details',
+                child: FilledButton.tonal(
+                  onPressed: () => context.push('/routine'),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.s, horizontal: AppSpacing.m),
+                    backgroundColor: routine.accentColor.withValues(alpha: 0.2),
+                    foregroundColor: routine.accentColor,
+                  ),
+                  child: const Text('See details'),
                 ),
-                child: const Text('See details'),
               ),
             ],
           ),

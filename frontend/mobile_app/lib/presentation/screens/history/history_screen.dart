@@ -119,86 +119,90 @@ class _HistoryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final statusColor = _statusColor(item.status);
     final statusLabel = (item.status ?? 'unknown').toUpperCase();
-    return InkWell(
-      onTap: () => context.pushNamed(
-        'analysis-detail',
-        pathParameters: {'id': item.id},
-        extra: item,
-      ),
-      borderRadius: BorderRadius.circular(AppRadius.l),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.l),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppRadius.l),
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-          ),
-          boxShadow: AppShadows.mild,
+    return Semantics(
+      button: true,
+      label: 'Open analysis ${item.id}',
+      child: InkWell(
+        onTap: () => context.pushNamed(
+          'analysis-detail',
+          pathParameters: {'id': item.id},
+          extra: item,
         ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.m),
-              child: SizedBox(
-                width: 72,
-                height: 72,
-                child: OptimizedNetworkImage(
-                  imageUrl: item.imageUrl,
-                  aspectRatio: 1,
-                  borderRadius: AppRadius.m,
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        child: Container(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppRadius.l),
+            border: Border.all(
+              color: Theme.of(context).dividerColor,
+            ),
+            boxShadow: AppShadows.mild,
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.m),
+                child: SizedBox(
+                  width: 72,
+                  height: 72,
+                  child: OptimizedNetworkImage(
+                    imageUrl: item.imageUrl,
+                    aspectRatio: 1,
+                    borderRadius: AppRadius.m,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: AppSpacing.m),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Scan #${item.id}',
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    _formatDate(item.createdAt),
-                    style: theme.textTheme.labelSmall
-                        ?.copyWith(color: AppColors.textSecondary),
-                  ),
-                  if (item.analysisResult != null) ...[
+              const SizedBox(width: AppSpacing.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Scan #${item.id}',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'Result ready',
-                      style: theme.textTheme.bodySmall
+                      _formatDate(item.createdAt),
+                      style: theme.textTheme.labelSmall
                           ?.copyWith(color: AppColors.textSecondary),
                     ),
+                    if (item.analysisResult != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        'Result ready',
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ],
                   ],
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSpacing.m),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.m,
-                vertical: AppSpacing.xs,
-              ),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppRadius.full),
-              ),
-              child: Text(
-                statusLabel,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: statusColor,
-                  fontWeight: FontWeight.w700,
                 ),
               ),
-            ),
-            const SizedBox(width: AppSpacing.s),
-            const Icon(Icons.chevron_right_rounded,
-                color: AppColors.textSecondary),
-          ],
+              const SizedBox(width: AppSpacing.m),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.m,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s),
+              const Icon(Icons.chevron_right_rounded,
+                  color: AppColors.textSecondary),
+            ],
+          ),
         ),
       ),
     );

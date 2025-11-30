@@ -133,18 +133,25 @@ class HeroHeader extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => context.push('/scan/prepare'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.l,
-                          vertical: AppSpacing.l,
+                    child: Tooltip(
+                      message: 'Start a quick skin scan',
+                      child: Semantics(
+                        button: true,
+                        label: 'Quick scan',
+                        child: FilledButton.icon(
+                          onPressed: () => context.push('/scan/prepare'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.l,
+                              vertical: AppSpacing.l,
+                            ),
+                          ),
+                          icon: const Icon(Icons.center_focus_strong_rounded),
+                          label: const Text('Quick Scan'),
                         ),
                       ),
-                      icon: const Icon(Icons.center_focus_strong_rounded),
-                      label: const Text('Quick Scan'),
                     ),
                   ),
                 ],
