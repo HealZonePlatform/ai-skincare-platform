@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
@@ -139,7 +141,14 @@ class HeroHeader extends StatelessWidget {
                         button: true,
                         label: 'Quick scan',
                         child: FilledButton.icon(
-                          onPressed: () => context.push('/scan/prepare'),
+                          onPressed: () async {
+                            await Haptics.light();
+                            if (context.mounted) {
+                              AnalyticsService.logButtonTap('quickScan');
+                              AnalyticsService.logScanStarted();
+                              context.push('/scan/prepare');
+                            }
+                          },
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: AppColors.primary,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/widgets/error_state.dart';
@@ -123,11 +125,18 @@ class _HistoryTile extends StatelessWidget {
       button: true,
       label: 'Open analysis ${item.id}',
       child: InkWell(
-        onTap: () => context.pushNamed(
-          'analysis-detail',
-          pathParameters: {'id': item.id},
-          extra: item,
-        ),
+        onTap: () async {
+          await Haptics.selection();
+          if (context.mounted) {
+            AnalyticsService.logEvent('analysisHistoryOpen',
+                parameters: {'id': item.id});
+            context.pushNamed(
+              'analysis-detail',
+              pathParameters: {'id': item.id},
+              extra: item,
+            );
+          }
+        },
         borderRadius: BorderRadius.circular(AppRadius.l),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.l),

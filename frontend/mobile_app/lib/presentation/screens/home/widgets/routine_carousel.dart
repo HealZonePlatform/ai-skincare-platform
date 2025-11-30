@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_responsive_layout.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
@@ -209,7 +211,14 @@ class RoutineCard extends StatelessWidget {
               Tooltip(
                 message: 'See routine details',
                 child: FilledButton.tonal(
-                  onPressed: () => context.push('/routine'),
+                  onPressed: () async {
+                    await Haptics.selection();
+                    if (context.mounted) {
+                      AnalyticsService.logButtonTap('routineDetails',
+                          parameters: {'title': routine.title});
+                      context.push('/routine');
+                    }
+                  },
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         vertical: AppSpacing.s, horizontal: AppSpacing.m),

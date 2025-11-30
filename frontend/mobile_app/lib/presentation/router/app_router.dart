@@ -24,15 +24,18 @@ import 'package:ai_skincare_platform/presentation/screens/survey/survey_screens.
 import 'package:ai_skincare_platform/presentation/widgets/shell_scaffold.dart';
 
 class AppRouter {
-  AppRouter({required this.isLoggedIn});
+  AppRouter({required this.isLoggedIn, required this.onboardingCompleted});
 
   final bool isLoggedIn;
+  final bool onboardingCompleted;
 
   GoRouter get router => _router;
 
   late final GoRouter _router = GoRouter(
     observers: [AnalyticsRouterObserver()],
-    initialLocation: isLoggedIn ? '/home' : '/auth/signin',
+    initialLocation: onboardingCompleted
+        ? (isLoggedIn ? '/home' : '/auth/signin')
+        : '/onboarding',
     routes: [
       ShellRoute(
         builder: (context, state, child) => ShellScaffold(child: child),
@@ -148,7 +151,15 @@ class AppRouter {
     ),
     redirect: (context, state) {
       final goingAuth = state.matchedLocation.startsWith('/auth/');
-      if (!isLoggedIn && !goingAuth) {
+      final onboardingFlow = state.matchedLocation.startsWith('/onboarding') ||
+          state.matchedLocation.startsWith('/preferences') ||
+          state.matchedLocation.startsWith('/survey');
+
+      if (!onboardingCompleted && !onboardingFlow) {
+        return '/onboarding';
+      }
+
+      if (!isLoggedIn && !goingAuth && onboardingCompleted) {
         return '/auth/signin';
       }
       return null;

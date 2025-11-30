@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
+import 'package:ai_skincare_platform/presentation/providers/onboarding_provider.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
 
@@ -93,8 +96,15 @@ class OnboardingScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxl),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => context.push('/preferences/categories'),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final navigator = Navigator.of(context);
+                          final provider = context.read<OnboardingProvider>();
+                          await Haptics.light();
+                          await provider.complete();
+                          if (!navigator.mounted) return;
+                          navigator.pushNamed('/preferences/categories');
+                        },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.secondary,
                         foregroundColor: AppColors.textPrimary,

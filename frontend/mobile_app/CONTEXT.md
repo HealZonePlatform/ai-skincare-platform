@@ -69,6 +69,139 @@ lib/
 │   │   └── repositories/              # Implementation repositories xác thực
 │   │       ├── auth_repository_impl.dart # Implementation repository xác thực
 │   │       └── token_repository_impl.dart # Implementation repository token
+│   ├── home/                          # Dữ liệu dashboard trang chủ
+│   │   ├── datasources/               # Data sources cho trang chủ
+│   │   │   └── home_remote_data_source.dart # Data source trang chủ từ xa
+│   │   ├── repositories/              # Repository cho trang chủ
+│   │   │   └── home_repository_impl.dart # Implementation repository trang chủ
+│   │   └── home_mock_data.dart        # Dữ liệu mẫu cho trang chủ
+│   └── profile/                       # Hồ sơ người dùng data
+│       ├── datasources/               # Remote và local data sources hồ sơ
+│       │   ├── profile_local_cache.dart # Cache hồ sơ cục bộ
+│       │   └── profile_remote_data_source.dart # Data source hồ sơ từ xa
+│       └── repositories/              # Implementation repositories hồ sơ
+│           └── profile_repository_impl.dart # Implementation repository hồ sơ
+├── domain/                            # Lớp domain (entities, usecases, repositories)
+│   ├── analysis/                      # Domain phân tích da
+│   │   ├── entities/                  # Entities phân tích
+│   │   ├── repositories/              # Interface repositories phân tích
+│   │   └── usecases/                  # Use cases phân tích
+│   ├── auth/                          # Xác thực domain
+│   │   ├── entities/                  # Entities xác thực (AuthTokens, UserCredentials)
+│   │   ├── repositories/              # Interface repositories xác thực
+│   │   └── usecases/                  # Use cases xác thực (login, register, logout)
+│   ├── common/                        # Các thành phần chung
+│   ├── home/                          # Domain dashboard trang chủ
+│   │   ├── entities/                  # Entities trang chủ (HomeDashboard, HomePulse, HomeInsight, v.v.)
+│   │   ├── repositories/              # Interface repositories trang chủ
+│   │   │   └── home_repository.dart   # Interface repository trang chủ
+│   │   └── usecases/                  # Use cases trang chủ
+│   │       └── get_home_dashboard_usecase.dart # Use case lấy dữ liệu dashboard trang chủ
+│   └── profile/                       # Hồ sơ người dùng domain
+│       ├── entities/                  # Entities hồ sơ (UserProfile, SkinAnalysisHistory)
+│       ├── repositories/              # Interface repositories hồ sơ
+│       └── usecases/                  # Use cases hồ sơ (get, update, change password)
+├── l10n/                              # Hỗ trợ đa ngôn ngữ
+│   └── app_localizations.dart         # Localization
+├── presentation/                      # Lớp presentation (UI, providers, screens, widgets)
+│   ├── providers/                     # Provider quản lý trạng thái
+│   │   ├── auth_provider.dart         # Quản lý trạng thái xác thực
+│   │   ├── home_provider.dart         # Quản lý trạng thái dashboard trang chủ
+│   │   ├── onboarding_provider.dart   # Quản lý trạng thái onboarding
+│   │   ├── theme_provider.dart        # Quản lý trạng thái theme
+│   │   └── user_profile_provider.dart # Quản lý hồ sơ người dùng
+│   ├── router/                        # Định tuyến
+│   │   ├── app_router.dart            # Cấu hình điều hướng
+│   │   └── router_observer.dart       # Observer cho router
+│   ├── screens/                       # Các màn hình ứng dụng
+│   │   ├── advice/                    # Màn hình lời khuyên
+│   │   ├── auth/                      # Màn hình xác thực
+│   │   ├── checkout/                  # Màn hình thanh toán
+│   │   ├── community/                 # Màn hình cộng đồng
+│   │   ├── history/                   # Màn hình lịch sử
+│   │   ├── home/                      # Màn hình trang chủ
+│   │   │   ├── home_screen.dart       # Màn hình chính
+│   │   │   ├── models/                # Model cho UI trang chủ
+│   │   │   │   └── home_models.dart   # Model chuyển đổi từ entity sang UI
+│   │   │   └── widgets/               # Widget riêng cho trang chủ
+│   │   │       ├── article_list.dart  # Danh sách bài viết
+│   │   │       ├── coach_card.dart    # Thẻ tư vấn viên
+│   │   │       ├── hero_header.dart   # Header chính
+│   │   │       ├── insight_cards.dart # Thẻ thông tin chi tiết
+│   │   │       ├── product_carousel.dart # Băng chuyền sản phẩm
+│   │   │       ├── pulse_card.dart    # Thẻ chỉ số sức khỏe da
+│   │   │       └── routine_carousel.dart # Băng chuyền lịch trình chăm sóc
+│   │   ├── lifestyle/                 # Màn hình lối sống
+│   │   ├── onboarding/                # Màn hình hướng dẫn
+│   │   ├── paywall/                   # Màn hình thanh toán
+│   │   ├── products/                  # Màn hình sản phẩm
+│   │   ├── profile/                   # Màn hình hồ sơ
+│   │   ├── routine/                   # Màn hình lịch trình
+│   │   ├── scan/                      # Màn hình quét da
+│   │   └── survey/                    # Màn hình khảo sát
+│   ├── widgets/                       # Widget tái sử dụng
+│   │   ├── app_loading_overlay.dart   # Overlay loading
+│   │   ├── brand_logo.dart            # Logo thương hiệu
+│   │   ├── hz_buttons.dart            # Nút tùy chỉnh
+│   │   ├── hz_loading_skeleton.dart   # Skeleton loading
+│   │   ├── hz_skeleton.dart           # Skeleton chung
+│   │   ├── optimized_network_image.dart # Ảnh mạng tối ưu
+│   │   ├── shell_scaffold.dart        # Giao diện chính với bottom navigation
+│   │   └── ui_kit/                    # Bộ widget UI
+│   │       ├── hz_responsive_layout.dart # Layout responsive
+│   │       ├── hz_section_header.dart # Header section
+│   │       ├── hz_stat_chip.dart      # Chip trạng thái
+│   │       └── hz_surface_card.dart   # Card bề mặt
+│   └── spec/                          # Spec cho UI components
+├── theme/                             # Theme và thiết kế
+│   └── app_theme.dart                 # Định nghĩa màu sắc, khoảng cách, kiểu dáng
+└── utils/                             # Tiện ích
+    ├── api_constants.dart             # Hằng số API
+    ├── error_handler.dart             # Xử lý lỗi
+    └── exceptions.dart                # Định nghĩa exception
+```
+├── main.dart                           # Điểm vào ứng dụng, khởi tạo theme và router
+├── api/                                # Các service API
+│   └── analyses_api_service.dart      # Service cho phân tích da
+├── config/                            # Cấu hình ứng dụng
+│   └── environment.dart               # Cấu hình runtime cho các môi trường
+├── core/                              # Lõi hệ thống
+│   ├── analytics/                     # Analytics service
+│   │   └── analytics_service.dart     # Dịch vụ analytics
+│   ├── config/                        # Cấu hình chung
+│   ├── constants/                     # Hằng số ứng dụng
+│   │   └── app_assets.dart            # Đường dẫn tài nguyên
+│   ├── demo/                          # Chức năng demo
+│   │   └── demo_session.dart          # Session demo
+│   ├── error/                         # Xử lý lỗi toàn cục
+│   │   └── global_error_notifier.dart # Notifier lỗi toàn cục
+│   ├── logging/                       # Logging service
+│   │   └── app_logger.dart            # Logger ứng dụng
+│   ├── network/                       # Quản lý mạng
+│   │   ├── api_client.dart           # API client singleton với interceptors
+│   │   ├── network_config.dart       # Cấu hình mạng
+│   │   └── interceptors/             # Các interceptor (retry, auth, logging)
+│   │       ├── retry_interceptor.dart # Interceptor retry
+│   │       └── security_interceptor.dart # Interceptor bảo mật
+│   ├── notifications/                 # Quản lý thông báo
+│   ├── security/                      # Bảo mật ứng dụng
+│   │   └── secure_preferences.dart    # Lưu trữ an toàn
+│   ├── session/                       # Quản lý phiên làm việc
+│   │   └── auth_session_observer.dart # Observer cho các sự kiện phiên
+│   ├── utils/                         # Tiện ích chung
+│   └── validation/                    # Xác thực đầu vào
+│       └── input_validators.dart      # Các hàm xác thực đầu vào
+├── data/                              # Lớp dữ liệu (implement repositories, data sources)
+│   ├── analysis/                      # Dữ liệu phân tích da
+│   │   ├── datasources/               # Data sources cho phân tích
+│   │   └── repositories/              # Repository cho phân tích
+│   ├── auth/                          # Xác thực data
+│   │   ├── datasources/               # Remote và local data sources xác thực
+│   │   │   ├── auth_remote_data_source.dart # Data source xác thực từ xa
+│   │   │   └── token_local_data_source.dart # Data source token cục bộ
+│   │   └── repositories/              # Implementation repositories xác thực
+│   │       ├── auth_repository_impl.dart # Implementation repository xác thực
+│   │       └── token_repository_impl.dart # Implementation repository token
 │   └── profile/                       # Hồ sơ người dùng data
 │       ├── datasources/               # Remote và local data sources hồ sơ
 │       │   ├── profile_local_cache.dart # Cache hồ sơ cục bộ
@@ -140,10 +273,19 @@ lib/
 - **SkinAnalysisHistory**: Lịch sử phân tích da (id, userId, imageUrl, analysisResult, createdAt, status)
 - **AuthTokens**: Token xác thực (accessToken, refreshToken)
 - **UserCredentials**: Thông tin đăng nhập (email, password)
+- **HomeDashboard**: Dữ liệu dashboard trang chủ (greetingName, heroStats, pulse, pulseHighlights, insights, routines, articles, products)
+- **HomePulse**: Chỉ số sức khỏe da (score, trend, delta, mood, updated)
+- **HomeInsight**: Thông tin chi tiết (title, caption, icon, progress, iconColor)
+- **HomeRoutine**: Lịch trình chăm sóc da (title, icon, steps, focus, minutes, bestMoment, accentColor)
+- **HomeArticle**: Bài viết (title, subtitle, icon, readingTime, route, heroColor)
+- **HomeProduct**: Sản phẩm (name, benefit, rating, icon, route, badge, color, imageUrl)
 
 ### Quản lý trạng thái
 - **AuthProvider**: Quản lý trạng thái đăng nhập, xử lý đăng nhập/đăng ký, logout
 - **UserProfileProvider**: Quản lý thông tin hồ sơ người dùng và lịch sử phân tích da
+- **HomeProvider**: Quản lý trạng thái dashboard trang chủ (loading, loaded, error) và fetch dữ liệu dashboard
+- **ThemeProvider**: Quản lý trạng thái theme (light/dark mode) và lưu trữ cài đặt theme người dùng
+- **OnboardingProvider**: Quản lý trạng thái hoàn thành của quy trình hướng dẫn người dùng mới
 
 ## Tính năng chính
 
@@ -171,6 +313,20 @@ lib/
 5. **Lịch sử và theo dõi**
    - Xem lịch sử phân tích
    - Theo dõi tiến trình chăm sóc da
+
+6. **Dashboard trang chủ**
+   - Hiển thị các chỉ số sức khỏe da (pulse, insights, stats)
+   - Hiển thị lịch trình chăm sóc da gợi ý
+   - Hiển thị bài viết và sản phẩm phù hợp
+   - Có cơ chế refresh và xử lý lỗi
+
+7. **Tùy chỉnh giao diện**
+   - Hỗ trợ chuyển đổi giữa chế độ sáng và tối
+   - Lưu trữ cài đặt theme người dùng
+
+8. **Hướng dẫn người dùng mới**
+   - Hiển thị quy trình hướng dẫn cho người dùng mới
+   - Theo dõi trạng thái hoàn thành onboarding
 
 ## Cấu hình và môi trường
 
@@ -249,6 +405,10 @@ lib/
 - **Hiện trạng**: Có nhiều widget tái sử dụng
 - **Cải thiện**: Có thể tạo package chung cho các thành phần chia sẻ nếu cần
 
+### 11. Tích hợp backend cho dashboard
+- **Hiện trạng**: Home screen hiện đang fetch dữ liệu từ HomeProvider, nhưng dữ liệu vẫn là mock
+- **Cải thiện**: Kết nối với backend thực tế để lấy dữ liệu dashboard thay vì sử dụng mock data
+
 ## Best practices đang được áp dụng
 
 - Sử dụng camelCase cho biến và hàm, PascalCase cho class và enum (theo quy tắc Dart)
@@ -324,49 +484,55 @@ lib/
 ### ❌ **Vấn đề cần cải thiện**
 
 #### 1. Hard-coded Mock Data
-- Hiện tại tất cả dữ liệu trong home_screen.dart là mock data
-- Cần tạo `HomeProvider` để fetch real data từ backend
-- Cần implement loading states và error handling
+- Home screen hiện đang fetch dữ liệu từ HomeProvider, nhưng dữ liệu vẫn là mock trong HomeMockData
+- Cần kết nối với backend thực tế để lấy dữ liệu dashboard
+- Cần cập nhật HomeRemoteDataSource để gọi API thực tế thay vì trả về mock data
 
-#### 2. Thiếu Dark Mode Support
-- Parameter `isDark` trong `AppTheme.build()` chưa được sử dụng
-- Cần implement full dark theme với MediaQuery.platformBrightnessOf(context)
+#### 2. Đã hỗ trợ Dark Mode
+- Parameter `isDark` trong `AppTheme.build()` đã được sử dụng
+- Có ThemeProvider và ThemePreferences để quản lý cài đặt theme người dùng
+- Có cơ chế lưu trữ và áp dụng theme giữa các phiên
 
-#### 3. Performance Concerns
+#### 3. Đã cải thiện cấu trúc Home Screen
+- Home screen đã được tách thành nhiều widget nhỏ hơn (article_list, coach_card, hero_header, insight_cards, product_carousel, pulse_card, routine_carousel)
+- Có cơ chế xử lý lỗi và skeleton loading cho dashboard
+- Có RefreshIndicator để pull-to-refresh dữ liệu dashboard
+
+#### 4. Performance Concerns
 - ListView trong ListView (Nested Scrolling) có thể gây lag trên thiết bị yếu
 - Thiếu Image Optimization (cacheWidth/cacheHeight, cached_network_image)
 
-#### 4. Missing Unit Tests
+#### 5. Missing Unit Tests
 - Có folder integration_test nhưng thiếu unit tests hoàn toàn
 - Không thể verify business logic, dễ có regression bugs
 
-#### 5. File Size Quá Lớn
-- home_screen.dart hiện tại có kích thước 49,784 bytes (quá lớn)
-- Cần tách thành các module nhỏ hơn để dễ maintain
+#### 6. Đã có Onboarding Flow
+- Có OnboardingProvider và OnboardingPreferences để quản lý trạng thái hoàn thành onboarding
+- Có màn hình hướng dẫn người dùng mới
 
 ### 🎯 **Roadmap phát triển ưu tiên**
 
 #### Phase 1: Fixes Critical (Tuần 1-2)
-1. Connect Real Backend API
-2. Code Refactoring (tách home_screen.dart thành modules nhỏ)
-3. Performance Optimization
+1. Connect Real Backend API cho dashboard (thay thế mock data trong HomeRemoteDataSource)
+2. Performance Optimization
+3. Hoàn thiện unit tests cho các providers và components
 
 #### Phase 2: Enhanced Features (Tuần 3-4)
-4. Dark Mode Support
-5. Accessibility (semantic labels, screen readers)
-6. Testing (unit tests cho providers và components)
+4. Accessibility (semantic labels, screen readers)
+5. Testing (unit tests cho các use cases và repositories)
 
 #### Phase 3: User Experience (Tuần 5-6)
-7. Onboarding Flow
-8. Advanced Features (pull-to-refresh, infinite scroll, search)
-9. Notifications (local và push notifications)
+6. Advanced Features (infinite scroll, search)
+7. Notifications (local và push notifications)
 
 #### Phase 4: Polish (Tuần 7-8)
-10. Micro-interactions (haptic feedback, animations)
-11. Social Features (reviews, ratings, sharing)
+8. Micro-interactions (haptic feedback, animations)
+9. Social Features (reviews, ratings, sharing)
 
-### 📊 **Tình trạng hiện tại: 7.5/10**
+### 📊 **Tình trạng hiện tại: 8.0/10**
 
 - Đã có foundation rất tốt với kiến trúc clean và UI/UX hiện đại
-- Thiếu backend integration và testing là 2 điểm chính cần cải thiện
-- Sau khi hoàn thiện các ưu tiên, ứng dụng có thể đạt mức 8.5-9/10
+- Home screen đã được cải thiện với việc tách module và có cơ chế xử lý lỗi
+- Đã có dark mode và onboarding flow
+- Vẫn còn thiếu backend integration cho dashboard và testing đầy đủ
+- Sau khi hoàn thiện các ưu tiên, ứng dụng có thể đạt mức 9/10

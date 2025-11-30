@@ -9,6 +9,7 @@ import 'package:ai_skincare_platform/core/network/api_client.dart';
 import 'package:ai_skincare_platform/l10n/app_localizations.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/home_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/onboarding_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/theme_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/router/app_router.dart';
@@ -40,12 +41,16 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => OnboardingProvider()..load()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
-      child: Consumer2<AuthProvider, ThemeProvider>(
-        builder: (context, auth, themeProvider, _) {
-          final router = AppRouter(isLoggedIn: auth.isLoggedIn).router;
+      child: Consumer3<AuthProvider, ThemeProvider, OnboardingProvider>(
+        builder: (context, auth, themeProvider, onboardingProvider, _) {
+          final router = AppRouter(
+            isLoggedIn: auth.isLoggedIn,
+            onboardingCompleted: onboardingProvider.isCompleted,
+          ).router;
           return ValueListenableBuilder<String?>(
             valueListenable: GlobalErrorNotifier.notifier,
             builder: (context, errorMessage, _) {

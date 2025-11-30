@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
+import 'package:ai_skincare_platform/core/utils/share_helper.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
@@ -32,7 +35,7 @@ class _ScanPrepareScreenState extends State<ScanPrepareScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chuẩn bị quét da'),
+        title: const Text('Prepare scan'),
         leading: const BackButton(color: AppColors.textPrimary),
       ),
       body: SafeArea(
@@ -109,9 +112,9 @@ class _AnimatedInstructionList extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _InstructionItem(icon: Icons.face, label: 'No Makeup'),
-        _InstructionItem(icon: Icons.visibility_off, label: 'No Glasses'),
-        _InstructionItem(icon: Icons.sentiment_neutral, label: 'Neutral Face'),
+        _InstructionItem(icon: Icons.face, label: 'No makeup'),
+        _InstructionItem(icon: Icons.visibility_off, label: 'No glasses'),
+        _InstructionItem(icon: Icons.sentiment_neutral, label: 'Neutral face'),
       ],
     );
   }
@@ -172,7 +175,7 @@ class _ScanCaptureScreenState extends State<ScanCaptureScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Đang quét gương mặt')),
+      appBar: AppBar(title: const Text('Scanning in progress')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -212,7 +215,7 @@ class _ScanCaptureScreenState extends State<ScanCaptureScreen>
               ),
               const SizedBox(height: AppSpacing.xl),
               HzPrimaryButton(
-                label: 'Xem kết quả mẫu',
+                label: 'View sample result',
                 icon: Icons.visibility_outlined,
                 onPressed: () => context.push('/scan/result'),
               ),
@@ -230,7 +233,22 @@ class ScanResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Kết quả gần nhất')),
+      appBar: AppBar(
+        title: const Text('Latest scan result'),
+        actions: [
+          IconButton(
+            tooltip: 'Share result',
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () async {
+              await Haptics.selection();
+              AnalyticsService.logEvent('shareResult');
+              await ShareHelper.shareText(
+                'Skin score: 86 - Routine is on track! #HealZone',
+              );
+            },
+          )
+        ],
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -250,7 +268,7 @@ class ScanResultScreen extends StatelessWidget {
                   const SizedBox(width: AppSpacing.l),
                   const Expanded(
                     child: Text(
-                      'Da khỏe ổn định! Tiếp tục duy trì routine hiện tại để cải thiện vùng chữ T.',
+                      'Skin barrier is stable. Keep your current routine to improve T-zone balance.',
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
@@ -259,8 +277,8 @@ class ScanResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             const HzSectionHeader(
-              title: 'Chỉ số chính',
-              subtitle: 'Cập nhật dựa trên lần quét mới nhất',
+              title: 'Key metrics',
+              subtitle: 'Updated from the most recent scan',
               padding: EdgeInsets.zero,
             ),
             const SizedBox(height: AppSpacing.m),
@@ -268,15 +286,16 @@ class ScanResultScreen extends StatelessWidget {
               spacing: AppSpacing.s,
               runSpacing: AppSpacing.s,
               children: [
-                HzStatChip(label: 'Độ ẩm', value: '72', icon: Icons.water_drop),
                 HzStatChip(
-                    label: 'Độ đàn hồi', value: '80', icon: Icons.auto_graph),
-                HzStatChip(label: 'Thâm mụn', value: '65', icon: Icons.blur_on),
+                    label: 'Hydration', value: '72', icon: Icons.water_drop),
+                HzStatChip(
+                    label: 'Elasticity', value: '80', icon: Icons.auto_graph),
+                HzStatChip(label: 'Spots', value: '65', icon: Icons.blur_on),
               ],
             ),
             const SizedBox(height: AppSpacing.xl),
             const HzSectionHeader(
-              title: 'Ảnh đối chiếu',
+              title: 'Reference photo',
               padding: EdgeInsets.only(bottom: AppSpacing.m),
             ),
             const OptimizedNetworkImage(
@@ -287,7 +306,7 @@ class ScanResultScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
-              label: 'Xem phân tích chi tiết',
+              label: 'View detailed analysis',
               icon: Icons.analytics_outlined,
               onPressed: () => context.push('/advice'),
             ),

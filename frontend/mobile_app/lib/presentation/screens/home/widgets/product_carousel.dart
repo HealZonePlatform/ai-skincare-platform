@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
@@ -139,7 +141,13 @@ class ProductCard extends StatelessWidget {
                 Tooltip(
                   message: 'View ${product.name}',
                   child: FilledButton.tonal(
-                    onPressed: () => context.push(product.route),
+                    onPressed: () async {
+                      await Haptics.selection();
+                      if (context.mounted) {
+                        AnalyticsService.logProductView(product.route);
+                        context.push(product.route);
+                      }
+                    },
                     style: FilledButton.styleFrom(
                       backgroundColor: product.color.withValues(alpha: 0.15),
                       foregroundColor: product.color,

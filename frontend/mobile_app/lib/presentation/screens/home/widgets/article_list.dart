@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
@@ -47,7 +49,13 @@ class ArticleCard extends StatelessWidget {
       label: 'Open article ${article.title}',
       button: true,
       child: InkWell(
-        onTap: () => context.push(article.route),
+        onTap: () async {
+          await Haptics.selection();
+          if (context.mounted) {
+            AnalyticsService.logArticleView(article.route);
+            context.push(article.route);
+          }
+        },
         borderRadius: BorderRadius.circular(AppRadius.l),
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.l),
