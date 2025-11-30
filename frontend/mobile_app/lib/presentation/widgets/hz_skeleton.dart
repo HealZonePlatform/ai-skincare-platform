@@ -1,4 +1,4 @@
-﻿// lib/presentation/widgets/hz_skeleton.dart
+// lib/presentation/widgets/hz_skeleton.dart
 
 import 'package:flutter/material.dart';
 
@@ -24,7 +24,8 @@ class HzSkeleton extends StatefulWidget {
   State<HzSkeleton> createState() => _HzSkeletonState();
 }
 
-class _HzSkeletonState extends State<HzSkeleton> with SingleTickerProviderStateMixin {
+class _HzSkeletonState extends State<HzSkeleton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -44,7 +45,8 @@ class _HzSkeletonState extends State<HzSkeleton> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.45);
+    final baseColor =
+        Theme.of(context).colorScheme.surface.withValues(alpha: 0.45);
     final highlight = Colors.white.withValues(alpha: 0.85);
 
     return Container(
@@ -52,7 +54,9 @@ class _HzSkeletonState extends State<HzSkeleton> with SingleTickerProviderStateM
       height: widget.height,
       margin: widget.margin,
       decoration: BoxDecoration(
-        borderRadius: widget.shape == BoxShape.rectangle ? BorderRadius.circular(widget.borderRadius) : null,
+        borderRadius: widget.shape == BoxShape.rectangle
+            ? BorderRadius.circular(widget.borderRadius)
+            : null,
         shape: widget.shape,
         gradient: LinearGradient(
           begin: Alignment.centerLeft,

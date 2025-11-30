@@ -26,8 +26,10 @@ class UserProfile {
       fullName: json['fullName'],
       phoneNumber: json['phoneNumber'],
       avatarUrl: json['avatarUrl'],
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 
@@ -42,6 +44,7 @@ class UserProfile {
       'updatedAt': updatedAt?.toIso8601String(),
     };
   }
+
   UserProfile copyWith({
     String? id,
     String? email,
@@ -86,7 +89,9 @@ class SkinAnalysisHistory {
       userId: json['userId'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
       analysisResult: json['analysisResult'] as Map<String, dynamic>?,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
       status: json['status'],
     );
   }

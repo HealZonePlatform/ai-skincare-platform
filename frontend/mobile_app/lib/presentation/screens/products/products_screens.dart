@@ -9,16 +9,29 @@ class ProductsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const products = [
-      _ProductSummary(id: '1', name: 'Senka Perfect Whip', price: '96.000đ', tags: ['Làm sạch', 'Chiết xuất tơ tằm']),
-      _ProductSummary(id: '2', name: 'Paula’s Choice BHA 2%', price: '335.000đ', tags: ['Tẩy tế bào chết', 'Giảm mụn']),
-      _ProductSummary(id: '3', name: 'Skin1004 Ampoule', price: '420.000đ', tags: ['Phục hồi', 'Giảm đỏ']),
+      _ProductSummary(
+          id: '1',
+          name: 'Senka Perfect Whip',
+          price: '96.000đ',
+          tags: ['Làm sạch', 'Chiết xuất tơ tằm']),
+      _ProductSummary(
+          id: '2',
+          name: 'Paula’s Choice BHA 2%',
+          price: '335.000đ',
+          tags: ['Tẩy tế bào chết', 'Giảm mụn']),
+      _ProductSummary(
+          id: '3',
+          name: 'Skin1004 Ampoule',
+          price: '420.000đ',
+          tags: ['Phục hồi', 'Giảm đỏ']),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sản phẩm gợi ý'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.filter_alt_outlined)),
+          IconButton(
+              onPressed: () {}, icon: const Icon(Icons.filter_alt_outlined)),
         ],
       ),
       body: ListView.builder(
@@ -28,18 +41,23 @@ class ProductsListScreen extends StatelessWidget {
           final product = products[index];
           return Card(
             margin: const EdgeInsets.only(bottom: AppSpacing.l),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.m)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.m)),
             child: ListTile(
               title: Text(product.name),
               subtitle: Wrap(
                 spacing: AppSpacing.s,
-                children: product.tags.map((tag) => Chip(label: Text(tag))).toList(),
+                children:
+                    product.tags.map((tag) => Chip(label: Text(tag))).toList(),
               ),
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(product.price, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  TextButton(onPressed: () => context.push('/products/${product.id}'), child: const Text('Chi tiết')),
+                  Text(product.price,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  TextButton(
+                      onPressed: () => context.push('/products/${product.id}'),
+                      child: const Text('Chi tiết')),
                 ],
               ),
             ),
@@ -65,7 +83,8 @@ class ProductDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Senka Perfect Whip', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              const Text('Senka Perfect Whip',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: AppSpacing.s),
               const Text('BeautyStore Official • 96.000đ'),
               const SizedBox(height: AppSpacing.l),
@@ -109,5 +128,9 @@ class _ProductSummary {
   final String price;
   final List<String> tags;
 
-  const _ProductSummary({required this.id, required this.name, required this.price, required this.tags});
+  const _ProductSummary(
+      {required this.id,
+      required this.name,
+      required this.price,
+      required this.tags});
 }

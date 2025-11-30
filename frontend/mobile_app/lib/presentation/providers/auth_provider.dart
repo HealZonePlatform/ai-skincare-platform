@@ -96,7 +96,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final credentials = UserCredentials.normalize(email: email, password: password);
+      final credentials =
+          UserCredentials.normalize(email: email, password: password);
       if (await _handleDemoLogin(credentials)) {
         return true;
       }
@@ -162,9 +163,11 @@ class AuthProvider with ChangeNotifier {
   Future<bool> _handleDemoLogin(UserCredentials credentials) async {
     final inputEmail = credentials.email.toLowerCase();
     final inputPassword = credentials.password;
-    
-    final isDefaultDemo = inputEmail == DemoSession.demoEmail && inputPassword == DemoSession.demoPassword;
-    final isUserDemo = inputEmail == DemoSession.userDemoEmail && inputPassword == DemoSession.userDemoPassword;
+
+    final isDefaultDemo = inputEmail == DemoSession.demoEmail &&
+        inputPassword == DemoSession.demoPassword;
+    final isUserDemo = inputEmail == DemoSession.userDemoEmail &&
+        inputPassword == DemoSession.userDemoPassword;
 
     if (!isDefaultDemo && !isUserDemo) {
       return false;

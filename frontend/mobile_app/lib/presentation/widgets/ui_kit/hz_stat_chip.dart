@@ -28,7 +28,8 @@ class HzStatChip extends StatelessWidget {
         vertical: AppSpacing.m,
       ),
       decoration: BoxDecoration(
-        color: chipColor.withValues(alpha: 0.08), // subtle tint based on the provided color
+        color: chipColor.withValues(
+            alpha: 0.08), // subtle tint based on the provided color
         borderRadius: AppRadius.chipRadius,
       ),
       child: Row(

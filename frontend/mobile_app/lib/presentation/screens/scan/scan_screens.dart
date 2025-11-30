@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,7 +15,8 @@ class ScanPrepareScreen extends StatefulWidget {
   State<ScanPrepareScreen> createState() => _ScanPrepareScreenState();
 }
 
-class _ScanPrepareScreenState extends State<ScanPrepareScreen> with SingleTickerProviderStateMixin {
+class _ScanPrepareScreenState extends State<ScanPrepareScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 6),
@@ -37,81 +36,113 @@ class _ScanPrepareScreenState extends State<ScanPrepareScreen> with SingleTicker
         leading: const BackButton(color: AppColors.textPrimary),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HzSurfaceCard(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.xl),
-                child: Row(
+                child: Column(
                   children: [
+                    const SizedBox(height: AppSpacing.xl),
                     AnimatedBuilder(
                       animation: _controller,
                       builder: (context, child) {
-                        return Transform.rotate(
-                          angle: _controller.value * math.pi * 2,
-                          child: child,
+                        return Transform.scale(
+                          scale: 1.0 + (_controller.value * 0.05),
+                          child: Container(
+                            width: 200,
+                            height: 200,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.secondary.withValues(alpha: 0.1),
+                            ),
+                            child: const Icon(Icons.wb_sunny_rounded,
+                                size: 80, color: AppColors.secondary),
+                          ),
                         );
                       },
-                      child: const Icon(Icons.sunny, size: 48, color: AppColors.secondary),
                     ),
-                    const SizedBox(width: AppSpacing.l),
-                    const Expanded(
-                      child: Text(
-                        'Đảm bảo ánh sáng tự nhiên hoặc đèn trắng dịu. Tránh ánh sáng vàng để AI nhận diện tốt nhất.',
-                      ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      'Let\'s check your skin',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: AppSpacing.m),
+                    Text(
+                      'Ensure natural lighting and remove any makeup or glasses for the best result.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(color: AppColors.textSecondary),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xxl),
+                    const _AnimatedInstructionList(),
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.l),
-              const _AnimatedInstructionList(),
-              const Spacer(),
-              HzPrimaryButton(
-                label: 'Bắt đầu quét',
-                icon: Icons.document_scanner,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: HzPrimaryButton(
+                label: 'Start Scan',
+                icon: Icons.camera_alt_rounded,
                 onPressed: () => context.push('/scan/capture'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _AnimatedInstructionList extends StatefulWidget {
+class _AnimatedInstructionList extends StatelessWidget {
   const _AnimatedInstructionList();
 
   @override
-  State<_AnimatedInstructionList> createState() => _AnimatedInstructionListState();
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _InstructionItem(icon: Icons.face, label: 'No Makeup'),
+        _InstructionItem(icon: Icons.visibility_off, label: 'No Glasses'),
+        _InstructionItem(icon: Icons.sentiment_neutral, label: 'Neutral Face'),
+      ],
+    );
+  }
 }
 
-class _AnimatedInstructionListState extends State<_AnimatedInstructionList> {
-  final instructions = const [
-    _InstructionRow(icon: Icons.clean_hands, text: 'Làm sạch da mặt và lau khô trước khi quét.'),
-    _InstructionRow(icon: Icons.center_focus_strong, text: 'Giữ máy cách mặt 15-20cm, căn chỉnh trán giữa khung.'),
-    _InstructionRow(icon: Icons.spa_outlined, text: 'Thả lỏng khuôn mặt và giữ yên trong 5 giây.'),
-  ];
+class _InstructionItem extends StatelessWidget {
+  const _InstructionItem({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Các bước nhanh',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.m),
-        ...instructions.asMap().entries.map(
-          (entry) => TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: 1),
-            duration: Duration(milliseconds: 400 + entry.key * 120),
-            builder: (context, value, child) => Opacity(opacity: value, child: child),
-            child: entry.value,
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.l),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.border),
           ),
+          child: Icon(icon, color: AppColors.textPrimary),
+        ),
+        const SizedBox(height: AppSpacing.s),
+        Text(
+          label,
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium
+              ?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -125,7 +156,8 @@ class ScanCaptureScreen extends StatefulWidget {
   State<ScanCaptureScreen> createState() => _ScanCaptureScreenState();
 }
 
-class _ScanCaptureScreenState extends State<ScanCaptureScreen> with SingleTickerProviderStateMixin {
+class _ScanCaptureScreenState extends State<ScanCaptureScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 5),
@@ -166,7 +198,8 @@ class _ScanCaptureScreenState extends State<ScanCaptureScreen> with SingleTicker
                           ],
                         ),
                       ),
-                      child: const Icon(Icons.face_retouching_natural, size: 120, color: AppColors.primary),
+                      child: const Icon(Icons.face_retouching_natural,
+                          size: 120, color: AppColors.primary),
                     ),
                   ),
                 ),
@@ -210,7 +243,8 @@ class ScanResultScreen extends StatelessWidget {
                     backgroundColor: AppColors.success.withValues(alpha: 0.1),
                     child: const Text(
                       '86',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.l),
@@ -235,7 +269,8 @@ class ScanResultScreen extends StatelessWidget {
               runSpacing: AppSpacing.s,
               children: [
                 HzStatChip(label: 'Độ ẩm', value: '72', icon: Icons.water_drop),
-                HzStatChip(label: 'Độ đàn hồi', value: '80', icon: Icons.auto_graph),
+                HzStatChip(
+                    label: 'Độ đàn hồi', value: '80', icon: Icons.auto_graph),
                 HzStatChip(label: 'Thâm mụn', value: '65', icon: Icons.blur_on),
               ],
             ),
@@ -245,7 +280,8 @@ class ScanResultScreen extends StatelessWidget {
               padding: EdgeInsets.only(bottom: AppSpacing.m),
             ),
             const OptimizedNetworkImage(
-              imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800',
+              imageUrl:
+                  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800',
               height: 220,
               borderRadius: AppRadius.l,
             ),
@@ -257,31 +293,6 @@ class ScanResultScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _InstructionRow extends StatelessWidget {
-  const _InstructionRow({required this.icon, required this.text});
-
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.m),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-            child: Icon(icon, color: AppColors.primary),
-          ),
-          const SizedBox(width: AppSpacing.m),
-          Expanded(child: Text(text)),
-        ],
       ),
     );
   }

@@ -37,7 +37,8 @@ class ProfileRemoteDataSource {
     );
     final data = response.data['data'] as List<dynamic>;
     return data
-        .map((json) => SkinAnalysisHistory.fromJson(json as Map<String, dynamic>))
+        .map((json) =>
+            SkinAnalysisHistory.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

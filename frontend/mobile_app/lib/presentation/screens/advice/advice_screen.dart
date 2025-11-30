@@ -16,36 +16,64 @@ class AdviceScreen extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.xl),
           children: [
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.l)),
               child: const Padding(
                 padding: EdgeInsets.all(AppSpacing.l),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Summary of your skin', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                    Text('Summary of your skin',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 16)),
                     SizedBox(height: AppSpacing.s),
-                    Text('- T-zone is oily while the cheeks are dehydrated\n- 3 new inflamed acne spots detected\n- Light dark spots around the cheeks'),
+                    Text(
+                        '- T-zone is oily while the cheeks are dehydrated\n- 3 new inflamed acne spots detected\n- Light dark spots around the cheeks'),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('Recommended routine', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text('Recommended routine',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.m),
             const _RoutineList(
               title: 'Morning',
-              steps: ['Micellar water', 'Gentle cleanser', 'Chamomile toner', 'Niacinamide 10%', 'SPF50 sunscreen'],
+              steps: [
+                'Micellar water',
+                'Gentle cleanser',
+                'Chamomile toner',
+                'Niacinamide 10%',
+                'SPF50 sunscreen'
+              ],
             ),
             const SizedBox(height: AppSpacing.m),
             const _RoutineList(
               title: 'Evening',
-              steps: ['Oil cleanser', 'Gel cleanser', 'Mild BHA toner', 'Recovery serum', 'Nourishing night cream'],
+              steps: [
+                'Oil cleanser',
+                'Gel cleanser',
+                'Mild BHA toner',
+                'Recovery serum',
+                'Nourishing night cream'
+              ],
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text('Suggested products', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text('Suggested products',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.m),
-            const _ProductSuggestion(name: 'Skin1004 Madagascar Centella Ampoule', benefit: 'Soothes and reduces redness'),
-            const _ProductSuggestion(name: 'La Roche-Posay Effaclar Duo+', benefit: 'Targets breakouts and fades marks'),
+            const _ProductSuggestion(
+                name: 'Skin1004 Madagascar Centella Ampoule',
+                benefit: 'Soothes and reduces redness'),
+            const _ProductSuggestion(
+                name: 'La Roche-Posay Effaclar Duo+',
+                benefit: 'Targets breakouts and fades marks'),
             const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
               label: 'Start this routine',
@@ -67,7 +95,8 @@ class _RoutineList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.m)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m)),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.l),
         child: Column(
@@ -98,12 +127,15 @@ class _ProductSuggestion extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.m),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.m)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m)),
       child: ListTile(
         leading: const Icon(Icons.shopping_bag_outlined),
         title: Text(name),
         subtitle: Text(benefit),
-        trailing: TextButton(onPressed: () => context.push('/products/1'), child: const Text('Details')),
+        trailing: TextButton(
+            onPressed: () => context.push('/products/1'),
+            child: const Text('Details')),
       ),
     );
   }

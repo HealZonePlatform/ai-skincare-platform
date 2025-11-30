@@ -1,4 +1,4 @@
-﻿import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart';
 
 class AppLocalizations {
   AppLocalizations(this.locale);
@@ -13,7 +13,8 @@ class AppLocalizations {
   static final Map<String, Map<String, String>> _localizedValues = {
     'en': {
       'loginTitle': 'Welcome back!',
-      'loginSubtitle': 'Sign in to keep your routines, reminders, and scan history in sync.',
+      'loginSubtitle':
+          'Sign in to keep your routines, reminders, and scan history in sync.',
       'emailLabel': 'Email',
       'passwordLabel': 'Password',
       'signInCta': 'Sign in',
@@ -21,7 +22,8 @@ class AppLocalizations {
     },
     'vi': {
       'loginTitle': 'Chào mừng trở lại!',
-      'loginSubtitle': 'Đăng nhập để đồng bộ chu trình, nhắc nhở và lịch sử phân tích da.',
+      'loginSubtitle':
+          'Đăng nhập để đồng bộ chu trình, nhắc nhở và lịch sử phân tích da.',
       'emailLabel': 'Email',
       'passwordLabel': 'Mật khẩu',
       'signInCta': 'Đăng nhập',

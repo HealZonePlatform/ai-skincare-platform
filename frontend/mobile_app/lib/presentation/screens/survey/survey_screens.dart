@@ -52,7 +52,9 @@ class _SurveySkinTypeScreenState extends State<SurveySkinTypeScreen> {
               HzPrimaryButton(
                 label: 'Continue',
                 icon: Icons.navigate_next,
-                onPressed: _selected == null ? null : () => context.push('/survey/concerns'),
+                onPressed: _selected == null
+                    ? null
+                    : () => context.push('/survey/concerns'),
               ),
             ],
           ),
@@ -92,7 +94,8 @@ class _SurveyConcernsScreenState extends State<SurveyConcernsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Select up to 4 concerns you are experiencing.', style: Theme.of(context).textTheme.titleMedium),
+              Text('Select up to 4 concerns you are experiencing.',
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: AppSpacing.m),
               Wrap(
                 spacing: AppSpacing.s,

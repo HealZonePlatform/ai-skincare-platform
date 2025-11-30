@@ -11,7 +11,7 @@ import 'package:ai_skincare_platform/presentation/screens/auth/register_screen.d
 import 'package:ai_skincare_platform/presentation/screens/checkout/checkout_screens.dart';
 import 'package:ai_skincare_platform/presentation/screens/community/community_screens.dart';
 import 'package:ai_skincare_platform/presentation/screens/history/history_screen.dart';
-import 'package:ai_skincare_platform/presentation/screens/home_screen.dart';
+import 'package:ai_skincare_platform/presentation/screens/home/home_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/lifestyle/lifestyle_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/onboarding/onboarding_screen.dart';
 import 'package:ai_skincare_platform/presentation/screens/paywall/paywall_screen.dart';
@@ -37,26 +37,38 @@ class AppRouter {
       ShellRoute(
         builder: (context, state, child) => ShellScaffold(child: child),
         routes: [
-          GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+          GoRoute(
+              path: '/home', builder: (context, state) => const HomeScreen()),
           GoRoute(
             path: '/community',
             builder: (context, state) => const CommunityFeedScreen(),
             routes: [
               GoRoute(
                 path: 'detail/:id',
-                builder: (context, state) => CommunityDetailScreen(postId: state.pathParameters['id'] ?? ''),
+                builder: (context, state) => CommunityDetailScreen(
+                    postId: state.pathParameters['id'] ?? ''),
               ),
-              GoRoute(path: 'new', builder: (context, state) => const CommunityNewPostScreen()),
+              GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const CommunityNewPostScreen()),
             ],
           ),
-          GoRoute(path: '/history', builder: (context, state) => const HistoryScreen()),
+          GoRoute(
+              path: '/history',
+              builder: (context, state) => const HistoryScreen()),
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfileOverviewScreen(),
             routes: [
-              GoRoute(path: 'reminders', builder: (context, state) => const ProfileRemindersScreen()),
-              GoRoute(path: 'goals', builder: (context, state) => const ProfileGoalsScreen()),
-              GoRoute(path: 'basic', builder: (context, state) => const ProfileBasicScreen()),
+              GoRoute(
+                  path: 'reminders',
+                  builder: (context, state) => const ProfileRemindersScreen()),
+              GoRoute(
+                  path: 'goals',
+                  builder: (context, state) => const ProfileGoalsScreen()),
+              GoRoute(
+                  path: 'basic',
+                  builder: (context, state) => const ProfileBasicScreen()),
               GoRoute(
                 path: 'analysis/:id',
                 name: 'analysis-detail',
@@ -69,11 +81,13 @@ class AppRouter {
                   final id = state.pathParameters['id'];
                   if (id == null) {
                     return const Scaffold(
-                      body: Center(child: Text('Analysis result not available.')),
+                      body:
+                          Center(child: Text('Analysis result not available.')),
                     );
                   }
 
-                  final provider = Provider.of<UserProfileProvider>(context, listen: false);
+                  final provider =
+                      Provider.of<UserProfileProvider>(context, listen: false);
                   final fallback = provider.skinAnalysisHistory.firstWhere(
                     (item) => item.id == id,
                     orElse: () => provider.skinAnalysisHistory.isNotEmpty
@@ -88,28 +102,45 @@ class AppRouter {
         ],
       ),
       GoRoute(path: '/onboarding', builder: (c, s) => const OnboardingScreen()),
-      GoRoute(path: '/preferences/categories', builder: (c, s) => const PreferencesCategoriesScreen()),
+      GoRoute(
+          path: '/preferences/categories',
+          builder: (c, s) => const PreferencesCategoriesScreen()),
       GoRoute(path: '/auth/signup', builder: (c, s) => const RegisterScreen()),
       GoRoute(path: '/auth/signin', builder: (c, s) => const LoginScreen()),
       GoRoute(path: '/auth/sigin', builder: (c, s) => const LoginScreen()),
-      GoRoute(path: '/survey/skin-type', builder: (c, s) => const SurveySkinTypeScreen()),
-      GoRoute(path: '/survey/concerns', builder: (c, s) => const SurveyConcernsScreen()),
-      GoRoute(path: '/scan/prepare', builder: (c, s) => const ScanPrepareScreen()),
-      GoRoute(path: '/scan/capture', builder: (c, s) => const ScanCaptureScreen()),
-      GoRoute(path: '/scan/result', builder: (c, s) => const ScanResultScreen()),
+      GoRoute(
+          path: '/survey/skin-type',
+          builder: (c, s) => const SurveySkinTypeScreen()),
+      GoRoute(
+          path: '/survey/concerns',
+          builder: (c, s) => const SurveyConcernsScreen()),
+      GoRoute(
+          path: '/scan/prepare', builder: (c, s) => const ScanPrepareScreen()),
+      GoRoute(
+          path: '/scan/capture', builder: (c, s) => const ScanCaptureScreen()),
+      GoRoute(
+          path: '/scan/result', builder: (c, s) => const ScanResultScreen()),
       GoRoute(path: '/advice', builder: (c, s) => const AdviceScreen()),
       GoRoute(path: '/routine', builder: (c, s) => const RoutineScreen()),
       GoRoute(path: '/products', builder: (c, s) => const ProductsListScreen()),
       GoRoute(
         path: '/products/:id',
-        builder: (c, s) => ProductDetailScreen(productId: s.pathParameters['id'] ?? ''),
+        builder: (c, s) =>
+            ProductDetailScreen(productId: s.pathParameters['id'] ?? ''),
       ),
       GoRoute(path: '/lifestyle', builder: (c, s) => const LifestyleScreen()),
       GoRoute(path: '/paywall', builder: (c, s) => const PaywallScreen()),
-      GoRoute(path: '/checkout/method', builder: (c, s) => const CheckoutMethodScreen()),
-      GoRoute(path: '/checkout/card', builder: (c, s) => const CheckoutCardScreen()),
-      GoRoute(path: '/checkout/qr', builder: (c, s) => const CheckoutQrScreen()),
-      GoRoute(path: '/checkout/success', builder: (c, s) => const CheckoutSuccessScreen()),
+      GoRoute(
+          path: '/checkout/method',
+          builder: (c, s) => const CheckoutMethodScreen()),
+      GoRoute(
+          path: '/checkout/card',
+          builder: (c, s) => const CheckoutCardScreen()),
+      GoRoute(
+          path: '/checkout/qr', builder: (c, s) => const CheckoutQrScreen()),
+      GoRoute(
+          path: '/checkout/success',
+          builder: (c, s) => const CheckoutSuccessScreen()),
     ],
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Not found')),

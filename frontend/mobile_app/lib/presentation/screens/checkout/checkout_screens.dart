@@ -46,7 +46,9 @@ class _CheckoutMethodScreenState extends State<CheckoutMethodScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(AppRadius.m),
                             border: Border.all(
-                              color: method.id == _selected ? AppColors.primary : AppColors.chipBg,
+                              color: method.id == _selected
+                                  ? AppColors.primary
+                                  : AppColors.chipBg,
                             ),
                           ),
                           child: RadioListTile<String>(
@@ -145,7 +147,8 @@ class _CheckoutCardScreenState extends State<CheckoutCardScreen> {
                 icon: Icons.lock_outline,
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đang xử lý thanh toán thẻ...')),
+                    const SnackBar(
+                        content: Text('Đang xử lý thanh toán thẻ...')),
                   );
                   context.push('/checkout/success');
                 },
@@ -182,7 +185,8 @@ class CheckoutQrScreen extends StatelessWidget {
                 child: const Icon(Icons.qr_code_2, size: 120),
               ),
               const SizedBox(height: AppSpacing.l),
-              const Text('Mở ứng dụng ngân hàng hoặc ví điện tử để quét mã VNPAY.'),
+              const Text(
+                  'Mở ứng dụng ngân hàng hoặc ví điện tử để quét mã VNPAY.'),
               const Spacer(),
               HzPrimaryButton(
                 label: 'Tôi đã thanh toán',
@@ -208,7 +212,7 @@ class CheckoutSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Thanh toán thành công')), 
+      appBar: AppBar(title: const Text('Thanh toán thành công')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -216,7 +220,8 @@ class CheckoutSuccessScreen extends StatelessWidget {
             CircleAvatar(
               radius: 48,
               backgroundColor: AppColors.success.withValues(alpha: 0.15),
-              child: const Icon(Icons.check_circle, color: AppColors.success, size: 48),
+              child: const Icon(Icons.check_circle,
+                  color: AppColors.success, size: 48),
             ),
             const SizedBox(height: AppSpacing.l),
             const Text('Chúc mừng!'),
@@ -254,7 +259,8 @@ class _PlanSummary extends StatelessWidget {
           SizedBox(height: AppSpacing.s),
           Text('99.000đ / tháng'),
           SizedBox(height: AppSpacing.s),
-          Text('Bao gồm: Routine cá nhân, chuyên gia đồng hành, ưu đãi sản phẩm'),
+          Text(
+              'Bao gồm: Routine cá nhân, chuyên gia đồng hành, ưu đãi sản phẩm'),
         ],
       ),
     );

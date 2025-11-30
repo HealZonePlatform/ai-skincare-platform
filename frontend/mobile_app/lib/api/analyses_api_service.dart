@@ -61,9 +61,15 @@ class AnalysesApiService {
         'limit': limit,
       };
 
-      if (status != null) queryParams['status'] = status;
-      if (fromDate != null) queryParams['fromDate'] = fromDate.toIso8601String();
-      if (toDate != null) queryParams['toDate'] = toDate.toIso8601String();
+      if (status != null) {
+        queryParams['status'] = status;
+      }
+      if (fromDate != null) {
+        queryParams['fromDate'] = fromDate.toIso8601String();
+      }
+      if (toDate != null) {
+        queryParams['toDate'] = toDate.toIso8601String();
+      }
 
       final response = await _dio.get(
         ApiConstants.analysesHistory,
@@ -117,7 +123,8 @@ class AnalysesApiService {
 
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        final message = (error.response?.data?['message'] as String?) ?? 'API Error';
+        final message =
+            (error.response?.data?['message'] as String?) ?? 'API Error';
 
         if (statusCode != null) {
           return ApiException(
@@ -145,5 +152,3 @@ class AnalysesApiService {
     }
   }
 }
-
-

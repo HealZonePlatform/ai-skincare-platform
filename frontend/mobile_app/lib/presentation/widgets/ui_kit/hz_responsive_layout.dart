@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 
-typedef ResponsiveBuilder = Widget Function(BuildContext context, BoxConstraints constraints);
+typedef ResponsiveBuilder = Widget Function(
+    BuildContext context, BoxConstraints constraints);
 
 class HzResponsiveLayout extends StatelessWidget {
   const HzResponsiveLayout({

@@ -26,7 +26,9 @@ class HzPrimaryButton extends StatelessWidget {
             ? const SizedBox(
                 height: 22,
                 width: 22,
-                child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -77,4 +79,3 @@ class HzSecondaryButton extends StatelessWidget {
     );
   }
 }
-

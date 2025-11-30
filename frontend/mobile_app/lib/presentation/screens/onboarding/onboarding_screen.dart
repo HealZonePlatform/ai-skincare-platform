@@ -10,7 +10,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -19,7 +19,8 @@ class OnboardingScreen extends StatelessWidget {
           Image.asset(
             'assets/images/onboarding_1.png',
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(color: AppColors.background),
+            errorBuilder: (_, __, ___) =>
+                Container(color: AppColors.background),
           ),
           // Gradient Overlay
           Container(
@@ -53,12 +54,14 @@ class OnboardingScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(AppRadius.full),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.auto_awesome, color: Colors.white, size: 16),
+                        const Icon(Icons.auto_awesome,
+                            color: Colors.white, size: 16),
                         const SizedBox(width: AppSpacing.s),
                         Text(
                           'AI-Powered Analysis',
@@ -95,7 +98,8 @@ class OnboardingScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.secondary,
                         foregroundColor: AppColors.textPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.l),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: AppSpacing.l),
                       ),
                       child: const Text('Get Started'),
                     ),
@@ -115,10 +119,12 @@ class PreferencesCategoriesScreen extends StatefulWidget {
   const PreferencesCategoriesScreen({super.key});
 
   @override
-  State<PreferencesCategoriesScreen> createState() => _PreferencesCategoriesScreenState();
+  State<PreferencesCategoriesScreen> createState() =>
+      _PreferencesCategoriesScreenState();
 }
 
-class _PreferencesCategoriesScreenState extends State<PreferencesCategoriesScreen> {
+class _PreferencesCategoriesScreenState
+    extends State<PreferencesCategoriesScreen> {
   final _selected = <String>{};
   final _options = const [
     'Everyday care',
@@ -168,12 +174,15 @@ class _PreferencesCategoriesScreenState extends State<PreferencesCategoriesScree
                 ],
               ),
               const Spacer(),
-              Text('Selected: ${_selected.length}/3', style: const TextStyle(color: AppColors.textSecondary)),
+              Text('Selected: ${_selected.length}/3',
+                  style: const TextStyle(color: AppColors.textSecondary)),
               const SizedBox(height: AppSpacing.s),
               HzPrimaryButton(
                 label: 'Continue',
                 icon: Icons.navigate_next,
-                onPressed: canContinue ? () => context.push('/survey/skin-type') : null,
+                onPressed: canContinue
+                    ? () => context.push('/survey/skin-type')
+                    : null,
               ),
             ],
           ),

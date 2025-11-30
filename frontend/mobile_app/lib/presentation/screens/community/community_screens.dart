@@ -15,7 +15,8 @@ class CommunityFeedScreen extends StatelessWidget {
         id: '',
         title: 'Skincare everyday #',
         author: 'Ngoc Anh',
-        excerpt: 'A simple routine and balanced lifestyle helped me calm breakouts in just two weeks.',
+        excerpt:
+            'A simple routine and balanced lifestyle helped me calm breakouts in just two weeks.',
         likes: 12 + index,
       ),
     );
@@ -36,7 +37,8 @@ class CommunityFeedScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final post = posts[index];
           return Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.l)),
             child: InkWell(
               borderRadius: BorderRadius.circular(AppRadius.l),
               onTap: () => context.push('/community/detail/'),
@@ -45,13 +47,19 @@ class CommunityFeedScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(post.title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(post.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600)),
                     const SizedBox(height: AppSpacing.s),
-                    Text(post.excerpt, maxLines: 2, overflow: TextOverflow.ellipsis),
+                    Text(post.excerpt,
+                        maxLines: 2, overflow: TextOverflow.ellipsis),
                     const SizedBox(height: AppSpacing.s),
                     Row(
                       children: [
-                        const CircleAvatar(radius: 16, child: Icon(Icons.person, size: 18)),
+                        const CircleAvatar(
+                            radius: 16, child: Icon(Icons.person, size: 18)),
                         const SizedBox(width: AppSpacing.s),
                         Text(post.author),
                         const Spacer(),
@@ -93,7 +101,8 @@ class CommunityDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Skincare everyday #', style: Theme.of(context).textTheme.headlineSmall),
+              Text('Skincare everyday #',
+                  style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.s),
               const Row(
                 children: [
@@ -114,10 +123,15 @@ class CommunityDetailScreen extends StatelessWidget {
               const Divider(),
               Row(
                 children: [
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.bookmark_border)),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.favorite_border)),
+                  IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.bookmark_border)),
                   const Spacer(),
-                  TextButton(onPressed: () {}, child: const Text('Comments (12)')),
+                  TextButton(
+                      onPressed: () {}, child: const Text('Comments (12)')),
                 ],
               ),
             ],
@@ -157,15 +171,22 @@ class _CommunityNewPostScreenState extends State<CommunityNewPostScreen> {
                 controller: _controller,
                 maxLines: 8,
                 decoration: const InputDecoration(
-                  hintText: 'Tell the community about your skincare experience...',
+                  hintText:
+                      'Tell the community about your skincare experience...',
                 ),
               ),
               const SizedBox(height: AppSpacing.l),
               Row(
                 children: [
-                  OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.image_outlined), label: const Text('Add images')),
+                  OutlinedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.image_outlined),
+                      label: const Text('Add images')),
                   const SizedBox(width: AppSpacing.m),
-                  OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.sell_outlined), label: const Text('Add tags')),
+                  OutlinedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.sell_outlined),
+                      label: const Text('Add tags')),
                 ],
               ),
               const Spacer(),
@@ -174,7 +195,8 @@ class _CommunityNewPostScreenState extends State<CommunityNewPostScreen> {
                 icon: Icons.send_outlined,
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Your post is being processed.')),
+                    const SnackBar(
+                        content: Text('Your post is being processed.')),
                   );
                   context.pop();
                 },

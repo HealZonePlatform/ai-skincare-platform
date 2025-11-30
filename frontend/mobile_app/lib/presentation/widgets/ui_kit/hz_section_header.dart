@@ -13,7 +13,8 @@ class HzSectionHeader extends StatelessWidget {
     this.actionLabel,
     this.onActionPressed,
     this.route,
-    this.padding = const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.m),
+    this.padding = const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl, vertical: AppSpacing.m),
   });
 
   final String title;
@@ -35,13 +36,19 @@ class HzSectionHeader extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     subtitle!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.textSecondary),
                   ),
                 ],
               ],

@@ -16,7 +16,8 @@ class AnalyticsRouterObserver extends NavigatorObserver {
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     if (previousRoute != null) {
-      final screenName = previousRoute.settings.name ?? previousRoute.runtimeType.toString();
+      final screenName =
+          previousRoute.settings.name ?? previousRoute.runtimeType.toString();
       AnalyticsService.logScreenView(screenName);
     }
   }

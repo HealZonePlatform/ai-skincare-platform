@@ -8,6 +8,8 @@ import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/network/api_client.dart';
 import 'package:ai_skincare_platform/l10n/app_localizations.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/home_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/theme_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/router/app_router.dart';
 import 'package:ai_skincare_platform/presentation/widgets/app_loading_overlay.dart';
@@ -37,11 +39,12 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
-      child: Consumer<AuthProvider>(
-        builder: (context, auth, _) {
-          final theme = AppTheme.build();
+      child: Consumer2<AuthProvider, ThemeProvider>(
+        builder: (context, auth, themeProvider, _) {
           final router = AppRouter(isLoggedIn: auth.isLoggedIn).router;
           return ValueListenableBuilder<String?>(
             valueListenable: GlobalErrorNotifier.notifier,
@@ -49,7 +52,9 @@ class MyApp extends StatelessWidget {
               return MaterialApp.router(
                 title: 'HealZone',
                 debugShowCheckedModeBanner: false,
-                theme: theme,
+                theme: AppTheme.build(),
+                darkTheme: AppTheme.build(isDark: true),
+                themeMode: themeProvider.themeMode,
                 routerConfig: router,
                 scaffoldMessengerKey: _scaffoldMessengerKey,
                 localizationsDelegates: const [

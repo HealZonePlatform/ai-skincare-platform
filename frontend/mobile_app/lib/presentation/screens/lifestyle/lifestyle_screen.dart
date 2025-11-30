@@ -19,7 +19,8 @@ class LifestyleScreen extends StatelessWidget {
           _LifestyleTile(
             title: 'Giấc ngủ',
             value: '7.5 giờ / đêm',
-            description: 'Ổn định, nên cố gắng đi ngủ trước 23h để da phục hồi tốt hơn.',
+            description:
+                'Ổn định, nên cố gắng đi ngủ trước 23h để da phục hồi tốt hơn.',
           ),
           _LifestyleTile(
             title: 'Nước uống',
@@ -43,7 +44,8 @@ class LifestyleScreen extends StatelessWidget {
 }
 
 class _LifestyleTile extends StatelessWidget {
-  const _LifestyleTile({required this.title, required this.value, required this.description});
+  const _LifestyleTile(
+      {required this.title, required this.value, required this.description});
 
   final String title;
   final String value;
@@ -53,13 +55,18 @@ class _LifestyleTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.l),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.m)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m)),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.l),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(title,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: AppSpacing.s),
             Text(value, style: const TextStyle(color: AppColors.primary)),
             const SizedBox(height: AppSpacing.s),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-import 'package:ai_skincare_platform/theme/app_theme.dart';
+import 'package:ai_skincare_platform/presentation/providers/theme_provider.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
+import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class ProfileOverviewScreen extends StatelessWidget {
   const ProfileOverviewScreen({super.key});
@@ -47,6 +49,8 @@ class ProfileOverviewScreen extends StatelessWidget {
             skinType: 'Combination skin',
           ),
           const SizedBox(height: AppSpacing.xl),
+          const _ThemeModeTile(),
+          const SizedBox(height: AppSpacing.m),
           for (final action in actions)
             _ProfileActionTile(
               icon: action.icon,
@@ -60,8 +64,82 @@ class ProfileOverviewScreen extends StatelessWidget {
   }
 }
 
+class _ThemeModeTile extends StatelessWidget {
+  const _ThemeModeTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final currentMode = themeProvider.themeMode;
+
+    String labelForMode(ThemeMode mode) {
+      switch (mode) {
+        case ThemeMode.dark:
+          return 'Dark';
+        case ThemeMode.light:
+          return 'Light';
+        case ThemeMode.system:
+          return 'System';
+      }
+    }
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: AppSpacing.m),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.m),
+      ),
+      child: ListTile(
+        leading: Icon(
+          currentMode == ThemeMode.dark
+              ? Icons.dark_mode_outlined
+              : Icons.light_mode_outlined,
+        ),
+        title: const Text('Theme'),
+        subtitle: const Text('Light / Dark / Follow system'),
+        trailing: PopupMenuButton<ThemeMode>(
+          tooltip: 'Change theme mode',
+          onSelected: (mode) => themeProvider.setThemeMode(mode),
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: ThemeMode.system,
+              child: Text('System default'),
+            ),
+            const PopupMenuItem(
+              value: ThemeMode.light,
+              child: Text('Light'),
+            ),
+            const PopupMenuItem(
+              value: ThemeMode.dark,
+              child: Text('Dark'),
+            ),
+          ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.m,
+              vertical: AppSpacing.s,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.full),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(labelForMode(currentMode)),
+                const SizedBox(width: AppSpacing.s),
+                const Icon(Icons.expand_more_rounded),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.name, required this.email, required this.skinType});
+  const _ProfileHeader(
+      {required this.name, required this.email, required this.skinType});
 
   final String name;
   final String email;
@@ -84,11 +162,17 @@ class _ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
-                Text(email, style: const TextStyle(color: AppColors.textSecondary)),
+                Text(name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
+                Text(email,
+                    style: const TextStyle(color: AppColors.textSecondary)),
                 const SizedBox(height: AppSpacing.s),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.m, vertical: AppSpacing.s / 2),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.m, vertical: AppSpacing.s / 2),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.s),
@@ -121,7 +205,8 @@ class _ProfileActionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.m),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.m)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m)),
       child: ListTile(
         leading: Icon(icon),
         title: Text(title),
@@ -180,7 +265,8 @@ class _ProfileBasicScreenState extends State<ProfileBasicScreen> {
                       initialValue: _gender,
                       decoration: const InputDecoration(labelText: 'Gender'),
                       items: const [
-                        DropdownMenuItem(value: 'female', child: Text('Female')),
+                        DropdownMenuItem(
+                            value: 'female', child: Text('Female')),
                         DropdownMenuItem(value: 'male', child: Text('Male')),
                         DropdownMenuItem(value: 'other', child: Text('Other')),
                       ],
@@ -258,7 +344,8 @@ class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
               title: const Text('Choose reminder time'),
               trailing: const Icon(Icons.access_time),
               onTap: () async {
-                final picked = await showTimePicker(context: context, initialTime: _dailyTime);
+                final picked = await showTimePicker(
+                    context: context, initialTime: _dailyTime);
                 if (picked != null) setState(() => _dailyTime = picked);
               },
             ),
@@ -272,7 +359,8 @@ class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
               title: const Text('Choose night reminder time'),
               trailing: const Icon(Icons.access_time),
               onTap: () async {
-                final picked = await showTimePicker(context: context, initialTime: _nightTime);
+                final picked = await showTimePicker(
+                    context: context, initialTime: _nightTime);
                 if (picked != null) setState(() => _nightTime = picked);
               },
             ),
@@ -284,10 +372,12 @@ class _ProfileRemindersScreenState extends State<ProfileRemindersScreen> {
               decoration: const InputDecoration(labelText: 'Frequency'),
               items: const [
                 DropdownMenuItem(value: 'weekly', child: Text('Weekly')),
-                DropdownMenuItem(value: 'biweekly', child: Text('Every 2 weeks')),
+                DropdownMenuItem(
+                    value: 'biweekly', child: Text('Every 2 weeks')),
                 DropdownMenuItem(value: 'monthly', child: Text('Monthly')),
               ],
-              onChanged: (value) => setState(() => _scanFrequency = value ?? 'weekly'),
+              onChanged: (value) =>
+                  setState(() => _scanFrequency = value ?? 'weekly'),
             ),
             const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
@@ -329,7 +419,7 @@ class _ProfileGoalsScreenState extends State<ProfileGoalsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Skincare goals')), 
+      appBar: AppBar(title: const Text('Skincare goals')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),

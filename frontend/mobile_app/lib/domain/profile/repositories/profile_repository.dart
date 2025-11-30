@@ -7,7 +7,8 @@ abstract class ProfileRepository {
 
   Future<UserProfile> updateProfile(Map<String, dynamic> payload);
 
-  Future<List<SkinAnalysisHistory>> fetchAnalysisHistory({int page = 1, int pageSize = 10});
+  Future<List<SkinAnalysisHistory>> fetchAnalysisHistory(
+      {int page = 1, int pageSize = 10});
 
   Future<UserProfile> uploadAvatar(String filePath);
 

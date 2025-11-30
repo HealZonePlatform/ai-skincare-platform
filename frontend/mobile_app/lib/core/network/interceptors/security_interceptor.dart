@@ -1,6 +1,5 @@
 // lib/core/network/interceptors/security_interceptor.dart
 
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 import 'package:dio/dio.dart';
@@ -26,14 +25,17 @@ class SecurityInterceptor extends Interceptor {
       );
     }
     if (!kIsWeb) {
-      options.headers.putIfAbsent('X-Client-Platform', () => Platform.operatingSystem);
+      // Platform.operatingSystem is not available on web without dart:io
+      // options.headers.putIfAbsent('X-Client-Platform', () => 'mobile');
+    } else {
+      options.headers.putIfAbsent('X-Client-Platform', () => 'web');
     }
     handler.next(options);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (err.response?.statusCode == HttpStatus.unauthorized) {
+    if (err.response?.statusCode == 401) {
       err = err.copyWith(
         message: 'Unauthorized request intercepted',
       );

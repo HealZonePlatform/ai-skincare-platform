@@ -11,7 +11,7 @@ class AppSpacing {
   static const double xl = 24;
   static const double xxl = 32;
   static const double xxxl = 48;
-  
+
   // Edge Insets presets
   static const screenPadding = EdgeInsets.all(xl);
   static const cardPadding = EdgeInsets.all(l);
@@ -29,7 +29,7 @@ class AppRadius {
   static const double xl = 20;
   static const double xxl = 28;
   static const double full = 9999;
-  
+
   // Border Radius presets
   static BorderRadius get cardRadius => BorderRadius.circular(l);
   static BorderRadius get buttonRadius => BorderRadius.circular(xl);
@@ -45,7 +45,7 @@ class AppShadows {
       offset: Offset(0, 2),
     ),
   ];
-  
+
   static const medium = [
     BoxShadow(
       color: Color(0x14000000),
@@ -54,7 +54,7 @@ class AppShadows {
       spreadRadius: -2,
     ),
   ];
-  
+
   static const strong = [
     BoxShadow(
       color: Color(0x1F000000),
@@ -63,7 +63,7 @@ class AppShadows {
       spreadRadius: -4,
     ),
   ];
-  
+
   static const floating = [
     BoxShadow(
       color: Color(0x14000000),

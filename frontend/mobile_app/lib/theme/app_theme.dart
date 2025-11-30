@@ -13,21 +13,29 @@ export 'app_typography.dart';
 
 class AppTheme {
   static ThemeData build({bool isDark = false}) {
+    final surface = isDark ? AppColors.darkSurface : AppColors.surface;
+    final background = isDark ? AppColors.darkBackground : AppColors.background;
+    final textPrimary =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final chipBg = isDark ? AppColors.darkChipBg : AppColors.chipBg;
+    final border = isDark ? AppColors.darkBorder : AppColors.border;
+    final divider = isDark ? AppColors.darkDivider : AppColors.divider;
+
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       primary: AppColors.primary,
       onPrimary: Colors.white,
       secondary: AppColors.secondary,
-      onSecondary: AppColors.textPrimary,
-      surface: AppColors.surface,
-      onSurface: AppColors.textPrimary,
+      onSecondary: textPrimary,
+      surface: surface,
+      onSurface: textPrimary,
       error: AppColors.danger,
       brightness: isDark ? Brightness.dark : Brightness.light,
-    );
+    ).copyWith(surface: surface, onSurface: textPrimary);
 
     final base = ThemeData(
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: AppColors.background,
+      scaffoldBackgroundColor: background,
       useMaterial3: true,
       fontFamily: 'Outfit', // Assuming Outfit or similar modern font
       textTheme: AppTypography.textTheme,
@@ -37,31 +45,31 @@ class AppTheme {
       appBarTheme: base.appBarTheme.copyWith(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: AppColors.background,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: background,
+        foregroundColor: textPrimary,
         titleTextStyle: AppTypography.textTheme.headlineSmall?.copyWith(
-          color: AppColors.textPrimary,
+          color: textPrimary,
           fontWeight: FontWeight.w600,
         ),
         systemOverlayStyle:
             isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
-        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        iconTheme: IconThemeData(color: textPrimary),
       ),
       cardTheme: base.cardTheme.copyWith(
         elevation: 0,
-        color: AppColors.surface,
+        color: surface,
         margin: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl, vertical: AppSpacing.s),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.l),
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: BorderSide(color: border, width: 1),
         ),
       ),
       chipTheme: base.chipTheme.copyWith(
-        backgroundColor: AppColors.chipBg,
+        backgroundColor: chipBg,
         selectedColor: AppColors.primary,
-        labelStyle: AppTypography.textTheme.labelMedium
-            ?.copyWith(color: AppColors.textPrimary),
+        labelStyle:
+            AppTypography.textTheme.labelMedium?.copyWith(color: textPrimary),
         secondaryLabelStyle:
             AppTypography.textTheme.labelMedium?.copyWith(color: Colors.white),
         padding: const EdgeInsets.symmetric(
@@ -106,18 +114,19 @@ class AppTheme {
       ),
       inputDecorationTheme: base.inputDecorationTheme.copyWith(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: surface,
         contentPadding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.l, vertical: AppSpacing.l),
-        hintStyle: AppTypography.textTheme.bodyMedium
-            ?.copyWith(color: AppColors.textTertiary),
+        hintStyle: AppTypography.textTheme.bodyMedium?.copyWith(
+            color:
+                isDark ? AppColors.darkTextTertiary : AppColors.textTertiary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.m),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.m),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.m),
@@ -128,15 +137,16 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.danger),
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.divider,
+      dividerTheme: DividerThemeData(
+        color: divider,
         thickness: 1,
         space: AppSpacing.xl,
       ),
       bottomNavigationBarTheme: base.bottomNavigationBarTheme.copyWith(
-        backgroundColor: AppColors.surface,
+        backgroundColor: surface,
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textTertiary,
+        unselectedItemColor:
+            isDark ? AppColors.darkTextTertiary : AppColors.textTertiary,
         selectedLabelStyle: AppTypography.textTheme.labelSmall
             ?.copyWith(fontWeight: FontWeight.w600),
         unselectedLabelStyle: AppTypography.textTheme.labelSmall,

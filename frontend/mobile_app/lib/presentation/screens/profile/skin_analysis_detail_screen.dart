@@ -20,7 +20,8 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final createdDate = DateFormat('dd MMM yyyy – HH:mm').format(analysisItem.createdAt.toLocal());
+    final createdDate = DateFormat('dd MMM yyyy – HH:mm')
+        .format(analysisItem.createdAt.toLocal());
 
     return Scaffold(
       appBar: AppBar(
@@ -100,7 +101,8 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.l, vertical: AppSpacing.s),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.l, vertical: AppSpacing.s),
       decoration: BoxDecoration(
         color: statusColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppRadius.m),
@@ -139,7 +141,8 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
   }
 
   Widget _buildAnalysisResultCard() {
-    if (analysisItem.analysisResult == null || analysisItem.analysisResult!.isEmpty) {
+    if (analysisItem.analysisResult == null ||
+        analysisItem.analysisResult!.isEmpty) {
       return const Card(
         child: Padding(
           padding: EdgeInsets.all(AppSpacing.l),
@@ -182,7 +185,8 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
 
   void _showDemoNotice(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Chức năng chia sẻ chỉ bật trên bản production.')),
+      const SnackBar(
+          content: Text('Chức năng chia sẻ chỉ bật trên bản production.')),
     );
   }
 }

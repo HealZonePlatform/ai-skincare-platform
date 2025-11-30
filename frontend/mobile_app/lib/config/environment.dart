@@ -47,7 +47,8 @@ class Environment {
   static bool get isDevelopment => flavor == AppEnvironment.development;
 
   static bool get enableLogging {
-    const override = bool.fromEnvironment('API_ENABLE_LOGGING', defaultValue: true);
+    const override =
+        bool.fromEnvironment('API_ENABLE_LOGGING', defaultValue: true);
     return override && _config.enableLogging;
   }
 
@@ -75,19 +76,22 @@ class Environment {
   }
 
   static Duration get connectTimeout {
-    const override = int.fromEnvironment('API_CONNECT_TIMEOUT_MS', defaultValue: 0);
+    const override =
+        int.fromEnvironment('API_CONNECT_TIMEOUT_MS', defaultValue: 0);
     final value = override > 0 ? override : _config.connectTimeoutMs;
     return Duration(milliseconds: value);
   }
 
   static Duration get receiveTimeout {
-    const override = int.fromEnvironment('API_RECEIVE_TIMEOUT_MS', defaultValue: 0);
+    const override =
+        int.fromEnvironment('API_RECEIVE_TIMEOUT_MS', defaultValue: 0);
     final value = override > 0 ? override : _config.receiveTimeoutMs;
     return Duration(milliseconds: value);
   }
 
   static Duration get sendTimeout {
-    const override = int.fromEnvironment('API_SEND_TIMEOUT_MS', defaultValue: 0);
+    const override =
+        int.fromEnvironment('API_SEND_TIMEOUT_MS', defaultValue: 0);
     final value = override > 0 ? override : _config.sendTimeoutMs;
     return Duration(milliseconds: value);
   }

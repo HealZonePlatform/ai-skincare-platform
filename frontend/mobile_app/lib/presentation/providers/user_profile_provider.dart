@@ -27,15 +27,20 @@ class UserProfileProvider with ChangeNotifier {
     ChangePasswordUseCase? changePasswordUseCase,
   })  : _cache = cache ?? ProfileLocalCache(),
         _getUserProfileUseCase = getUserProfileUseCase ??
-            GetUserProfileUseCase(repository: profileRepository ?? ProfileRepositoryImpl()),
+            GetUserProfileUseCase(
+                repository: profileRepository ?? ProfileRepositoryImpl()),
         _getAnalysisHistoryUseCase = getAnalysisHistoryUseCase ??
-            GetAnalysisHistoryUseCase(repository: profileRepository ?? ProfileRepositoryImpl()),
+            GetAnalysisHistoryUseCase(
+                repository: profileRepository ?? ProfileRepositoryImpl()),
         _updateUserProfileUseCase = updateUserProfileUseCase ??
-            UpdateUserProfileUseCase(repository: profileRepository ?? ProfileRepositoryImpl()),
+            UpdateUserProfileUseCase(
+                repository: profileRepository ?? ProfileRepositoryImpl()),
         _uploadAvatarUseCase = uploadAvatarUseCase ??
-            UploadAvatarUseCase(repository: profileRepository ?? ProfileRepositoryImpl()),
+            UploadAvatarUseCase(
+                repository: profileRepository ?? ProfileRepositoryImpl()),
         _changePasswordUseCase = changePasswordUseCase ??
-            ChangePasswordUseCase(repository: profileRepository ?? ProfileRepositoryImpl()) {
+            ChangePasswordUseCase(
+                repository: profileRepository ?? ProfileRepositoryImpl()) {
     loadUserProfile();
     _authSubscription = AuthSessionObserver.instance.events.listen((event) {
       if (event == AuthSessionEvent.signedIn) {
@@ -71,8 +76,9 @@ class UserProfileProvider with ChangeNotifier {
   String _searchQuery = '';
 
   UserProfile? get userProfile => _userProfile;
-  List<SkinAnalysisHistory> get skinAnalysisHistory =>
-      _searchQuery.isEmpty ? List.unmodifiable(_history) : List.unmodifiable(_filteredHistory);
+  List<SkinAnalysisHistory> get skinAnalysisHistory => _searchQuery.isEmpty
+      ? List.unmodifiable(_history)
+      : List.unmodifiable(_filteredHistory);
   bool get isLoading => _isLoading;
   bool get isUpdating => _isUpdating;
   bool get isHistoryLoading => _historyLoading;
@@ -316,8 +322,12 @@ class UserProfileProvider with ChangeNotifier {
           (entry) =>
               term.isEmpty ||
               entry.id.toLowerCase().contains(term.toLowerCase()) ||
-              entry.status?.toLowerCase().contains(term.toLowerCase()) == true ||
-              entry.createdAt.toIso8601String().toLowerCase().contains(term.toLowerCase()),
+              entry.status?.toLowerCase().contains(term.toLowerCase()) ==
+                  true ||
+              entry.createdAt
+                  .toIso8601String()
+                  .toLowerCase()
+                  .contains(term.toLowerCase()),
         ),
       );
   }

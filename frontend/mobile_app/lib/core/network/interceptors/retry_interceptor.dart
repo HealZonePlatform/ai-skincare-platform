@@ -23,7 +23,8 @@ class RetryInterceptor extends Interceptor {
   final Set<DioExceptionType> retryableTypes;
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
     final requestOptions = err.requestOptions;
     final shouldRetry = _shouldRetry(err);
     final retries = (requestOptions.extra['retry_count'] as int?) ?? 0;

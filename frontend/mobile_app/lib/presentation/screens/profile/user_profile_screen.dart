@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +46,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           body: RefreshIndicator(
             onRefresh: () => provider.loadUserProfile(forceRefresh: true),
             child: CustomScrollView(
-              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics()),
               slivers: [
                 SliverAppBar(
                   expandedHeight: 230,
@@ -78,26 +79,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 else
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.l),
+                      padding: const EdgeInsets.fromLTRB(AppSpacing.xl,
+                          AppSpacing.xl, AppSpacing.xl, AppSpacing.l),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _QuickStats(provider: provider),
                           const SizedBox(height: AppSpacing.xl),
-                          _ActionCards(onChangePassword: () => _showChangePasswordDialog(context, provider)),
+                          _ActionCards(
+                              onChangePassword: () =>
+                                  _showChangePasswordDialog(context, provider)),
                         ],
                       ),
                     ),
                   ),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.l, AppSpacing.xl, AppSpacing.s),
+                  padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.xl, AppSpacing.l, AppSpacing.xl, AppSpacing.s),
                   sliver: SliverToBoxAdapter(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Skin analysis history',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         TextButton(
                           onPressed: () => context.push('/history'),
@@ -108,13 +116,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  sliver: provider.isHistoryLoading && provider.skinAnalysisHistory.isEmpty
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                  sliver: provider.isHistoryLoading &&
+                          provider.skinAnalysisHistory.isEmpty
                       ? SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) => const Padding(
                               padding: EdgeInsets.only(bottom: AppSpacing.m),
-                              child: HzSkeleton.rect(height: 96, width: double.infinity),
+                              child: HzSkeleton.rect(
+                                  height: 96, width: double.infinity),
                             ),
                             childCount: 4,
                           ),
@@ -122,7 +133,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       : SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              final history = provider.skinAnalysisHistory[index];
+                              final history =
+                                  provider.skinAnalysisHistory[index];
                               return _HistoryTile(item: history);
                             },
                             childCount: provider.skinAnalysisHistory.length,
@@ -131,16 +143,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
                 if (provider.hasMoreHistory)
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.l),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl, vertical: AppSpacing.l),
                     sliver: SliverToBoxAdapter(
                       child: Center(
                         child: OutlinedButton.icon(
-                          onPressed: provider.isHistoryLoading ? null : () => provider.loadSkinAnalysisHistory(loadMore: true),
+                          onPressed: provider.isHistoryLoading
+                              ? null
+                              : () => provider.loadSkinAnalysisHistory(
+                                  loadMore: true),
                           icon: provider.isHistoryLoading
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 2),
                                 )
                               : const Icon(Icons.expand_more),
                           label: const Text('Load more history'),
@@ -148,7 +165,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                     ),
                   ),
-                const SliverPadding(padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
+                const SliverPadding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
               ],
             ),
           ),
@@ -178,7 +196,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           padding: EdgeInsets.only(
             left: AppSpacing.xl,
             right: AppSpacing.xl,
-            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom + AppSpacing.xl,
+            bottom: MediaQuery.of(bottomSheetContext).viewInsets.bottom +
+                AppSpacing.xl,
             top: AppSpacing.l,
           ),
           child: Column(
@@ -187,7 +206,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             children: [
               Text(
                 'Edit profile',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.l),
               TextFormField(
@@ -222,7 +244,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   messenger.showSnackBar(
                     SnackBar(
                       content: Text(
-                        success ? 'Profile updated successfully.' : provider.errorMessage ?? 'Could not update profile.',
+                        success
+                            ? 'Profile updated successfully.'
+                            : provider.errorMessage ??
+                                'Could not update profile.',
                       ),
                     ),
                   );
@@ -235,7 +260,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  Future<void> _showChangePasswordDialog(BuildContext context, UserProfileProvider provider) async {
+  Future<void> _showChangePasswordDialog(
+      BuildContext context, UserProfileProvider provider) async {
     final currentController = TextEditingController();
     final newController = TextEditingController();
     final confirmController = TextEditingController();
@@ -251,7 +277,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               TextField(
                 controller: currentController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Current password'),
+                decoration:
+                    const InputDecoration(labelText: 'Current password'),
               ),
               const SizedBox(height: AppSpacing.m),
               TextField(
@@ -263,7 +290,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               TextField(
                 controller: confirmController,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Confirm new password'),
+                decoration:
+                    const InputDecoration(labelText: 'Confirm new password'),
               ),
             ],
           ),
@@ -277,8 +305,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 final messenger = ScaffoldMessenger.of(context);
                 final navigator = Navigator.of(dialogContext);
 
-                if (newController.text.trim() != confirmController.text.trim()) {
-                  messenger.showSnackBar(const SnackBar(content: Text('New password does not match.')));
+                if (newController.text.trim() !=
+                    confirmController.text.trim()) {
+                  messenger.showSnackBar(const SnackBar(
+                      content: Text('New password does not match.')));
                   return;
                 }
 
@@ -292,7 +322,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 messenger.showSnackBar(
                   SnackBar(
                     content: Text(
-                      success ? 'Password updated successfully.' : provider.errorMessage ?? 'Could not change password.',
+                      success
+                          ? 'Password updated successfully.'
+                          : provider.errorMessage ??
+                              'Could not change password.',
                     ),
                   ),
                 );
@@ -315,8 +348,12 @@ class _ProfileHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final name = profile?.fullName?.isNotEmpty == true ? profile!.fullName! : 'HealZone member';
-    final since = profile?.createdAt != null ? profile!.createdAt!.year : DateTime.now().year;
+    final name = profile?.fullName?.isNotEmpty == true
+        ? profile!.fullName!
+        : 'HealZone member';
+    final since = profile?.createdAt != null
+        ? profile!.createdAt!.year
+        : DateTime.now().year;
 
     return Stack(
       fit: StackFit.expand,
@@ -340,7 +377,8 @@ class _ProfileHero extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
@@ -350,18 +388,21 @@ class _ProfileHero extends StatelessWidget {
                 backgroundColor: Colors.white.withValues(alpha: 0.18),
                 child: Text(
                   name.isNotEmpty ? name.characters.first.toUpperCase() : 'U',
-                  style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: AppSpacing.m),
               Text(
                 name,
-                style: theme.textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                    color: Colors.white, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Healing journey with HealZone since $since',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.85)),
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: Colors.white.withValues(alpha: 0.85)),
               ),
               const SizedBox(height: AppSpacing.m),
               Wrap(
@@ -370,15 +411,19 @@ class _ProfileHero extends StatelessWidget {
                 children: [
                   InputChip(
                     backgroundColor: Colors.white.withValues(alpha: 0.16),
-                    avatar: const Icon(Icons.email_outlined, size: 18, color: Colors.white),
-                    label: Text(profile?.email ?? 'Syncing email...', style: const TextStyle(color: Colors.white)),
+                    avatar: const Icon(Icons.email_outlined,
+                        size: 18, color: Colors.white),
+                    label: Text(profile?.email ?? 'Syncing email...',
+                        style: const TextStyle(color: Colors.white)),
                     onPressed: () {},
                   ),
                   if (onEditPressed != null)
                     InputChip(
                       backgroundColor: Colors.white.withValues(alpha: 0.16),
-                      avatar: const Icon(Icons.edit_outlined, size: 18, color: Colors.white),
-                      label: const Text('Edit profile', style: TextStyle(color: Colors.white)),
+                      avatar: const Icon(Icons.edit_outlined,
+                          size: 18, color: Colors.white),
+                      label: const Text('Edit profile',
+                          style: TextStyle(color: Colors.white)),
                       onPressed: onEditPressed,
                     ),
                 ],
@@ -421,19 +466,25 @@ class _QuickStats extends StatelessWidget {
     final theme = Theme.of(context);
     final history = provider.skinAnalysisHistory;
     final latest = history.isNotEmpty ? history.first : null;
-    final strengths = (latest?.analysisResult?['strengths'] as List?)?.length ?? 0;
-    final confidence = ((latest?.analysisResult?['confidenceScore'] ?? 0.0) * 100).round();
+    final strengths =
+        (latest?.analysisResult?['strengths'] as List?)?.length ?? 0;
+    final confidence =
+        ((latest?.analysisResult?['confidenceScore'] ?? 0.0) * 100).round();
 
     final stats = [
       _StatItem(
         icon: Icons.schedule_outlined,
         title: 'Recent scan',
-        description: latest == null ? 'Waiting for a new scan' : _formatDate(latest.createdAt),
+        description: latest == null
+            ? 'Waiting for a new scan'
+            : _formatDate(latest.createdAt),
       ),
       _StatItem(
         icon: Icons.star_rate_rounded,
         title: 'Skin strengths',
-        description: strengths == 0 ? 'Building insights...' : '$strengths highlighted areas',
+        description: strengths == 0
+            ? 'Building insights...'
+            : '$strengths highlighted areas',
       ),
       _StatItem(
         icon: Icons.timeline_rounded,
@@ -449,9 +500,13 @@ class _QuickStats extends StatelessWidget {
       children: stats
           .map(
             (stat) => SizedBox(
-              width: isWide ? (MediaQuery.of(context).size.width / 3) - AppSpacing.xl * 1.8 : double.infinity,
+              width: isWide
+                  ? (MediaQuery.of(context).size.width / 3) -
+                      AppSpacing.xl * 1.8
+                  : double.infinity,
               child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.l)),
                 elevation: 0,
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.l),
@@ -464,11 +519,14 @@ class _QuickStats extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(stat.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                            Text(stat.title,
+                                style: theme.textTheme.titleSmall
+                                    ?.copyWith(fontWeight: FontWeight.w600)),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
                               stat.description,
-                              style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -500,7 +558,8 @@ class _ActionCards extends StatelessWidget {
     return Column(
       children: [
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.l)),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.l),
             child: Column(
@@ -511,9 +570,12 @@ class _ActionCards extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.shield_moon_outlined, color: AppColors.primary),
+                        const Icon(Icons.shield_moon_outlined,
+                            color: AppColors.primary),
                         const SizedBox(width: AppSpacing.m),
-                        Text('Account security', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                        Text('Account security',
+                            style: theme.textTheme.titleSmall
+                                ?.copyWith(fontWeight: FontWeight.w600)),
                       ],
                     ),
                     TextButton(
@@ -525,7 +587,8 @@ class _ActionCards extends StatelessWidget {
                 const SizedBox(height: AppSpacing.s),
                 Text(
                   'Refresh your password frequently to keep your account safe.',
-                  style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -533,7 +596,8 @@ class _ActionCards extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.l),
         Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.l)),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.l)),
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.l),
             child: Column(
@@ -541,15 +605,19 @@ class _ActionCards extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.auto_graph_outlined, color: AppColors.primary),
+                    const Icon(Icons.auto_graph_outlined,
+                        color: AppColors.primary),
                     const SizedBox(width: AppSpacing.m),
-                    Text('Progress tracking', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                    Text('Progress tracking',
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w600)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.s),
                 Text(
                   'Run weekly scans so HealZone can tune your regimen with accurate trend data.',
-                  style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -615,25 +683,29 @@ class _HistoryTile extends StatelessWidget {
             const SizedBox(width: AppSpacing.l),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.l, horizontal: AppSpacing.s),
+                padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.l, horizontal: AppSpacing.s),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Analysis • ${_formatDate(item.createdAt)}',
-                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       summary,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Chip(
                       backgroundColor: statusColor.withValues(alpha: 0.18),
-                      labelStyle: theme.textTheme.labelSmall?.copyWith(color: statusColor, fontWeight: FontWeight.w600),
+                      labelStyle: theme.textTheme.labelSmall?.copyWith(
+                          color: statusColor, fontWeight: FontWeight.w600),
                       visualDensity: VisualDensity.compact,
                       label: Text(item.status?.toUpperCase() ?? 'UNKNOWN'),
                     ),
@@ -655,10 +727,10 @@ class _HistoryTile extends StatelessWidget {
 }
 
 class _StatItem {
-  const _StatItem({required this.icon, required this.title, required this.description});
+  const _StatItem(
+      {required this.icon, required this.title, required this.description});
 
   final IconData icon;
   final String title;
   final String description;
 }
-

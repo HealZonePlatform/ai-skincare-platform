@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 class ShellScaffold extends StatelessWidget {
   const ShellScaffold({super.key, required this.child});
 
@@ -7,7 +8,10 @@ class ShellScaffold extends StatelessWidget {
 
   static const _tabs = <_TabItem>[
     _TabItem(route: '/home', icon: Icons.home, label: 'Trang chủ'),
-    _TabItem(route: '/community', icon: Icons.people_alt_rounded, label: 'Cộng đồng'),
+    _TabItem(
+        route: '/community',
+        icon: Icons.people_alt_rounded,
+        label: 'Cộng đồng'),
     _TabItem(route: '/history', icon: Icons.calendar_month, label: 'Lịch sử'),
     _TabItem(route: '/profile', icon: Icons.person, label: 'Hồ sơ'),
   ];
@@ -16,7 +20,8 @@ class ShellScaffold extends StatelessWidget {
 
   int _currentIndex(String location) {
     for (var i = 0; i < _tabs.length; i++) {
-      if (location == _tabs[i].route || location.startsWith('${_tabs[i].route}/')) {
+      if (location == _tabs[i].route ||
+          location.startsWith('${_tabs[i].route}/')) {
         return i;
       }
     }
@@ -50,7 +55,10 @@ class ShellScaffold extends StatelessWidget {
                     _tabs[i].icon,
                     color: i == currentIndex
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).round()),
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha((0.6 * 255).round()),
                   ),
                 ),
             ],
@@ -65,5 +73,6 @@ class _TabItem {
   final String route;
   final IconData icon;
   final String label;
-  const _TabItem({required this.route, required this.icon, required this.label});
+  const _TabItem(
+      {required this.route, required this.icon, required this.label});
 }

@@ -27,9 +27,13 @@ class OptimizedNetworkImage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final effectiveWidth = width ?? constraints.maxWidth;
-        final ratio = aspectRatio ?? (effectiveWidth.isFinite ? effectiveWidth / (height ?? 200) : 16 / 9);
+        final ratio = aspectRatio ??
+            (effectiveWidth.isFinite
+                ? effectiveWidth / (height ?? 200)
+                : 16 / 9);
         final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-        final memCacheWidth = (effectiveWidth * devicePixelRatio).clamp(480, 2048).round();
+        final memCacheWidth =
+            (effectiveWidth * devicePixelRatio).clamp(480, 2048).round();
         final memCacheHeight = (memCacheWidth / ratio).round();
 
         final image = CachedNetworkImage(
