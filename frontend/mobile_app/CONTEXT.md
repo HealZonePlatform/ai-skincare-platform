@@ -25,6 +25,7 @@
 ## Kiến trúc ứng dụng
 
 ### Cấu trúc thư mục
+
 ```
 lib/
 ├── main.dart                           # Điểm vào ứng dụng, khởi tạo theme và router
@@ -61,6 +62,7 @@ lib/
 ├── data/                              # Lớp dữ liệu (implement repositories, data sources)
 │   ├── analysis/                      # Dữ liệu phân tích da
 │   │   ├── datasources/               # Data sources cho phân tích
+│   │   ├── models/                    # DTOs và models cho phân tích
 │   │   └── repositories/              # Repository cho phân tích
 │   ├── auth/                          # Xác thực data
 │   │   ├── datasources/               # Remote và local data sources xác thực
@@ -72,9 +74,11 @@ lib/
 │   ├── home/                          # Dữ liệu dashboard trang chủ
 │   │   ├── datasources/               # Data sources cho trang chủ
 │   │   │   └── home_remote_data_source.dart # Data source trang chủ từ xa
+│   │   ├── models/                    # DTOs và models cho trang chủ
+│   │   │   └── home_dashboard_dto.dart # DTO chuyển đổi từ API sang entity
 │   │   ├── repositories/              # Repository cho trang chủ
 │   │   │   └── home_repository_impl.dart # Implementation repository trang chủ
-│   │   └── home_mock_data.dart        # Dữ liệu mẫu cho trang chủ
+│   │   └── home_mock_data.dart        # Dữ liệu mẫu cho trang chủ (đã thay thế bằng API thực tế)
 │   └── profile/                       # Hồ sơ người dùng data
 │       ├── datasources/               # Remote và local data sources hồ sơ
 │       │   ├── profile_local_cache.dart # Cache hồ sơ cục bộ
@@ -269,6 +273,7 @@ lib/
 ```
 
 ### Kiến trúc dữ liệu
+
 - **UserProfile**: Thông tin người dùng (id, email, họ tên, số điện thoại, avatar, ngày tạo/cập nhật)
 - **SkinAnalysisHistory**: Lịch sử phân tích da (id, userId, imageUrl, analysisResult, createdAt, status)
 - **AuthTokens**: Token xác thực (accessToken, refreshToken)
@@ -279,6 +284,19 @@ lib/
 - **HomeRoutine**: Lịch trình chăm sóc da (title, icon, steps, focus, minutes, bestMoment, accentColor)
 - **HomeArticle**: Bài viết (title, subtitle, icon, readingTime, route, heroColor)
 - **HomeProduct**: Sản phẩm (name, benefit, rating, icon, route, badge, color, imageUrl)
+
+### Cấu trúc DTO và chuyển đổi
+
+- **HomeDashboardDto**: DTO gốc từ API, chứa toàn bộ dữ liệu dashboard
+- **HomeHeroStatDto**: DTO cho các chỉ số chính (label, value, icon, detail, color)
+- **HomePulseDto**: DTO cho chỉ số sức khỏe da (score, trend, delta, mood, updated)
+- **HomePulseHighlightDto**: DTO cho các điểm nổi bật (label, value, icon, color)
+- **HomeInsightDto**: DTO cho thông tin chi tiết (title, caption, icon, progress, iconColor)
+- **HomeRoutineDto**: DTO cho lịch trình chăm sóc (title, icon, steps, focus, minutes, bestMoment, accentColor)
+- **HomeArticleDto**: DTO cho bài viết (title, subtitle, icon, readingTime, route, heroColor)
+- **HomeProductDto**: DTO cho sản phẩm (name, benefit, rating, icon, route, badge, color, imageUrl)
+
+Các DTO có phương thức `toEntity()` để chuyển đổi sang entity tương ứng và `fromJson()`/`toJson()` để xử lý serialization. Các phương thức helper như `_parseString()`, `_parseInt()`, `_parseDouble()`, `_parseColor()` giúp đảm bảo an toàn khi chuyển đổi dữ liệu từ API.
 
 ### Quản lý trạng thái
 - **AuthProvider**: Quản lý trạng thái đăng nhập, xử lý đăng nhập/đăng ký, logout
@@ -483,10 +501,10 @@ lib/
 
 ### ❌ **Vấn đề cần cải thiện**
 
-#### 1. Hard-coded Mock Data
-- Home screen hiện đang fetch dữ liệu từ HomeProvider, nhưng dữ liệu vẫn là mock trong HomeMockData
-- Cần kết nối với backend thực tế để lấy dữ liệu dashboard
-- Cần cập nhật HomeRemoteDataSource để gọi API thực tế thay vì trả về mock data
+#### 1. Đã kết nối backend thực tế
+- Home screen hiện đã fetch dữ liệu từ HomeProvider, sử dụng API thực tế thay vì mock data
+- HomeRemoteDataSource đã được cập nhật để gọi `/api/v1/dashboard` và có cơ chế xử lý lỗi
+- Đã có offline cache fallback cho dashboard data
 
 #### 2. Đã hỗ trợ Dark Mode
 - Parameter `isDark` trong `AppTheme.build()` đã được sử dụng
@@ -498,41 +516,68 @@ lib/
 - Có cơ chế xử lý lỗi và skeleton loading cho dashboard
 - Có RefreshIndicator để pull-to-refresh dữ liệu dashboard
 
-#### 4. Performance Concerns
-- ListView trong ListView (Nested Scrolling) có thể gây lag trên thiết bị yếu
-- Thiếu Image Optimization (cacheWidth/cacheHeight, cached_network_image)
+#### 4. Đã tối ưu hiệu suất
+- Đã refactor `product_carousel.dart` và `routine_carousel.dart` để tránh nested `ListView`
+- Sử dụng `SliverList` và `CustomScrollView` với `itemExtent` và `cacheExtent`
+- Đã cập nhật `optimized_network_image.dart` với cache sizes dựa trên device pixel ratio
+- Đã thêm cache width/height cho các `CachedNetworkImage` và `Image.asset`
 
-#### 5. Missing Unit Tests
-- Có folder integration_test nhưng thiếu unit tests hoàn toàn
-- Không thể verify business logic, dễ có regression bugs
+#### 5. Đã cải thiện bảo mật và session handling
+- Đã thêm encryption layer cho `flutter_secure_storage` với `SecureTokenStorage`
+- Có cơ chế xử lý refresh-fail và logout khi token hết hạn
+- Đảm bảo concurrent refresh attempts được xử lý an toàn
+- Đã thêm single flight mechanism cho token refresh
 
 #### 6. Đã có Onboarding Flow
 - Có OnboardingProvider và OnboardingPreferences để quản lý trạng thái hoàn thành onboarding
 - Có màn hình hướng dẫn người dùng mới
 
+#### 7. Đã cải thiện scan flow và navigation
+- Đã thêm permission screen cho camera
+- Đã sửa lỗi bottom navigation để highlight đúng các nested routes
+- Đã thêm `WillPopScope` cho scan screens để xử lý back button đúng cách
+- FAB đã được làm contextual với icon/behavior phù hợp từng context
+
+#### 8. Đã có offline cache
+- Đã thêm local caches cho dashboard, profile, và history
+- Có cơ chế serve cached data khi offline và hiển thị offline indicator
+
+#### 9. Chưa hoàn thiện Testing
+- Vẫn còn thiếu unit tests cho các providers, use cases và repositories
+- Cần bổ sung widget tests cho UI components và integration tests cho các flows chính
+- Folder `integration_test` đã có nhưng cần hoàn thiện
+
+#### 10. Chưa hoàn thiện Theme System
+- Theme system chưa được wire hoàn chỉnh với `ThemeProvider` trong `main.dart`
+- Chưa có quick toggle cho dark mode và theme changes chưa propagate mà không cần restart
+
 ### 🎯 **Roadmap phát triển ưu tiên**
 
 #### Phase 1: Fixes Critical (Tuần 1-2)
-1. Connect Real Backend API cho dashboard (thay thế mock data trong HomeRemoteDataSource)
-2. Performance Optimization
-3. Hoàn thiện unit tests cho các providers và components
+1. Hoàn thiện unit tests cho các providers và components
+2. Wire theme system hoàn chỉnh và thêm quick toggle
+3. Thêm real-time validation cho các form
 
 #### Phase 2: Enhanced Features (Tuần 3-4)
 4. Accessibility (semantic labels, screen readers)
-5. Testing (unit tests cho các use cases và repositories)
+5. Analytics event catalog và crash reporting integration
+6. Push notifications (FCM setup và scheduling)
 
 #### Phase 3: User Experience (Tuần 5-6)
-6. Advanced Features (infinite scroll, search)
-7. Notifications (local và push notifications)
+7. Advanced Features (infinite scroll, search)
+8. Offline support hoàn chỉnh với queue retry cho pending actions
+9. Tối ưu hóa animations và CPU usage
 
 #### Phase 4: Polish (Tuần 7-8)
-8. Micro-interactions (haptic feedback, animations)
-9. Social Features (reviews, ratings, sharing)
+10. Micro-interactions (haptic feedback, animations)
+11. Social Features (reviews, ratings, sharing)
+12. CI/CD workflow và coverage reporting
 
-### 📊 **Tình trạng hiện tại: 8.0/10**
+### 📊 **Tình trạng hiện tại: 8.5/10**
 
 - Đã có foundation rất tốt với kiến trúc clean và UI/UX hiện đại
 - Home screen đã được cải thiện với việc tách module và có cơ chế xử lý lỗi
-- Đã có dark mode và onboarding flow
-- Vẫn còn thiếu backend integration cho dashboard và testing đầy đủ
+- Backend integration đã hoàn thiện cho dashboard
+- Performance và security đã được cải thiện đáng kể
+- Vẫn còn thiếu testing đầy đủ và một số tính năng UX cần hoàn thiện
 - Sau khi hoàn thiện các ưu tiên, ứng dụng có thể đạt mức 9/10

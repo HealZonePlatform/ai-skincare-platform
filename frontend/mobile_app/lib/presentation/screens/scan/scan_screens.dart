@@ -1,7 +1,14 @@
+import 'dart:async';
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/core/utils/share_helper.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
@@ -10,6 +17,110 @@ import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_head
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_stat_chip.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_surface_card.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
+import 'package:ai_skincare_platform/utils/error_handler.dart';
+import 'package:ai_skincare_platform/utils/exceptions.dart';
+
+const _scanPlaceholderImageUrl =
+    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800';
+
+class ScanPermissionScreen extends StatefulWidget {
+  const ScanPermissionScreen({super.key});
+
+  @override
+  State<ScanPermissionScreen> createState() => _ScanPermissionScreenState();
+}
+
+class _ScanPermissionScreenState extends State<ScanPermissionScreen> {
+  bool _isRequesting = false;
+
+  Future<void> _requestPermission() async {
+    if (_isRequesting) return;
+    setState(() {
+      _isRequesting = true;
+    });
+    final status = await Permission.camera.request();
+    if (!mounted) return;
+
+    setState(() {
+      _isRequesting = false;
+    });
+
+    if (status.isGranted) {
+      context.go('/scan/prepare');
+      return;
+    }
+
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Camera permission is required to continue.'),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            children: [
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.camera_alt_rounded,
+                  size: 96,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                'Camera access needed',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.m),
+              Text(
+                'We need camera access to capture your skin photo securely for AI analysis. Photos stay private and are only used for your scan.',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const Spacer(),
+              HzPrimaryButton(
+                label: 'Allow camera access',
+                icon: Icons.check_circle,
+                isLoading: _isRequesting,
+                onPressed: _requestPermission,
+              ),
+              const SizedBox(height: AppSpacing.m),
+              HzSecondaryButton(
+                label: 'Not now',
+                icon: Icons.close_rounded,
+                onPressed: () => context.go('/home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class ScanPrepareScreen extends StatefulWidget {
   const ScanPrepareScreen({super.key});
@@ -19,20 +130,44 @@ class ScanPrepareScreen extends StatefulWidget {
 }
 
 class _ScanPrepareScreenState extends State<ScanPrepareScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 6),
   )..repeat();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        precacheImage(const NetworkImage(_scanPlaceholderImageUrl), context);
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _controller.stop();
+    } else if (state == AppLifecycleState.resumed) {
+      _controller.repeat();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _syncAnimationWithAccessibility(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prepare scan'),
@@ -92,15 +227,24 @@ class _ScanPrepareScreenState extends State<ScanPrepareScreen>
             Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
               child: HzPrimaryButton(
-                label: 'Start Scan',
+                label: 'I\'m ready',
                 icon: Icons.camera_alt_rounded,
-                onPressed: () => context.push('/scan/capture'),
+                onPressed: () => context.go('/scan/capture'),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  void _syncAnimationWithAccessibility(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    if (reduceMotion && _controller.isAnimating) {
+      _controller.stop();
+    } else if (!reduceMotion && !_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 }
 
@@ -109,12 +253,23 @@ class _AnimatedInstructionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _InstructionItem(icon: Icons.face, label: 'No makeup'),
-        _InstructionItem(icon: Icons.visibility_off, label: 'No glasses'),
-        _InstructionItem(icon: Icons.sentiment_neutral, label: 'Neutral face'),
+        _InstructionItem(
+          icon: Icons.brightness_low_rounded,
+          label: 'Use soft, even lighting (no backlight)',
+        ),
+        SizedBox(height: AppSpacing.m),
+        _InstructionItem(
+          icon: Icons.visibility_off,
+          label: 'Remove glasses/makeup for accurate reading',
+        ),
+        SizedBox(height: AppSpacing.m),
+        _InstructionItem(
+          icon: Icons.center_focus_strong_rounded,
+          label: 'Keep camera 20-30cm away, neutral face',
+        ),
       ],
     );
   }
@@ -128,7 +283,7 @@ class _InstructionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.l),
@@ -139,13 +294,15 @@ class _InstructionItem extends StatelessWidget {
           ),
           child: Icon(icon, color: AppColors.textPrimary),
         ),
-        const SizedBox(height: AppSpacing.s),
-        Text(
-          label,
-          style: Theme.of(context)
-              .textTheme
-              .labelMedium
-              ?.copyWith(fontWeight: FontWeight.w600),
+        const SizedBox(width: AppSpacing.m),
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(context)
+                .textTheme
+                .labelLarge
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
         ),
       ],
     );
@@ -160,66 +317,610 @@ class ScanCaptureScreen extends StatefulWidget {
 }
 
 class _ScanCaptureScreenState extends State<ScanCaptureScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  bool _isCapturing = false;
+  final ImagePicker _picker = ImagePicker();
+  String? _capturedImagePath;
+  String? _lastError;
+  int _countdown = 0;
+  Timer? _countdownTimer;
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 5),
   )..repeat(reverse: true);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _controller.stop();
+    } else if (state == AppLifecycleState.resumed && !_isCapturing) {
+      _controller.repeat(reverse: true);
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
 
+  Future<bool> _confirmExit() async {
+    if (!_isCapturing) {
+      _cancelCountdown();
+      return true;
+    }
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel scan?'),
+        content: const Text('Your scan progress will be lost.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Continue'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cancel scan'),
+          ),
+        ],
+      ),
+    );
+    if (shouldExit == true) {
+      _cancelCountdown();
+    }
+    return shouldExit ?? false;
+  }
+
+  Future<void> _capturePhoto() async {
+    if (_isCapturing) return;
+    setState(() {
+      _isCapturing = true;
+      _lastError = null;
+    });
+    _controller.stop();
+    _cancelCountdown();
+
+    try {
+      final status = await Permission.camera.status;
+      if (!status.isGranted) {
+        const message = 'Camera permission is required to capture.';
+        GlobalErrorNotifier.report(message);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(message),
+              action: SnackBarAction(
+                label: 'Grant',
+                onPressed: () => context.go('/scan/permission'),
+              ),
+            ),
+          );
+        }
+        return;
+      }
+
+      final file = await _picker.pickImage(
+        source: ImageSource.camera,
+        preferredCameraDevice: CameraDevice.front,
+        imageQuality: 85,
+        maxWidth: 1600,
+      );
+
+      if (!mounted) return;
+      if (file == null) {
+        _controller.repeat(reverse: true);
+        return;
+      }
+
+      _capturedImagePath = file.path;
+      context.go('/scan/processing', extra: {'imagePath': file.path});
+    } catch (error, stackTrace) {
+      ErrorHandler.logError(error, stackTrace);
+      final message = ErrorHandler.getUserMessage(error);
+      _lastError = message;
+      GlobalErrorNotifier.report(message);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            action: SnackBarAction(
+              label: 'Retry',
+              onPressed: _capturePhoto,
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCapturing = false;
+        });
+        _controller.repeat(reverse: true);
+      }
+    }
+  }
+
+  void _startAutoCaptureCountdown() {
+    if (_isCapturing || _countdownTimer != null) return;
+    setState(() {
+      _countdown = 3;
+      _lastError = null;
+    });
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_countdown <= 1) {
+        timer.cancel();
+        _countdownTimer = null;
+        setState(() => _countdown = 0);
+        _capturePhoto();
+        return;
+      }
+      setState(() => _countdown -= 1);
+    });
+  }
+
+  void _cancelCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+    if (_countdown != 0) {
+      setState(() => _countdown = 0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Scanning in progress')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, child) {
-                      final scale = 1 + (_controller.value * 0.05);
-                      return Transform.scale(scale: scale, child: child);
-                    },
-                    child: Container(
-                      width: 280,
-                      height: 280,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(280),
-                        gradient: RadialGradient(
-                          colors: [
-                            AppColors.primary.withValues(alpha: 0.15),
-                            AppColors.primary.withValues(alpha: 0.05),
-                          ],
-                        ),
+    _syncAnimationWithAccessibility(context);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final shouldExit = await _confirmExit();
+        if (shouldExit && context.mounted) {
+          context.pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Align your face'),
+          leading: const BackButton(),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, child) {
+                        final scale = 1 + (_controller.value * 0.05);
+                        return Transform.scale(scale: scale, child: child);
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 280,
+                            height: 280,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(280),
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.primary.withValues(alpha: 0.15),
+                                  AppColors.primary.withValues(alpha: 0.05),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 260,
+                            height: 260,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.6),
+                                width: 3,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.12),
+                                  blurRadius: 18,
+                                  spreadRadius: 6,
+                                )
+                              ],
+                            ),
+                          ),
+                          if (_capturedImagePath != null)
+                            ClipOval(
+                              child: Image.file(
+                                File(_capturedImagePath!),
+                                width: 230,
+                                height: 230,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          else
+                            const Icon(
+                              Icons.face_retouching_natural,
+                              size: 120,
+                              color: AppColors.primary,
+                            ),
+                          if (_countdown > 0)
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: const BoxDecoration(
+                                color: Colors.black54,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '$_countdown',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineMedium
+                                    ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                        ],
                       ),
-                      child: const Icon(Icons.face_retouching_natural,
-                          size: 120, color: AppColors.primary),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.l),
-              LinearProgressIndicator(
-                value: _controller.value,
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(AppRadius.m),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              HzPrimaryButton(
-                label: 'View sample result',
-                icon: Icons.visibility_outlined,
-                onPressed: () => context.push('/scan/result'),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.l),
+                LinearProgressIndicator(
+                  value: _controller.value,
+                  minHeight: 8,
+                  borderRadius: BorderRadius.circular(AppRadius.m),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                HzPrimaryButton(
+                  label: _isCapturing ? 'Capturing...' : 'Capture photo',
+                  icon: Icons.camera_alt_outlined,
+                  isLoading: _isCapturing,
+                  onPressed: _capturePhoto,
+                ),
+                const SizedBox(height: AppSpacing.s),
+                HzSecondaryButton(
+                  label: _countdown > 0
+                      ? 'Auto capture in $_countdown'
+                      : 'Auto capture (3s)',
+                  icon: Icons.timer_outlined,
+                  onPressed: _countdownTimer == null
+                      ? _startAutoCaptureCountdown
+                      : null,
+                ),
+                const SizedBox(height: AppSpacing.s),
+                HzSecondaryButton(
+                  label: 'View sample result',
+                  icon: Icons.visibility_outlined,
+                  onPressed: () => context.go('/scan/result'),
+                ),
+                if (_lastError != null) ...[
+                  const SizedBox(height: AppSpacing.m),
+                  Text(
+                    _lastError!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.danger),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _syncAnimationWithAccessibility(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    if (reduceMotion && _controller.isAnimating) {
+      _controller.stop();
+    } else if (!reduceMotion &&
+        !_controller.isAnimating &&
+        !_isCapturing &&
+        _countdownTimer == null) {
+      _controller.repeat(reverse: true);
+    }
+  }
+}
+
+class ScanProcessingScreen extends StatefulWidget {
+  const ScanProcessingScreen({
+    super.key,
+    this.imagePath,
+  });
+
+  final String? imagePath;
+
+  @override
+  State<ScanProcessingScreen> createState() => _ScanProcessingScreenState();
+}
+
+class _ScanProcessingScreenState extends State<ScanProcessingScreen>
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  bool _isProcessing = true;
+  String? _processingError;
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat(reverse: true);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _simulateProcessing();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _controller.stop();
+    } else if (state == AppLifecycleState.resumed && _isProcessing) {
+      _controller.repeat(reverse: true);
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _simulateProcessing() async {
+    try {
+      if (widget.imagePath == null || widget.imagePath!.isEmpty) {
+        throw ValidationException(
+            message: 'No captured photo was provided for analysis.');
+      }
+      await Future<void>.delayed(const Duration(seconds: 3));
+      if (!mounted) return;
+      setState(() {
+        _isProcessing = false;
+      });
+      if (!mounted) return;
+      context.go('/scan/result', extra: {'imagePath': widget.imagePath});
+    } catch (error, stackTrace) {
+      _handleProcessingError(error, stackTrace);
+    }
+  }
+
+  Future<bool> _confirmExit() async {
+    if (!_isProcessing) {
+      return true;
+    }
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel scan?'),
+        content:
+            const Text('Processing will stop and your scan will be discarded.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Stay'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+    return shouldExit ?? false;
+  }
+
+  void _handleProcessingError(Object error, StackTrace stackTrace) {
+    ErrorHandler.logError(error, stackTrace);
+    final message = ErrorHandler.getUserMessage(error);
+    setState(() {
+      _processingError = message;
+      _isProcessing = false;
+    });
+    GlobalErrorNotifier.report(message);
+  }
+
+  Future<void> _retryProcessing() async {
+    setState(() {
+      _processingError = null;
+      _isProcessing = true;
+    });
+    _controller.repeat(reverse: true);
+    await _simulateProcessing();
+  }
+
+  void _syncAnimationWithAccessibility(BuildContext context) {
+    final reduceMotion = MediaQuery.of(context).disableAnimations;
+    if (reduceMotion && _controller.isAnimating) {
+      _controller.stop();
+    } else if (!reduceMotion && !_controller.isAnimating && _isProcessing) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  Widget _buildPreview() {
+    final path = widget.imagePath;
+    if (path == null || path.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final borderRadius = BorderRadius.circular(AppRadius.m);
+    final isLocal = !path.startsWith('http');
+    if (isLocal) {
+      return ClipRRect(
+        borderRadius: borderRadius,
+        child: Image.file(
+          File(path),
+          height: 140,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(
+            height: 140,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: borderRadius,
+            ),
+            alignment: Alignment.center,
+            child: const Icon(Icons.broken_image_outlined),
+          ),
+        ),
+      );
+    }
+    return OptimizedNetworkImage(
+      imageUrl: path,
+      height: 140,
+      borderRadius: AppRadius.m,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _syncAnimationWithAccessibility(context);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final shouldExit = await _confirmExit();
+        if (shouldExit && context.mounted) {
+          context.go('/home');
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Analyzing...'),
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              children: [
+                Expanded(
+                  child: _processingError != null
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline,
+                                size: 72, color: AppColors.danger),
+                            const SizedBox(height: AppSpacing.l),
+                            Text(
+                              _processingError!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.m),
+                            Text(
+                              'Try again or go back to start a new scan.',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(color: AppColors.textSecondary),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            HzPrimaryButton(
+                              label: 'Retry processing',
+                              icon: Icons.refresh_rounded,
+                              onPressed: _retryProcessing,
+                            ),
+                            const SizedBox(height: AppSpacing.s),
+                            HzSecondaryButton(
+                              label: 'Back to home',
+                              icon: Icons.home_outlined,
+                              onPressed: () => context.go('/home'),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AnimatedBuilder(
+                              animation: _controller,
+                              builder: (context, child) {
+                                final size = 120 + (_controller.value * 20);
+                                return SizedBox(
+                                  height: size,
+                                  width: size,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 6,
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                      AppColors.primary,
+                                    ),
+                                    value: _controller.value,
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            Text(
+                              'AI is analyzing your scan',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: AppSpacing.s),
+                            const Text(
+                              'This usually takes 5-10 seconds.\nKeep the app open.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: AppColors.textSecondary),
+                            ),
+                            const SizedBox(height: AppSpacing.xl),
+                            _buildPreview(),
+                          ],
+                        ),
+                ),
+                if (_processingError == null)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Stay still while we process your scan.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.m),
+                      IconButton(
+                        tooltip: 'Cancel',
+                        onPressed: () async {
+                          final shouldExit = await _confirmExit();
+                          if (!context.mounted) return;
+                          if (shouldExit) {
+                            context.go('/home');
+                          }
+                        },
+                        icon: const Icon(Icons.close_rounded),
+                      )
+                    ],
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -228,7 +929,12 @@ class _ScanCaptureScreenState extends State<ScanCaptureScreen>
 }
 
 class ScanResultScreen extends StatelessWidget {
-  const ScanResultScreen({super.key});
+  const ScanResultScreen({
+    super.key,
+    this.imagePath,
+  });
+
+  final String? imagePath;
 
   @override
   Widget build(BuildContext context) {
@@ -298,21 +1004,55 @@ class ScanResultScreen extends StatelessWidget {
               title: 'Reference photo',
               padding: EdgeInsets.only(bottom: AppSpacing.m),
             ),
-            const OptimizedNetworkImage(
-              imageUrl:
-                  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800',
-              height: 220,
-              borderRadius: AppRadius.l,
-            ),
+            _buildResultImage(),
             const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
               label: 'View detailed analysis',
               icon: Icons.analytics_outlined,
-              onPressed: () => context.push('/advice'),
+              onPressed: () => context.go('/advice'),
+            ),
+            const SizedBox(height: AppSpacing.s),
+            HzSecondaryButton(
+              label: 'Scan again',
+              icon: Icons.refresh_rounded,
+              onPressed: () => context.go('/scan/prepare'),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildResultImage() {
+    final path = imagePath;
+    if (path == null || path.isEmpty) {
+      return const OptimizedNetworkImage(
+        imageUrl: _scanPlaceholderImageUrl,
+        height: 220,
+        borderRadius: AppRadius.l,
+      );
+    }
+    final isLocal = !path.startsWith('http');
+    if (isLocal) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        child: Image.file(
+          File(path),
+          height: 220,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const OptimizedNetworkImage(
+            imageUrl: _scanPlaceholderImageUrl,
+            height: 220,
+            borderRadius: AppRadius.l,
+          ),
+        ),
+      );
+    }
+    return OptimizedNetworkImage(
+      imageUrl: path,
+      height: 220,
+      borderRadius: AppRadius.l,
     );
   }
 }

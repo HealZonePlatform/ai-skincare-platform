@@ -146,7 +146,7 @@ class HeroHeader extends StatelessWidget {
                             if (context.mounted) {
                               AnalyticsService.logButtonTap('quickScan');
                               AnalyticsService.logScanStarted();
-                              context.push('/scan/prepare');
+                              context.push('/scan/permission');
                             }
                           },
                           style: FilledButton.styleFrom(

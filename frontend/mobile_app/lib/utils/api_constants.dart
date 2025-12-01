@@ -12,6 +12,9 @@ class ApiConstants {
   static const String login = '/auth/login';
   static const String refreshToken = '/auth/refresh';
 
+  // Home Dashboard
+  static const String dashboard = '/dashboard';
+
   // User Profile Endpoints
   static const String userProfile = '/users/profile';
   static const String changePassword = '/users/change-password';

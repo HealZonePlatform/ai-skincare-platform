@@ -43,17 +43,15 @@ class RoutineCarousel extends StatelessWidget {
         HzResponsiveLayout(
           mobile: (_, __) => SizedBox(
             height: 320,
-            child: SingleChildScrollView(
+            child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  for (final routine in routines) ...[
-                    RoutineCard(routine: routine),
-                    const SizedBox(width: AppSpacing.l),
-                  ],
-                ],
-              ),
+              cacheExtent: 720,
+              padding: EdgeInsets.zero,
+              itemBuilder: (context, index) =>
+                  RoutineCard(routine: routines[index]),
+              separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.l),
+              itemCount: routines.length,
             ),
           ),
           tablet: (_, constraints) {

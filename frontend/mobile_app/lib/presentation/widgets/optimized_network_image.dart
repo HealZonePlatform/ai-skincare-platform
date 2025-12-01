@@ -36,18 +36,29 @@ class OptimizedNetworkImage extends StatelessWidget {
             (effectiveWidth * devicePixelRatio).clamp(480, 2048).round();
         final memCacheHeight = (memCacheWidth / ratio).round();
 
+        final placeholder = AspectRatio(
+          aspectRatio: ratio,
+          child: const HzSkeleton.rect(),
+        );
+
         final image = CachedNetworkImage(
           imageUrl: imageUrl,
           memCacheWidth: memCacheWidth,
           memCacheHeight: memCacheHeight,
+          maxWidthDiskCache: memCacheWidth,
+          maxHeightDiskCache: memCacheHeight,
           fadeInDuration: const Duration(milliseconds: 250),
           fadeOutDuration: const Duration(milliseconds: 200),
           fit: BoxFit.cover,
-          placeholder: (context, _) => const HzSkeleton.rect(height: 200),
-          errorWidget: (_, __, ___) => Container(
-            color: Colors.grey.shade200,
-            alignment: Alignment.center,
-            child: const Icon(Icons.broken_image_outlined),
+          placeholder: (_, __) => placeholder,
+          errorWidget: (_, __, ___) => AspectRatio(
+            aspectRatio: ratio,
+            child: Container(
+              color: Colors.grey.shade100,
+              alignment: Alignment.center,
+              child: const Icon(Icons.broken_image_outlined,
+                  color: AppColors.textTertiary),
+            ),
           ),
         );
 

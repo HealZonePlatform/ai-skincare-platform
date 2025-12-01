@@ -16,24 +16,38 @@ import 'package:ai_skincare_platform/presentation/router/app_router.dart';
 import 'package:ai_skincare_platform/presentation/widgets/app_loading_overlay.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/utils/error_handler.dart';
+import 'package:ai_skincare_platform/core/config/theme_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ApiClient.instance.init();
+  final themePreferences = await ThemePreferences.create();
+  final initialThemeMode =
+      themePreferences.getSavedThemeMode() ?? ThemeMode.system;
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     ErrorHandler.logError(details.exception, details.stack);
   };
 
-  runApp(const MyApp());
+  runApp(MyApp(
+    themePreferences: themePreferences,
+    initialThemeMode: initialThemeMode,
+  ));
 }
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    super.key,
+    required this.themePreferences,
+    required this.initialThemeMode,
+  });
+
+  final ThemePreferences themePreferences;
+  final ThemeMode initialThemeMode;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +56,12 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => OnboardingProvider()..load()),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(
+            preferences: themePreferences,
+            initialMode: initialThemeMode,
+          ),
+        ),
         ChangeNotifierProvider(create: (_) => UserProfileProvider()),
       ],
       child: Consumer3<AuthProvider, ThemeProvider, OnboardingProvider>(

@@ -29,18 +29,16 @@ class ProductCarousel extends StatelessWidget {
     return SliverToBoxAdapter(
       child: SizedBox(
         height: 340,
-        child: SingleChildScrollView(
+        child: ListView.separated(
           scrollDirection: Axis.horizontal,
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Row(
-            children: [
-              for (final product in products) ...[
-                ProductCard(product: product),
-                const SizedBox(width: AppSpacing.l),
-              ],
-            ],
+          cacheExtent: 960,
+          itemBuilder: (context, index) => ProductCard(
+            product: products[index],
           ),
+          separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.l),
+          itemCount: products.length,
         ),
       ),
     );
@@ -177,6 +175,8 @@ class ProductCard extends StatelessWidget {
     return Image.asset(
       product.placeholderAsset,
       fit: BoxFit.cover,
+      cacheWidth: 800,
+      cacheHeight: 800,
       errorBuilder: (_, __, ___) => Container(
         color: product.color.withValues(alpha: 0.12),
         alignment: Alignment.center,

@@ -1,31 +1,27 @@
 // lib/data/auth/datasources/token_local_data_source.dart
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
 import 'package:ai_skincare_platform/domain/auth/entities/auth_tokens.dart';
+import 'package:ai_skincare_platform/core/security/secure_token_storage.dart';
 
 /// Handles secure persistence of authentication tokens using [FlutterSecureStorage].
 class TokenLocalDataSource {
-  static const String _accessTokenKey = 'accessToken';
-  static const String _refreshTokenKey = 'refreshToken';
-
-  final FlutterSecureStorage _storage;
+  final SecureTokenStorage _storage;
 
   TokenLocalDataSource({
-    FlutterSecureStorage? storage,
-  }) : _storage = storage ?? const FlutterSecureStorage();
+    SecureTokenStorage? storage,
+  }) : _storage = storage ?? SecureTokenStorage();
 
   Future<void> saveTokens(AuthTokens tokens) async {
-    await Future.wait([
-      _storage.write(key: _accessTokenKey, value: tokens.accessToken),
-      _storage.write(key: _refreshTokenKey, value: tokens.refreshToken),
-    ]);
+    await _storage.write(
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    );
   }
 
   Future<AuthTokens?> fetchTokens() async {
-    final values = await _storage.readAll();
-    final accessToken = values[_accessTokenKey];
-    final refreshToken = values[_refreshTokenKey];
+    final values = await _storage.readTokens();
+    final accessToken = values?['accessToken'];
+    final refreshToken = values?['refreshToken'];
 
     if (accessToken == null || refreshToken == null) {
       return null;
@@ -38,14 +34,14 @@ class TokenLocalDataSource {
   }
 
   Future<String?> fetchAccessToken() {
-    return _storage.read(key: _accessTokenKey);
+    return _storage.readAccessToken();
   }
 
   Future<String?> fetchRefreshToken() {
-    return _storage.read(key: _refreshTokenKey);
+    return _storage.readRefreshToken();
   }
 
   Future<void> clearTokens() async {
-    await _storage.deleteAll();
+    await _storage.clear();
   }
 }

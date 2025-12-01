@@ -118,11 +118,28 @@ class AppRouter {
           path: '/survey/concerns',
           builder: (c, s) => const SurveyConcernsScreen()),
       GoRoute(
+          path: '/scan/permission',
+          builder: (c, s) => const ScanPermissionScreen()),
+      GoRoute(
           path: '/scan/prepare', builder: (c, s) => const ScanPrepareScreen()),
       GoRoute(
           path: '/scan/capture', builder: (c, s) => const ScanCaptureScreen()),
       GoRoute(
-          path: '/scan/result', builder: (c, s) => const ScanResultScreen()),
+        path: '/scan/processing',
+        builder: (c, s) => ScanProcessingScreen(
+          imagePath: (s.extra is Map<String, dynamic>)
+              ? (s.extra as Map<String, dynamic>)['imagePath'] as String?
+              : s.extra as String?,
+        ),
+      ),
+      GoRoute(
+        path: '/scan/result',
+        builder: (c, s) => ScanResultScreen(
+          imagePath: (s.extra is Map<String, dynamic>)
+              ? (s.extra as Map<String, dynamic>)['imagePath'] as String?
+              : s.extra as String?,
+        ),
+      ),
       GoRoute(path: '/advice', builder: (c, s) => const AdviceScreen()),
       GoRoute(path: '/routine', builder: (c, s) => const RoutineScreen()),
       GoRoute(path: '/products', builder: (c, s) => const ProductsListScreen()),

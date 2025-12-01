@@ -346,7 +346,8 @@ class UserProfileProvider with ChangeNotifier {
 
   void _handleError(Object error, StackTrace stackTrace) {
     ErrorHandler.logError(error, stackTrace);
-    final message = ErrorHandler.getUserMessage(error);
+    final normalized = ErrorHandler.normalize(error);
+    final message = ErrorHandler.getUserMessage(normalized);
     _errorMessage = message;
     GlobalErrorNotifier.report(message);
   }

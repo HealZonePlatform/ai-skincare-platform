@@ -108,7 +108,8 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (error, stackTrace) {
       ErrorHandler.logError(error, stackTrace);
-      final message = ErrorHandler.getUserMessage(error);
+      final normalized = ErrorHandler.normalize(error);
+      final message = ErrorHandler.getUserMessage(normalized);
       _errorMessage = message;
       GlobalErrorNotifier.report(message);
       return false;
@@ -131,7 +132,8 @@ class AuthProvider with ChangeNotifier {
       return true;
     } catch (error, stackTrace) {
       ErrorHandler.logError(error, stackTrace);
-      final message = ErrorHandler.getUserMessage(error);
+      final normalized = ErrorHandler.normalize(error);
+      final message = ErrorHandler.getUserMessage(normalized);
       _errorMessage = message;
       GlobalErrorNotifier.report(message);
       return false;

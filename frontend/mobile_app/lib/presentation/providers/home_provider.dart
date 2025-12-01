@@ -47,7 +47,8 @@ class HomeProvider with ChangeNotifier {
       _status = HomeLoadStatus.loaded;
     } catch (error, stackTrace) {
       ErrorHandler.logError(error, stackTrace);
-      _error = ErrorHandler.getUserMessage(error);
+      final normalized = ErrorHandler.normalize(error);
+      _error = ErrorHandler.getUserMessage(normalized);
       _status = HomeLoadStatus.error;
     } finally {
       notifyListeners();

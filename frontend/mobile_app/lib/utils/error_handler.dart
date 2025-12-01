@@ -1,7 +1,5 @@
 // lib/utils/error_handler.dart
 
-import 'package:flutter/foundation.dart';
-
 import 'package:ai_skincare_platform/core/logging/app_logger.dart';
 import 'package:ai_skincare_platform/utils/exceptions.dart';
 
@@ -10,13 +8,6 @@ class ErrorHandler {
 
   /// Log errors to console (in debug mode) or external service (in production)
   static void logError(dynamic error, StackTrace? stackTrace) {
-    if (kDebugMode) {
-      debugPrint('[HealZone] Error: $error');
-      if (stackTrace != null) {
-        debugPrint('Stack trace: $stackTrace');
-      }
-    }
-
     AppLogger.error(
       'Captured error',
       error: error,
@@ -24,21 +15,32 @@ class ErrorHandler {
     );
   }
 
+  static AppException normalize(dynamic error) {
+    if (error is AppException) {
+      return error;
+    }
+    return UnknownException(
+      'An unexpected error occurred. Please try again.',
+    );
+  }
+
   /// Get user-friendly error message
   static String getUserMessage(dynamic error) {
-    if (error is ApiException) {
-      if (error.isUnauthorized) {
+    final normalized = normalize(error);
+    if (normalized is ApiException) {
+      if (normalized.isUnauthorized) {
         return 'Session expired. Please login again.';
-      } else if (error.isServerError) {
+      } else if (normalized.isServerError) {
         return 'Server error. Please try again later.';
       }
-      return error.message;
-    } else if (error is NetworkException) {
-      return error.message;
-    } else if (error is ValidationException) {
-      return error.message;
-    } else {
-      return 'An unexpected error occurred. Please try again.';
+      return normalized.message;
     }
+    if (normalized is NetworkException) {
+      return normalized.message;
+    }
+    if (normalized is ValidationException) {
+      return normalized.message;
+    }
+    return normalized.message;
   }
 }

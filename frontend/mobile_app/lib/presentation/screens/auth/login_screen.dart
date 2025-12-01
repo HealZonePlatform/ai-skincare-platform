@@ -52,6 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           const _AuthBackground(),
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       horizontal,
                       AppSpacing.xl,
                       horizontal,
-                      AppSpacing.xl,
+                      AppSpacing.xl + MediaQuery.of(context).viewInsets.bottom,
                     ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1100),
@@ -166,6 +167,7 @@ class _LoginCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           Form(
             key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

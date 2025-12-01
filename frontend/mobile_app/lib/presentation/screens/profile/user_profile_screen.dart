@@ -53,6 +53,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   expandedHeight: 230,
                   pinned: true,
                   backgroundColor: Colors.transparent,
+                  automaticallyImplyLeading: false,
+                  leading: Navigator.of(context).canPop()
+                      ? const BackButton()
+                      : const SizedBox.shrink(),
                   flexibleSpace: FlexibleSpaceBar(
                     background: _ProfileHero(
                       profile: profile,

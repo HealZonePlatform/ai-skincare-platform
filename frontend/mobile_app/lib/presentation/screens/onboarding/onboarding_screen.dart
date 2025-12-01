@@ -7,8 +7,27 @@ import 'package:ai_skincare_platform/presentation/providers/onboarding_provider.
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  static const _backgroundAsset = 'assets/images/onboarding_1.png';
+  late final ImageProvider _backgroundImage =
+      const AssetImage(_backgroundAsset);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        precacheImage(_backgroundImage, context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +38,8 @@ class OnboardingScreen extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           // Background Image
-          Image.asset(
-            'assets/images/onboarding_1.png',
+          Image(
+            image: _backgroundImage,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) =>
                 Container(color: AppColors.background),
@@ -96,15 +115,15 @@ class OnboardingScreen extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxl),
                   SizedBox(
                     width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final navigator = Navigator.of(context);
-                          final provider = context.read<OnboardingProvider>();
-                          await Haptics.light();
-                          await provider.complete();
-                          if (!navigator.mounted) return;
-                          navigator.pushNamed('/preferences/categories');
-                        },
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+                        final provider = context.read<OnboardingProvider>();
+                        await Haptics.light();
+                        await provider.complete();
+                        if (!navigator.mounted) return;
+                        navigator.pushNamed('/preferences/categories');
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.secondary,
                         foregroundColor: AppColors.textPrimary,

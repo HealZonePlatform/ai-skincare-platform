@@ -28,6 +28,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  final Set<String> _prefetchedImageUrls = <String>{};
+  bool _prefetchedProductPlaceholder = false;
 
   @override
   void initState() {
@@ -52,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final viewData = homeProvider.dashboard != null
         ? HomeViewData.fromEntity(homeProvider.dashboard!)
         : null;
+    _precacheHeroMedia(viewData);
 
     final showSkeleton = (homeProvider.isLoading && viewData == null) ||
         (profileProvider.isLoading && profileProvider.userProfile == null);
@@ -64,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
+          cacheExtent: 1200,
           slivers: [
             SliverAppBar(
               backgroundColor: AppColors.surface,
@@ -162,6 +166,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _onRefresh(HomeProvider homeProvider) async {
     await homeProvider.loadDashboard(forceRefresh: true);
+  }
+
+  void _precacheHeroMedia(HomeViewData? viewData) {
+    if (viewData == null || !mounted) return;
+
+    String? productUrl;
+    for (final product in viewData.products) {
+      final candidate = product.imageUrl;
+      if (candidate != null && candidate.isNotEmpty) {
+        productUrl = candidate;
+        break;
+      }
+    }
+
+    if (productUrl != null && _prefetchedImageUrls.add(productUrl)) {
+      precacheImage(NetworkImage(productUrl), context);
+    }
+
+    if (!_prefetchedProductPlaceholder && viewData.products.isNotEmpty) {
+      precacheImage(
+        AssetImage(viewData.products.first.placeholderAsset),
+        context,
+      );
+      _prefetchedProductPlaceholder = true;
+    }
   }
 }
 
