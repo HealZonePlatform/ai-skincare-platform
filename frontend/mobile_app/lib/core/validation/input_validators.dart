@@ -5,28 +5,28 @@ class InputValidators {
 
   static String? required(String? value, {String fieldName = 'This field'}) {
     if (value == null || value.trim().isEmpty) {
-      return '$fieldName is required.';
+      return '$fieldName cannot be empty.';
     }
     return null;
   }
 
   static String? email(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required.';
+      return 'Please enter your email so we can keep your account in sync.';
     }
     final emailPattern = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailPattern.hasMatch(value)) {
-      return 'Please enter a valid email address.';
+      return 'Email format looks off. Try something like you@healzone.com.';
     }
     return null;
   }
 
   static String? password(String? value, {int minLength = 6}) {
     if (value == null || value.isEmpty) {
-      return 'Password is required.';
+      return 'Choose a password to keep your data safe.';
     }
     if (value.length < minLength) {
-      return 'Password must be at least $minLength characters.';
+      return 'Password needs at least $minLength characters.';
     }
     return null;
   }
@@ -36,7 +36,7 @@ class InputValidators {
       return 'Please confirm your password.';
     }
     if (value != original) {
-      return 'Passwords do not match.';
+      return 'Passwords do not match. Double check your spelling.';
     }
     return null;
   }

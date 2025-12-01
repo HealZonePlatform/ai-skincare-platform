@@ -14,6 +14,7 @@ class AppColors {
   // Surface & Background - Clean & Warm
   static const surface = Color(0xFFFFFFFF);
   static const surfaceLight = Color(0xFFFBFBF9); // Off-white
+  static const surfaceElevated = Color(0xFFF2F2EC);
   static const background = Color(0xFFF7F7F5); // Very light grey/beige
 
   // Text Colors - High Contrast but Soft
@@ -50,10 +51,18 @@ class AppColors {
   static const darkBorder = Color(0xFF30332B);
   static const darkDivider = Color(0xFF2A2D26);
   static const darkChipBg = Color(0xFF2A2D26);
+  static const darkSurfaceElevated = Color(0xFF24261F);
+  static const darkOverlay = Color(0xAA0B0C0A);
 
   // Gradients
   static const primaryGradient = LinearGradient(
     colors: [Color(0xFF6B705C), Color(0xFF888C75)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const primaryGradientDark = LinearGradient(
+    colors: [Color(0xFF2E3126), Color(0xFF484B3D)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -69,6 +78,16 @@ class AppColors {
       Color(0xFF6B705C),
       Color(0xFF888C75),
       Color(0xFFDDBEA9),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const heroGradientDark = LinearGradient(
+    colors: [
+      Color(0xFF1E2218),
+      Color(0xFF32362A),
+      Color(0xFF6B705C),
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

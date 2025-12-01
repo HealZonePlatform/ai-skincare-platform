@@ -11,6 +11,7 @@ class EnvConfig {
     this.enableCrashReporting = false,
     this.enablePushNotifications = false,
     this.enableAnalytics = true,
+    this.crashDsn = '',
   });
 
   final String apiBaseUrl;
@@ -22,4 +23,5 @@ class EnvConfig {
   final bool enableCrashReporting;
   final bool enablePushNotifications;
   final bool enableAnalytics;
+  final String crashDsn;
 }

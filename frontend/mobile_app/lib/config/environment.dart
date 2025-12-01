@@ -70,6 +70,14 @@ class Environment {
 
   static bool get enableAnalytics => _config.enableAnalytics;
 
+  static String get crashDsn {
+    const override = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+    if (override.isNotEmpty) {
+      return override;
+    }
+    return _config.crashDsn;
+  }
+
   static bool get strictSSL {
     const override = bool.fromEnvironment('API_STRICT_SSL', defaultValue: true);
     return override && _config.strictSSL;

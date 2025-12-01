@@ -144,8 +144,11 @@ class HeroHeader extends StatelessWidget {
                           onPressed: () async {
                             await Haptics.light();
                             if (context.mounted) {
-                              AnalyticsService.logButtonTap('quickScan');
-                              AnalyticsService.logScanStarted();
+                              AnalyticsService.logButtonTap(
+                                'quickScan',
+                                parameters: {'surface': 'hero_header'},
+                              );
+                              AnalyticsService.logScanStarted(source: 'hero');
                               context.push('/scan/permission');
                             }
                           },

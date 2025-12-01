@@ -22,7 +22,10 @@ class AppLoadingOverlay extends StatelessWidget {
         opacity: visible ? 1 : 0,
         duration: const Duration(milliseconds: 250),
         child: Container(
-          color: AppColors.surface.withValues(alpha: 0.9),
+          color: Theme.of(context)
+              .colorScheme
+              .surface
+              .withValues(alpha: 0.9),
           alignment: Alignment.center,
           child: Column(
             mainAxisSize: MainAxisSize.min,

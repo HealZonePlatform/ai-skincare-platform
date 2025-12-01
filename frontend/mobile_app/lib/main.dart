@@ -4,36 +4,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
+import 'package:ai_skincare_platform/core/error/crash_reporter.dart';
 import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/network/api_client.dart';
+import 'package:ai_skincare_platform/core/network/connectivity_service.dart';
+import 'package:ai_skincare_platform/core/notifications/notification_service.dart';
 import 'package:ai_skincare_platform/l10n/app_localizations.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
+import 'package:ai_skincare_platform/presentation/providers/connectivity_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/home_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/onboarding_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/theme_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/router/app_router.dart';
 import 'package:ai_skincare_platform/presentation/widgets/app_loading_overlay.dart';
+import 'package:ai_skincare_platform/presentation/widgets/offline_banner.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
-import 'package:ai_skincare_platform/utils/error_handler.dart';
 import 'package:ai_skincare_platform/core/config/theme_preferences.dart';
+import 'package:ai_skincare_platform/utils/error_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ApiClient.instance.init();
-  final themePreferences = await ThemePreferences.create();
-  final initialThemeMode =
-      themePreferences.getSavedThemeMode() ?? ThemeMode.system;
+  await CrashReporter.guard(() async {
+    await CrashReporter.init();
+    await ApiClient.instance.init();
+    await ConnectivityService.instance.initialize();
+    await NotificationService.instance.initialize();
+    final themePreferences = await ThemePreferences.create();
+    final initialThemeMode =
+        themePreferences.getSavedThemeMode() ?? ThemeMode.system;
 
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    ErrorHandler.logError(details.exception, details.stack);
-  };
+    FlutterError.onError = (details) {
+      ErrorHandler.logError(details.exception, details.stack);
+      CrashReporter.recordFlutterError(details);
+    };
 
-  runApp(MyApp(
-    themePreferences: themePreferences,
-    initialThemeMode: initialThemeMode,
-  ));
+    runApp(MyApp(
+      themePreferences: themePreferences,
+      initialThemeMode: initialThemeMode,
+    ));
+  });
 }
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
@@ -56,6 +66,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => OnboardingProvider()..load()),
+        ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(
             preferences: themePreferences,
@@ -70,6 +81,8 @@ class MyApp extends StatelessWidget {
             isLoggedIn: auth.isLoggedIn,
             onboardingCompleted: onboardingProvider.isCompleted,
           ).router;
+          NotificationService.instance
+              .setNavigationHandler((route) => router.go(route ?? '/home'));
           return ValueListenableBuilder<String?>(
             valueListenable: GlobalErrorNotifier.notifier,
             builder: (context, errorMessage, _) {
@@ -109,6 +122,7 @@ class MyApp extends StatelessWidget {
                     children: [
                       if (child != null) child,
                       overlay,
+                      const OfflineBanner(),
                     ],
                   );
                 },

@@ -130,3 +130,28 @@ Dự án này được cấp phép theo giấy phép MIT - xem tệp [LICENSE](L
 
 Tài khoản này chạy hoàn toàn offline, dữ liệu (hồ sơ + lịch sử phân tích) được mock ngay trong app. Đừng quên xoá đoạn demo này trước khi phát hành production.
 
+## Local setup & environment
+
+- Install Flutter 3.24+ and Java 17. From repo root: `cd frontend/mobile_app && flutter pub get`.
+- Backend: start the local gateway from project root with `docker compose up` (see `/services` for ports). Default dev API is `http://192.168.56.1:3001/api/v1`.
+- Run Android/iOS: `flutter run --dart-define=APP_ENV=development --dart-define=API_BASE_URL=http://192.168.56.1:3001 --dart-define=ENABLE_PUSH_NOTIFICATIONS=false --dart-define=SENTRY_DSN=`.
+- iOS: `cd ios && pod install` after fetching packages. Android package id: `com.healzone.mobile`.
+
+## Analytics & crash reporting
+
+- Event catalog is defined in `lib/core/analytics/analytics_events.dart` and used via `AnalyticsService` (auth, scan, engagement, error surfaces).
+- Crash reporting uses Sentry. Provide `SENTRY_DSN` and set `ENABLE_CRASH_REPORTING=true` for staging/prod builds. Development keeps crash reporting disabled by default.
+
+## Dependency audit (pubspec.yaml)
+
+- Removed `path_provider` (unused).
+- Kept `encrypt` (AES wrapper for `SecurePreferences` and token storage).
+- Kept `permission_handler` (scan/camera permissions), `firebase_messaging` + `flutter_local_notifications` + `timezone` (push + scheduled reminders).
+- Kept `shared_preferences` (theme/onboarding flags, dashboard cache), `flutter_secure_storage` (encrypted tokens).
+
+## Troubleshooting
+
+- Build issues: run `flutter clean && flutter pub get`.
+- Emulator permissions: set `ENABLE_PUSH_NOTIFICATIONS=false` (default) to avoid Firebase init during local runs.
+- Tests: use `SharedPreferences.setMockInitialValues({})` before bootstrapping to reset local state; new integration tests cover login -> home -> scan sample flow.
+- Coverage target: `flutter test --coverage && dart run tool/coverage_check.dart --min 70 coverage/lcov.info`.

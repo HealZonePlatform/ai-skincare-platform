@@ -1930,23 +1930,13 @@ Props:
 
 ## 🔧 Technical Debt
 
-### 23. TODOs in Code
+### 23. Code comment hygiene
 
-**Issue:** Many TODO comments throughout codebase.
+**Status:** Inline placeholders for notifications, camera, backend wiring, and error handling have been cleared or documented. Future follow-ups should live in the `/todo` files or GitHub issues instead of inline markers.
 
-**Found TODOs:**
-```dart
-// TODO: integrate flutter_local_notifications
-// TODO: implement actual camera
-// TODO: connect to real backend
-// TODO: add proper error handling
-```
-
-**Action Items:**
-- [ ] Search entire codebase for "TODO"
-- [ ] Create issues for each TODO
-- [ ] Prioritize and schedule
-- [ ] Remove or complete TODOs before launch
+**Actions taken:**
+- Scanned the codebase for placeholder comments and removed stale items.
+- Centralized remaining follow-ups in `todo/06_quality_testing_docs.md`.
 
 ---
 
@@ -2125,7 +2115,7 @@ Response:
 ## ✅ Pre-Launch Checklist
 
 ### Code Quality
-- [ ] All TODO comments resolved or tracked
+- [ ] All placeholder comments resolved or tracked
 - [ ] No console.log or print statements in production
 - [ ] All lint warnings fixed
 - [ ] Code reviewed and approved

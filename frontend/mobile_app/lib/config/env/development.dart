@@ -12,4 +12,5 @@ const developmentConfig = EnvConfig(
   enableCrashReporting: false,
   enablePushNotifications: false,
   enableAnalytics: true,
+  crashDsn: '',
 );

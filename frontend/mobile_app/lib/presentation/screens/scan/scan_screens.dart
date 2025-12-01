@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:ai_skincare_platform/core/analytics/analytics_events.dart';
 import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
 import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/utils/haptics.dart';
@@ -171,7 +172,7 @@ class _ScanPrepareScreenState extends State<ScanPrepareScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prepare scan'),
-        leading: const BackButton(color: AppColors.textPrimary),
+        leading: const BackButton(),
       ),
       body: SafeArea(
         child: Column(
@@ -283,14 +284,15 @@ class _InstructionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.l),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: theme.colorScheme.surface,
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: theme.dividerColor),
           ),
           child: Icon(icon, color: AppColors.textPrimary),
         ),
@@ -698,6 +700,10 @@ class _ScanProcessingScreenState extends State<ScanProcessingScreen>
       setState(() {
         _isProcessing = false;
       });
+      AnalyticsService.logScanCompleted(
+        source: 'camera',
+        parameters: {'has_image': true},
+      );
       if (!mounted) return;
       context.go('/scan/result', extra: {'imagePath': widget.imagePath});
     } catch (error, stackTrace) {
@@ -733,6 +739,7 @@ class _ScanProcessingScreenState extends State<ScanProcessingScreen>
   void _handleProcessingError(Object error, StackTrace stackTrace) {
     ErrorHandler.logError(error, stackTrace);
     final message = ErrorHandler.getUserMessage(error);
+    AnalyticsService.logError(message, surface: 'scan_processing');
     setState(() {
       _processingError = message;
       _isProcessing = false;
@@ -943,16 +950,19 @@ class ScanResultScreen extends StatelessWidget {
         title: const Text('Latest scan result'),
         actions: [
           IconButton(
-            tooltip: 'Share result',
-            icon: const Icon(Icons.share_outlined),
-            onPressed: () async {
-              await Haptics.selection();
-              AnalyticsService.logEvent('shareResult');
-              await ShareHelper.shareText(
-                'Skin score: 86 - Routine is on track! #HealZone',
-              );
-            },
-          )
+              tooltip: 'Share result',
+              icon: const Icon(Icons.share_outlined),
+              onPressed: () async {
+                await Haptics.selection();
+                AnalyticsService.logEvent(
+                  AnalyticsEvent.scanShared,
+                  parameters: {'surface': 'result_appbar'},
+                );
+                await ShareHelper.shareText(
+                  'Skin score: 86 - Routine is on track! #HealZone',
+                );
+              },
+            )
         ],
       ),
       body: SafeArea(

@@ -139,13 +139,16 @@ class ProductCard extends StatelessWidget {
                 Tooltip(
                   message: 'View ${product.name}',
                   child: FilledButton.tonal(
-                    onPressed: () async {
-                      await Haptics.selection();
-                      if (context.mounted) {
-                        AnalyticsService.logProductView(product.route);
-                        context.push(product.route);
-                      }
-                    },
+                  onPressed: () async {
+                    await Haptics.selection();
+                    if (context.mounted) {
+                      AnalyticsService.logProductView(
+                        product.route,
+                        parameters: {'surface': 'home_carousel'},
+                      );
+                      context.push(product.route);
+                    }
+                  },
                     style: FilledButton.styleFrom(
                       backgroundColor: product.color.withValues(alpha: 0.15),
                       foregroundColor: product.color,

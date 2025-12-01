@@ -212,8 +212,10 @@ class RoutineCard extends StatelessWidget {
                   onPressed: () async {
                     await Haptics.selection();
                     if (context.mounted) {
-                      AnalyticsService.logButtonTap('routineDetails',
-                          parameters: {'title': routine.title});
+                      AnalyticsService.logRoutineOpen(
+                        routine.title,
+                        parameters: {'focus': routine.focus},
+                      );
                       context.push('/routine');
                     }
                   },

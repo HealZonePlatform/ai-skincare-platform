@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:ai_skincare_platform/theme/app_theme.dart';
+
 class ShellScaffold extends StatelessWidget {
   const ShellScaffold({super.key, required this.child});
 
@@ -47,7 +49,11 @@ class ShellScaffold extends StatelessWidget {
     final currentIndex = _currentIndex(location);
 
     return Scaffold(
-      body: child,
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: child,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_isScanRoute(location)) {
@@ -63,47 +69,50 @@ class ShellScaffold extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        child: SizedBox(
-          height: 72,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (var i = 0; i < _tabs.length; i++)
-                Expanded(
-                  child: InkResponse(
-                    onTap: () => context.go(_tabs[i].route),
-                    radius: 32,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _tabs[i].icon,
-                          color: i == currentIndex
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withAlpha((0.6 * 255).round()),
-                        ),
-                        const SizedBox(height: 6),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          height: 3,
-                          width: 18,
-                          decoration: BoxDecoration(
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          child: SizedBox(
+            height: 72,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                for (var i = 0; i < _tabs.length; i++)
+                  Expanded(
+                    child: InkResponse(
+                      onTap: () => context.go(_tabs[i].route),
+                      radius: 32,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _tabs[i].icon,
                             color: i == currentIndex
                                 ? Theme.of(context).colorScheme.primary
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withAlpha((0.6 * 255).round()),
                           ),
-                        )
-                      ],
+                          const SizedBox(height: AppSpacing.xs),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            height: 3,
+                            width: 18,
+                            decoration: BoxDecoration(
+                              color: i == currentIndex
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

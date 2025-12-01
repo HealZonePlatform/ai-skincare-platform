@@ -52,7 +52,10 @@ class ArticleCard extends StatelessWidget {
         onTap: () async {
           await Haptics.selection();
           if (context.mounted) {
-            AnalyticsService.logArticleView(article.route);
+            AnalyticsService.logArticleView(
+              article.route,
+              parameters: {'surface': 'home_list'},
+            );
             context.push(article.route);
           }
         },

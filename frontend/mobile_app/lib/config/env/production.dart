@@ -12,4 +12,5 @@ const productionConfig = EnvConfig(
   enableCrashReporting: true,
   enablePushNotifications: true,
   enableAnalytics: true,
+  crashDsn: '',
 );

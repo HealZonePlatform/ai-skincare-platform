@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ai_skincare_platform/core/demo/demo_session.dart';
 import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/session/auth_session_observer.dart';
+import 'package:ai_skincare_platform/core/network/connectivity_service.dart';
 import 'package:ai_skincare_platform/data/profile/datasources/profile_local_cache.dart';
 import 'package:ai_skincare_platform/data/profile/repositories/profile_repository_impl.dart';
 import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
@@ -109,6 +110,7 @@ class UserProfileProvider with ChangeNotifier {
       _userProfile = await _getUserProfileUseCase.execute();
       await _cache.cacheProfile(_userProfile!);
       await _initialiseHistory();
+      ConnectivityService.instance.clearRetry('profile_sync');
     } catch (error, stackTrace) {
       _handleError(error, stackTrace);
     } finally {
@@ -129,6 +131,9 @@ class UserProfileProvider with ChangeNotifier {
         ..clear()
         ..addAll(cachedHistory);
       notifyListeners();
+      if (ConnectivityService.instance.isOffline) {
+        _errorMessage = 'Offline: showing cached profile.';
+      }
     }
   }
 
@@ -350,6 +355,10 @@ class UserProfileProvider with ChangeNotifier {
     final message = ErrorHandler.getUserMessage(normalized);
     _errorMessage = message;
     GlobalErrorNotifier.report(message);
+    if (ConnectivityService.instance.isOffline) {
+      ConnectivityService.instance.registerRetry(
+          'profile_sync', () => loadUserProfile(forceRefresh: true));
+    }
   }
 
   void clearError() {

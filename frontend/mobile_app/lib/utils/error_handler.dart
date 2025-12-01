@@ -1,5 +1,6 @@
 // lib/utils/error_handler.dart
 
+import 'package:ai_skincare_platform/core/error/crash_reporter.dart';
 import 'package:ai_skincare_platform/core/logging/app_logger.dart';
 import 'package:ai_skincare_platform/utils/exceptions.dart';
 
@@ -13,6 +14,9 @@ class ErrorHandler {
       error: error,
       stackTrace: stackTrace,
     );
+    if (stackTrace != null) {
+      CrashReporter.recordNonFatal(error, stackTrace);
+    }
   }
 
   static AppException normalize(dynamic error) {

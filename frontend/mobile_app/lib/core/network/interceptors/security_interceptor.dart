@@ -25,8 +25,7 @@ class SecurityInterceptor extends Interceptor {
       );
     }
     if (!kIsWeb) {
-      // Platform.operatingSystem is not available on web without dart:io
-      // options.headers.putIfAbsent('X-Client-Platform', () => 'mobile');
+      options.headers.putIfAbsent('X-Client-Platform', () => 'mobile');
     } else {
       options.headers.putIfAbsent('X-Client-Platform', () => 'web');
     }

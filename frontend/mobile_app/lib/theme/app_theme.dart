@@ -14,6 +14,8 @@ export 'app_typography.dart';
 class AppTheme {
   static ThemeData build({bool isDark = false}) {
     final surface = isDark ? AppColors.darkSurface : AppColors.surface;
+    final elevatedSurface =
+        isDark ? AppColors.darkSurfaceElevated : AppColors.surfaceElevated;
     final background = isDark ? AppColors.darkBackground : AppColors.background;
     final textPrimary =
         isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
@@ -36,6 +38,7 @@ class AppTheme {
     final base = ThemeData(
       colorScheme: colorScheme,
       scaffoldBackgroundColor: background,
+      canvasColor: background,
       useMaterial3: true,
       fontFamily: 'Outfit', // Assuming Outfit or similar modern font
       textTheme: AppTypography.textTheme,
@@ -57,7 +60,7 @@ class AppTheme {
       ),
       cardTheme: base.cardTheme.copyWith(
         elevation: 0,
-        color: surface,
+        color: elevatedSurface,
         margin: const EdgeInsets.symmetric(
             horizontal: AppSpacing.xl, vertical: AppSpacing.s),
         shape: RoundedRectangleBorder(
@@ -85,11 +88,11 @@ class AppTheme {
           padding: const EdgeInsets.symmetric(
               vertical: AppSpacing.l, horizontal: AppSpacing.xl),
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppRadius.xl)),
-          elevation: 0,
-          textStyle: AppTypography.textTheme.labelLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
+            borderRadius: BorderRadius.circular(AppRadius.xl)),
+        elevation: 0,
+        textStyle: AppTypography.textTheme.labelLarge
+            ?.copyWith(fontWeight: FontWeight.w600),
+      ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -141,6 +144,13 @@ class AppTheme {
         color: divider,
         thickness: 1,
         space: AppSpacing.xl,
+      ),
+      bottomSheetTheme: base.bottomSheetTheme.copyWith(
+        backgroundColor: elevatedSurface,
+        surfaceTintColor: elevatedSurface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.l)),
+        ),
       ),
       bottomNavigationBarTheme: base.bottomNavigationBarTheme.copyWith(
         backgroundColor: surface,

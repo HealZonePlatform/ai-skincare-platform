@@ -87,27 +87,29 @@ class InsightCards extends StatelessWidget {
                             color: insight.iconColor, size: 20),
                       ),
                       const SizedBox(width: AppSpacing.s),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            insight.title,
-                            style: theme.textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          Text(
-                            insight.caption,
-                            style: theme.textTheme.bodySmall
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              insight.title,
+                              style: theme.textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              insight.caption,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
                       Text(
                         '$progressPercent%',
                         style: theme.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: insight.iconColor),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

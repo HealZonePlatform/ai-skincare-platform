@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
+import 'package:ai_skincare_platform/core/analytics/analytics_events.dart';
 import 'package:ai_skincare_platform/core/demo/demo_session.dart';
 import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/network/api_client.dart';
@@ -66,7 +67,7 @@ class AuthProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> _initialize() async {
-    await ApiClient.instance.init();
+    await ApiClient.instance.init(tokenRepository: _tokenRepository);
     final tokens = await _checkAuthStatusUseCase.execute();
     if (tokens != null) {
       if (tokens.accessToken == DemoSession.tokens.accessToken) {
@@ -85,6 +86,10 @@ class AuthProvider with ChangeNotifier {
         _isLoggedIn = false;
         _errorMessage = 'Your session has expired. Please sign in again.';
         GlobalErrorNotifier.report(_errorMessage!);
+        AnalyticsService.logEvent(
+          AnalyticsEvent.authSessionTimeout,
+          parameters: {'reason': 'refresh_failed'},
+        );
         notifyListeners();
       }
     });
@@ -103,7 +108,10 @@ class AuthProvider with ChangeNotifier {
       }
       await _loginUseCase.execute(credentials);
       _isLoggedIn = true;
-      AnalyticsService.logEvent('login_success');
+      AnalyticsService.logEvent(
+        AnalyticsEvent.authLoginSuccess,
+        parameters: {'method': 'password'},
+      );
       _notifySignedIn();
       return true;
     } catch (error, stackTrace) {
@@ -127,7 +135,10 @@ class AuthProvider with ChangeNotifier {
     try {
       await _registerUseCase.execute(userData);
       _isLoggedIn = true;
-      AnalyticsService.logEvent('signup_success');
+      AnalyticsService.logEvent(
+        AnalyticsEvent.authRegisterSuccess,
+        parameters: {'method': 'password'},
+      );
       _notifySignedIn();
       return true;
     } catch (error, stackTrace) {
@@ -147,6 +158,7 @@ class AuthProvider with ChangeNotifier {
     await _logoutUseCase.execute();
     DemoSession.deactivate();
     _isLoggedIn = false;
+    AnalyticsService.logEvent(AnalyticsEvent.authLogout);
     AuthSessionObserver.instance.notify(AuthSessionEvent.signedOut);
     notifyListeners();
   }
@@ -177,7 +189,10 @@ class AuthProvider with ChangeNotifier {
     DemoSession.activate();
     await _tokenRepository.saveTokens(DemoSession.tokens);
     _isLoggedIn = true;
-    AnalyticsService.logEvent('login_demo');
+    AnalyticsService.logEvent(
+      AnalyticsEvent.authDemoLogin,
+      parameters: {'method': isDefaultDemo ? 'default_demo' : 'user_demo'},
+    );
     _notifySignedIn();
     return true;
   }

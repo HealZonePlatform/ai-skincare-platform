@@ -60,84 +60,88 @@ class _HomeScreenState extends State<HomeScreen> {
         (profileProvider.isLoading && profileProvider.userProfile == null);
 
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () => _onRefresh(homeProvider),
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          cacheExtent: 1200,
-          slivers: [
-            SliverAppBar(
-              backgroundColor: AppColors.surface,
-              pinned: true,
-              expandedHeight: 380,
-              leading: const SizedBox.shrink(),
-              titleSpacing: 0,
-              title: const BrandLogo(compact: true, size: 28),
-              flexibleSpace: FlexibleSpaceBar(
-                background: HeroHeader(
-                  greetingName: profileProvider.userProfile?.fullName ??
-                      viewData?.greetingName ??
-                      'there',
-                  heroStats: viewData?.heroStats ?? [],
-                  score: viewData?.pulse.score ?? 0,
-                ),
-              ),
-              actions: [
-                IconButton(
-                  tooltip: 'Profile',
-                  onPressed: () => context.push('/profile'),
-                  icon: const Icon(Icons.person_outline),
-                ),
-                IconButton(
-                  tooltip: 'Sign out',
-                  onPressed: () => context.read<AuthProvider>().logout(),
-                  icon: const Icon(Icons.logout_rounded),
-                ),
-              ],
+      body: SafeArea(
+        top: false,
+        child: RefreshIndicator(
+          onRefresh: () => _onRefresh(homeProvider),
+          child: CustomScrollView(
+            controller: _scrollController,
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.xl,
-                  AppSpacing.l,
-                  AppSpacing.xl,
-                  0,
+            cacheExtent: 1200,
+            slivers: [
+              SliverAppBar(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                pinned: true,
+                expandedHeight: 380,
+                leading: const SizedBox.shrink(),
+                titleSpacing: 0,
+                title: const BrandLogo(compact: true, size: 28),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: HeroHeader(
+                    greetingName: profileProvider.userProfile?.fullName ??
+                        viewData?.greetingName ??
+                        'there',
+                    heroStats: viewData?.heroStats ?? [],
+                    score: viewData?.pulse.score ?? 0,
+                  ),
                 ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 250),
+                actions: [
+                  IconButton(
+                    tooltip: 'Profile',
+                    onPressed: () => context.push('/profile'),
+                    icon: const Icon(Icons.person_outline),
+                  ),
+                  IconButton(
+                    tooltip: 'Sign out',
+                    onPressed: () => context.read<AuthProvider>().logout(),
+                    icon: const Icon(Icons.logout_rounded),
+                  ),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.xl,
+                    AppSpacing.l,
+                    AppSpacing.xl,
+                    0,
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
                   child: _buildBodyContent(
                     theme: theme,
                     viewData: viewData,
                     showSkeleton: showSkeleton,
                     homeProvider: homeProvider,
+                    usingCache: homeProvider.usingCache,
                   ),
                 ),
               ),
             ),
-            const SliverToBoxAdapter(
-              child: HzSectionHeader(
-                title: 'Latest stories',
-                subtitle: 'Guides curated for your skin goals',
-                actionLabel: 'See all',
-                route: '/community',
+              const SliverToBoxAdapter(
+                child: HzSectionHeader(
+                  title: 'Latest stories',
+                  subtitle: 'Guides curated for your skin goals',
+                  actionLabel: 'See all',
+                  route: '/community',
+                ),
               ),
-            ),
-            ArticleList(articles: viewData?.articles ?? const []),
-            const SliverToBoxAdapter(
-              child: HzSectionHeader(
-                title: 'Recommended products',
-                subtitle: 'Fastest wins for your current skin state',
-                actionLabel: 'Browse',
-                route: '/products',
+              ArticleList(articles: viewData?.articles ?? const []),
+              const SliverToBoxAdapter(
+                child: HzSectionHeader(
+                  title: 'Recommended products',
+                  subtitle: 'Fastest wins for your current skin state',
+                  actionLabel: 'Browse',
+                  route: '/products',
+                ),
               ),
-            ),
-            ProductCarousel(products: viewData?.products ?? const []),
-            const SliverPadding(
-                padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
-          ],
+              ProductCarousel(products: viewData?.products ?? const []),
+              const SliverPadding(
+                  padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
+            ],
+          ),
         ),
       ),
     );
@@ -148,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required HomeViewData? viewData,
     required bool showSkeleton,
     required HomeProvider homeProvider,
+    required bool usingCache,
   }) {
     if (showSkeleton) {
       return const HomeSkeleton();
@@ -159,9 +164,12 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     if (viewData == null) {
-      return const HomeSkeleton();
+      return HomeError(
+        message: 'No dashboard data yet. Pull to refresh.',
+        onRetry: () => homeProvider.retry(),
+      );
     }
-    return HomeContent(viewData: viewData);
+    return HomeContent(viewData: viewData, usingCache: usingCache);
   }
 
   Future<void> _onRefresh(HomeProvider homeProvider) async {
@@ -195,15 +203,42 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeContent extends StatelessWidget {
-  const HomeContent({super.key, required this.viewData});
+  const HomeContent({super.key, required this.viewData, this.usingCache = false});
 
   final HomeViewData viewData;
+  final bool usingCache;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (usingCache)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.l, vertical: AppSpacing.s),
+            margin: const EdgeInsets.only(bottom: AppSpacing.m),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(AppRadius.m),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.wifi_off, color: AppColors.warning, size: 18),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Text(
+                    'Offline - showing cached dashboard',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: AppColors.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+          ),
         PulseCard(pulse: viewData.pulse, highlights: viewData.pulseHighlights),
         const SizedBox(height: AppSpacing.l),
         InsightCards(insights: viewData.insights),
@@ -250,7 +285,7 @@ class HomeError extends StatelessWidget {
     final theme = Theme.of(context);
     return HzSurfaceCard(
       padding: const EdgeInsets.all(AppSpacing.xl),
-      backgroundColor: Colors.white,
+      backgroundColor: theme.colorScheme.surface,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
