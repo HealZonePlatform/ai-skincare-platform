@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:ai_skincare_platform/core/constants/app_assets.dart';
 import 'package:ai_skincare_platform/presentation/providers/auth_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/home_provider.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
@@ -14,9 +15,9 @@ import 'package:ai_skincare_platform/presentation/screens/home/widgets/product_c
 import 'package:ai_skincare_platform/presentation/screens/home/widgets/pulse_card.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/widgets/routine_carousel.dart';
 import 'package:ai_skincare_platform/presentation/widgets/brand_logo.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_skeleton.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
-import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_surface_card.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,8 +29,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
-  final Set<String> _prefetchedImageUrls = <String>{};
-  bool _prefetchedProductPlaceholder = false;
 
   @override
   void initState() {
@@ -45,16 +44,22 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> _onRefresh(HomeProvider provider) async {
+    await provider.loadDashboard(forceRefresh: true);
+    if (!mounted) return;
+    await context.read<UserProfileProvider>().loadUserProfile(
+          forceRefresh: true,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final homeProvider = context.watch<HomeProvider>();
     final profileProvider = context.watch<UserProfileProvider>();
 
     final viewData = homeProvider.dashboard != null
         ? HomeViewData.fromEntity(homeProvider.dashboard!)
         : null;
-    _precacheHeroMedia(viewData);
 
     final showSkeleton = (homeProvider.isLoading && viewData == null) ||
         (profileProvider.isLoading && profileProvider.userProfile == null);
@@ -85,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         'there',
                     heroStats: viewData?.heroStats ?? [],
                     score: viewData?.pulse.score ?? 0,
+                    lastScanLabel: viewData?.pulse.updated ?? 'Today',
+                    beforeImageAsset: AppAssets.analysisPlaceholder,
+                    afterImageAsset: AppAssets.analysisPlaceholder,
                   ),
                 ),
                 actions: [
@@ -111,15 +119,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                   child: _buildBodyContent(
-                    theme: theme,
+                    context: context,
                     viewData: viewData,
                     showSkeleton: showSkeleton,
                     homeProvider: homeProvider,
-                    usingCache: homeProvider.usingCache,
                   ),
                 ),
+                ),
               ),
-            ),
               const SliverToBoxAdapter(
                 child: HzSectionHeader(
                   title: 'Latest stories',
@@ -128,7 +135,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   route: '/community',
                 ),
               ),
-              ArticleList(articles: viewData?.articles ?? const []),
+              if (viewData?.articles.isNotEmpty == true)
+                ArticleList(articles: viewData!.articles)
+              else
+                SliverToBoxAdapter(
+                  child: _EmptySection(
+                    message: 'New skincare guides coming soon!',
+                    illustration: IllustrationType.emptyArticles,
+                    actionLabel: 'Browse community',
+                    onAction: () => context.push('/community'),
+                  ),
+                ),
               const SliverToBoxAdapter(
                 child: HzSectionHeader(
                   title: 'Recommended products',
@@ -137,9 +154,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   route: '/products',
                 ),
               ),
-              ProductCarousel(products: viewData?.products ?? const []),
+              if (viewData?.products.isNotEmpty == true)
+                ProductCarousel(products: viewData!.products)
+              else
+                const SliverToBoxAdapter(
+                  child: _EmptySection(
+                    message: 'We are finding the best products for you...',
+                    illustration: IllustrationType.emptyProducts,
+                  ),
+                ),
               const SliverPadding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5)),
+                padding: EdgeInsets.only(bottom: AppSpacing.xxl * 1.5),
+              ),
             ],
           ),
         ),
@@ -148,11 +174,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBodyContent({
-    required ThemeData theme,
+    required BuildContext context,
     required HomeViewData? viewData,
     required bool showSkeleton,
     required HomeProvider homeProvider,
-    required bool usingCache,
   }) {
     if (showSkeleton) {
       return const HomeSkeleton();
@@ -161,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return HomeError(
         message: homeProvider.error ?? 'Could not load dashboard data.',
         onRetry: () => homeProvider.retry(),
+        onAltAction: () => context.push('/scan/permission'),
       );
     }
     if (viewData == null) {
@@ -169,36 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
         onRetry: () => homeProvider.retry(),
       );
     }
-    return HomeContent(viewData: viewData, usingCache: usingCache);
-  }
-
-  Future<void> _onRefresh(HomeProvider homeProvider) async {
-    await homeProvider.loadDashboard(forceRefresh: true);
-  }
-
-  void _precacheHeroMedia(HomeViewData? viewData) {
-    if (viewData == null || !mounted) return;
-
-    String? productUrl;
-    for (final product in viewData.products) {
-      final candidate = product.imageUrl;
-      if (candidate != null && candidate.isNotEmpty) {
-        productUrl = candidate;
-        break;
-      }
-    }
-
-    if (productUrl != null && _prefetchedImageUrls.add(productUrl)) {
-      precacheImage(NetworkImage(productUrl), context);
-    }
-
-    if (!_prefetchedProductPlaceholder && viewData.products.isNotEmpty) {
-      precacheImage(
-        AssetImage(viewData.products.first.placeholderAsset),
-        context,
-      );
-      _prefetchedProductPlaceholder = true;
-    }
+    return HomeContent(
+      viewData: viewData,
+      usingCache: homeProvider.usingCache,
+    );
   }
 }
 
@@ -275,38 +275,101 @@ class HomeSkeleton extends StatelessWidget {
 }
 
 class HomeError extends StatelessWidget {
-  const HomeError({super.key, required this.message, required this.onRetry});
+  const HomeError({
+    super.key,
+    required this.message,
+    required this.onRetry,
+    this.onAltAction,
+  });
 
   final String message;
   final VoidCallback onRetry;
+  final VoidCallback? onAltAction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return HzSurfaceCard(
+    return Padding(
       padding: const EdgeInsets.all(AppSpacing.xl),
-      backgroundColor: theme.colorScheme.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Something went wrong',
-            style: theme.textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: AppSpacing.s),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: AppSpacing.m),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
-          ),
-        ],
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        decoration: BoxDecoration(
+          gradient: AppColors.dewdropGradient,
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          boxShadow: AppShadows.mild,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SkincareIllustration(
+              type: IllustrationType.errorState,
+              size: 180,
+            ),
+            const SizedBox(height: AppSpacing.l),
+            Text(
+              'Connection hiccup',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: AppSpacing.s),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.m),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                ),
+                if (onAltAction != null) ...[
+                  const SizedBox(width: AppSpacing.s),
+                  OutlinedButton.icon(
+                    onPressed: onAltAction,
+                    icon: const Icon(Icons.center_focus_strong_rounded),
+                    label: const Text('Quick scan'),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptySection extends StatelessWidget {
+  const _EmptySection({
+    required this.message,
+    required this.illustration,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String message;
+  final IllustrationType illustration;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.xxl,
+        horizontal: AppSpacing.xl,
+      ),
+      child: IllustratedMessage(
+        illustration: illustration,
+        title: 'Stay tuned',
+        message: message,
+        actionLabel: actionLabel,
+        onAction: onAction,
       ),
     );
   }

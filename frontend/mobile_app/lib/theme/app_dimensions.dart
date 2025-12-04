@@ -72,4 +72,13 @@ class AppShadows {
       spreadRadius: -5,
     ),
   ];
+
+  static const softGlow = [
+    BoxShadow(
+      color: Color(0x22C5A9E0),
+      blurRadius: 28,
+      offset: Offset(0, 12),
+      spreadRadius: -6,
+    ),
+  ];
 }

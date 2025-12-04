@@ -472,7 +472,7 @@ class _HeroPanel extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final gradient =
-        isDark ? AppColors.heroGradientDark : AppColors.primaryGradient;
+        isDark ? AppColors.primaryGradient : AppColors.primaryGradient;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(

@@ -28,7 +28,8 @@ class AppTheme {
       primary: AppColors.primary,
       onPrimary: Colors.white,
       secondary: AppColors.secondary,
-      onSecondary: textPrimary,
+      onSecondary: AppColors.textPrimary,
+      tertiary: AppColors.accent,
       surface: surface,
       onSurface: textPrimary,
       error: AppColors.danger,
@@ -89,10 +90,10 @@ class AppTheme {
               vertical: AppSpacing.l, horizontal: AppSpacing.xl),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.xl)),
-        elevation: 0,
-        textStyle: AppTypography.textTheme.labelLarge
-            ?.copyWith(fontWeight: FontWeight.w600),
-      ),
+          elevation: 0,
+          textStyle: AppTypography.textTheme.labelLarge
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -139,6 +140,12 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadius.m),
           borderSide: const BorderSide(color: AppColors.danger),
         ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.m),
+          borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+        ),
+        prefixIconColor: AppColors.primary,
+        suffixIconColor: AppColors.textSecondary,
       ),
       dividerTheme: DividerThemeData(
         color: divider,
@@ -166,9 +173,9 @@ class AppTheme {
         showUnselectedLabels: true,
       ),
       floatingActionButtonTheme: base.floatingActionButtonTheme.copyWith(
-        backgroundColor: AppColors.secondary,
+        backgroundColor: AppColors.accent, // Use Accent for FAB
         foregroundColor: AppColors.textPrimary,
-        elevation: 2,
+        elevation: 4,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.l)),
       ),

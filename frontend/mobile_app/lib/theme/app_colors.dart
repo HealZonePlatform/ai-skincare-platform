@@ -2,93 +2,94 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Brand Colors - Earthy & Natural
-  static const primary = Color(0xFF6B705C); // Olive Green - More grounded
-  static const primaryLight = Color(0xFFA5A58D); // Sage
-  static const primaryDark = Color(0xFF484A3E); // Deep Olive
+  // Brand Colors - Premium & Soft
+  static const primary = Color(0xFFC5A9E0); // Gentle Purple
+  static const primaryLight = Color(0xFFE2D4F0);
+  static const primaryDark = Color(0xFF9A7FB5);
 
-  static const secondary = Color(0xFFDDBEA9); // Beige/Peach - Softer
-  static const secondaryLight = Color(0xFFFFE8D6); // Champagne
-  static const secondaryDark = Color(0xFFCB997E); // Terracotta
+  static const secondary = Color(0xFFFFB5C5); // Soft Pink
+  static const secondaryLight = Color(0xFFFFD6E0);
+  static const secondaryDark = Color(0xFFE08A9D);
 
-  // Surface & Background - Clean & Warm
+  static const accent = Color(0xFFA8E6CF); // Mint Green
+  static const accentLight = Color(0xFFD4F3E7);
+  static const accentDark = Color(0xFF7AC4AB);
+
+  // Surface & Background - Warm & Clean
   static const surface = Color(0xFFFFFFFF);
-  static const surfaceLight = Color(0xFFFBFBF9); // Off-white
-  static const surfaceElevated = Color(0xFFF2F2EC);
-  static const background = Color(0xFFF7F7F5); // Very light grey/beige
+  static const surfaceLight = Color(0xFFFBFBF9);
+  static const surfaceElevated = Color(0xFFFFFFFF);
+  static const background = Color(0xFFFFF8F0); // Warm Cream
 
   // Text Colors - High Contrast but Soft
-  static const textPrimary =
-      Color(0xFF2F3128); // Almost black, slightly green-tinted
-  static const textSecondary = Color(0xFF6C7064); // Dark Grey/Green
-  static const textTertiary = Color(0xFFA0A498);
-  static const textDisabled = Color(0xFFD6D8D1);
+  static const textPrimary = Color(0xFF2C2C2C); // Rich Charcoal
+  static const textSecondary = Color(0xFF6C6C6C); // Medium Grey
+  static const textTertiary = Color(0xFFA0A0A0); // Light Grey
+  static const textDisabled = Color(0xFFD6D6D6);
 
   // Semantic Colors
-  static const success = Color(0xFF606C38); // Forest Green
-  static const successLight = Color(0xFF8F9E58);
-  static const warning = Color(0xFFD4A373); // Muted Orange
-  static const warningLight = Color(0xFFE9C496);
-  static const danger = Color(0xFFBC6C25); // Burnt Orange/Red
-  static const dangerLight = Color(0xFFDDA15E);
-  static const info = Color(0xFF7F9CA2); // Muted Blue/Green
-  static const infoLight = Color(0xFFA8C0C4);
+  static const success = Color(0xFFA8E6CF); // Mint Green
+  static const successLight = Color(0xFFD4F3E7);
+  static const warning = Color(0xFFFFD166); // Soft Yellow/Orange
+  static const warningLight = Color(0xFFFFE8B3);
+  static const danger = Color(0xFFFF8A8A); // Soft Red
+  static const dangerLight = Color(0xFFFFC4C4);
+  static const info = Color(0xFF90DBF4); // Soft Blue
+  static const infoLight = Color(0xFFC7EDFA);
 
   // UI Elements
-  static const chipBg = Color(0xFFF0F2EB);
-  static const border = Color(0xFFE6E8E0);
-  static const divider = Color(0xFFF0F2EB);
-  static const overlay = Color(0x662F3128);
-  static const overlayDark = Color(0xAA0B0C0A);
+  static const chipBg = Color(0xFFF5F0F6); // Very light purple tint
+  static const border = Color(0xFFEFEFEF);
+  static const divider = Color(0xFFF5F5F5);
+  static const overlay = Color(0x662C2C2C);
+  static const overlayDark = Color(0xAA000000);
 
-  // Dark palette
-  static const darkSurface = Color(0xFF1E1F1B);
-  static const darkSurfaceMuted = Color(0xFF262822);
-  static const darkBackground = Color(0xFF121310);
-  static const darkTextPrimary = Color(0xFFE8EAE2);
-  static const darkTextSecondary = Color(0xFFB5B8AE);
-  static const darkTextTertiary = Color(0xFF8A8D83);
-  static const darkBorder = Color(0xFF30332B);
-  static const darkDivider = Color(0xFF2A2D26);
-  static const darkChipBg = Color(0xFF2A2D26);
-  static const darkSurfaceElevated = Color(0xFF24261F);
-  static const darkOverlay = Color(0xAA0B0C0A);
+  // Dark palette (Adjusted for premium feel in dark mode)
+  static const darkSurface = Color(0xFF1E1E24);
+  static const darkSurfaceMuted = Color(0xFF25252D);
+  static const darkBackground = Color(0xFF121216);
+  static const darkTextPrimary = Color(0xFFE8E8E8);
+  static const darkTextSecondary = Color(0xFFB0B0B0);
+  static const darkTextTertiary = Color(0xFF808080);
+  static const darkBorder = Color(0xFF2E2E36);
+  static const darkDivider = Color(0xFF2A2A30);
+  static const darkChipBg = Color(0xFF2C2C35);
+  static const darkSurfaceElevated = Color(0xFF25252D);
+  static const darkOverlay = Color(0xAA000000);
 
   // Gradients
   static const primaryGradient = LinearGradient(
-    colors: [Color(0xFF6B705C), Color(0xFF888C75)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const primaryGradientDark = LinearGradient(
-    colors: [Color(0xFF2E3126), Color(0xFF484B3D)],
+    colors: [Color(0xFFC5A9E0), Color(0xFFA084CA)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static const secondaryGradient = LinearGradient(
-    colors: [Color(0xFFDDBEA9), Color(0xFFCB997E)],
+    colors: [Color(0xFFFFB5C5), Color(0xFFFF8FA3)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const heroGradient = LinearGradient(
-    colors: [
-      Color(0xFF6B705C),
-      Color(0xFF888C75),
-      Color(0xFFDDBEA9),
-    ],
+  static const sunriseGradient = LinearGradient(
+    colors: [Color(0xFFFFB5C5), Color(0xFFFFD6E0), Color(0xFFFFF8F0)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static const heroGradientDark = LinearGradient(
-    colors: [
-      Color(0xFF1E2218),
-      Color(0xFF32362A),
-      Color(0xFF6B705C),
-    ],
+  static const dewdropGradient = LinearGradient(
+    colors: [Color(0xFFE0F7FA), Color(0xFFA8E6CF), Color(0xFFFFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const glassGradient = LinearGradient(
+    colors: [Color(0x99FFFFFF), Color(0x66FFFFFF)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const glassGradientDark = LinearGradient(
+    colors: [Color(0x991E1E24), Color(0x661E1E24)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

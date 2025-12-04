@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
 import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
@@ -15,13 +16,13 @@ class ProductCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) {
-      return const SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Text(
-            'No recommendations yet. Complete a scan to unlock products.',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+      return SliverToBoxAdapter(
+        child: IllustratedMessage(
+          illustration: IllustrationType.emptyProducts,
+          title: 'No recommendations yet',
+          message: 'Complete a quick scan to unlock products matched to your skin.',
+          actionLabel: 'Start scan',
+          onAction: () => context.push('/scan/permission'),
         ),
       );
     }
@@ -53,6 +54,13 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final ingredients = product.benefit
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final ingredientBadges =
+        ingredients.isNotEmpty ? ingredients : [product.badge];
     return Semantics(
       label: 'View product ${product.name}',
       button: true,
@@ -124,6 +132,32 @@ class ProductCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.m),
+            Text(
+              'Ingredient focus',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: ingredientBadges
+                  .map(
+                    (badge) => Chip(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.s,
+                        vertical: AppSpacing.xs,
+                      ),
+                      avatar: const Icon(Icons.science_outlined, size: 16),
+                      label: Text(badge),
+                    ),
+                  )
+                  .toList(),
             ),
             const Spacer(),
             Row(

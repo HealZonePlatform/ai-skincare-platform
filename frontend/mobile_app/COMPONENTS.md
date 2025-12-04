@@ -1,43 +1,143 @@
 # UI Components (frontend/mobile_app)
 
-This app uses a lightweight UI kit under `lib/presentation/widgets` and `lib/presentation/screens/home/widgets`. Below are the most common pieces and how to use them safely.
+This app uses a comprehensive UI kit under `lib/presentation/widgets`. Below are the components and how to use them.
 
-## Buttons
-- `HzPrimaryButton({label, onPressed, isLoading, icon})`: Full-width CTA with optional loader. Disable via `isLoading` instead of nulling `onPressed` to keep layout stable.
-- `HzSecondaryButton({label, onPressed, icon})`: Outlined alternative for cancel/secondary actions.
+## Core Components
 
-Usage:
+### Buttons
+- `HzPrimaryButton({label, onPressed, isLoading, icon})`: Full-width CTA with optional loader
+- `HzSecondaryButton({label, onPressed, icon})`: Outlined alternative
+
+### Loading & Error
+- `HzSkeleton`, `AppLoadingOverlay`: Skeleton/overlay components
+- `OfflineBanner`: Connectivity indicator
+
+### Navigation
+- `ShellScaffold`: Wraps tabbed routes with scan FAB
+
+---
+
+## Brand Identity Widgets (NEW)
+
+### Icons (`widgets/icons/`)
 ```dart
-HzPrimaryButton(
-  label: 'Continue',
-  icon: Icons.check_circle,
-  isLoading: state.isSaving,
-  onPressed: state.isSaving ? null : _submit,
-);
+import '.../widgets/icons/skin_type_icons.dart';
+import '.../widgets/icons/ingredient_icons.dart';
+
+// Skin type icons
+SkinTypeIcon(skinType: SkinType.oily, size: 24)
+
+// Ingredient icons  
+IngredientIcon(name: 'niacinamide', size: 20)
 ```
 
-## HeroHeader (Home)
-- Props: `greetingName`, `heroStats`, `score`.
-- Behaviour: Quick Scan button triggers `/scan/permission`, logs analytics, and plays a light haptic.
-- Layout: Uses gradients and a fixed height; wrap in a `SizedBox` when embedding outside the Home screen.
+### Skincare Visual Elements
+| Widget | Import | Usage |
+|--------|--------|-------|
+| `SkinCompatibilityIndicator` | `skin_compatibility_indicator.dart` | Match score with breakdown |
+| `StarRating` | `star_rating.dart` | Interactive/readonly ratings |
+| `SkinConcernBadge` | `skin_concern_badge.dart` | Concern tags with colors |
 
-## PulseCard
-- Props: `PulseModel pulse`, `List<PulseHighlightModel> highlights`.
-- Shows skin pulse score, sparkline, and highlight pills. Provide at least one highlight for optimal layout; if `trend` is empty, the component renders a “No data yet” message.
+---
 
-## InsightCards
-- Props: `List<InsightModel> insights`.
-- Empty list → neutral empty state box.
-- On wide layouts (`>700px`) cards render in a row; otherwise they stack with spacing. Supply `progress` as a value between `0` and `1`.
+### Routine Widgets (`widgets/routine/`)
+```dart
+import '.../widgets/routine/routine_widgets.dart';
 
-## Lists & Carousels
-- `ProductCarousel`, `RoutineCarousel`, `ArticleList` all accept pre-mapped view models from `HomeViewData`. Pass routes that exist in `GoRouter` to keep navigation consistent.
-- For offline mode, surface cached data by toggling `usingCache` flags in providers (already handled in `HomeProvider`).
+// Step card with timeline
+RoutineStepCard(step: step, isLast: false)
 
-## Loading & Error Surfaces
-- `HzSkeleton` and `AppLoadingOverlay` are the preferred skeleton/overlay components.
-- `OfflineBanner` listens to `ConnectivityProvider` and should stay mounted near the top of the widget tree (it is already included in `MyApp`).
+// Progress tracker
+RoutineProgressTracker(completed: 3, total: 5)
 
-## Navigation Shell
-- `ShellScaffold` wraps tabbed routes and injects the scan FAB. FAB toggles between scan and close icons depending on whether the current route starts with `/scan`.
-- When adding new tabs, update `_tabs` in `ShellScaffold` and ensure `AppRouter` routes are nested under the shell.
+// Timeline with reordering
+RoutineTimelineView(steps: steps, onReorder: onReorder)
+
+// Walkthrough mode
+RoutineWalkthrough(steps: steps, onComplete: onComplete)
+```
+
+Categories: Cleanse, Tone, Treat, Moisturize, Protect, Special
+
+---
+
+### Community Widgets (`widgets/community/`)
+```dart
+import '.../widgets/community/community_widgets.dart';
+
+// Post card (text, image, beforeAfter, routine, review)
+CommunityPostCard(post: post)
+
+// Product review with pros/cons
+ProductReviewCard(review: review)
+
+// Shareable routine
+SharedRoutineCard(routine: routine)
+
+// Skin journey timeline
+SkinJourneyCard(entries: entries)
+```
+
+---
+
+### Premium Widgets (`widgets/premium/`)
+```dart
+import '.../widgets/premium/premium_widgets.dart';
+
+// 5 tiers: Free, Silver, Gold, Platinum, Diamond
+PremiumBadge(tier: PremiumTier.gold, animate: true)
+
+// Lock overlay
+PremiumLock(
+  child: featureWidget,
+  requiredTier: PremiumTier.platinum,
+  currentTier: user.tier,
+)
+
+// Subscription card
+PremiumSubscriptionCard(
+  tier: PremiumTier.gold,
+  price: '9.99',
+  features: ['AI Analysis', 'Unlimited Scans'],
+  isPopular: true,
+)
+```
+
+---
+
+### Education Widgets (`widgets/education/`)
+```dart
+import '.../widgets/education/education_widgets.dart';
+
+// Skincare tips (6 categories)
+SkincareTipCard(tip: tip)
+DailyTipWidget(tip: tip)
+
+// Ingredient spotlight
+IngredientSpotlight(ingredient: ingredient)
+
+// Calendar tracking
+SkinCalendar(month: 12, year: 2024, entries: entries)
+
+// Streak widget
+StreakWidget(currentStreak: 7, longestStreak: 14, weekData: weekData)
+
+// Goal tracker
+SkinGoalCard(goal: goal)
+```
+
+---
+
+## Widget Structure
+
+```
+widgets/
+├── icons/              # Skin type, ingredient icons
+├── routine/            # Steps, progress, timeline
+├── community/          # Posts, reviews, sharing
+├── premium/            # Badges, locks, subscriptions
+├── education/          # Tips, calendar, streaks
+├── form/               # Requirement checklist
+├── illustrations/      # Skincare illustrations
+└── ui_kit/             # Layout, headers, chips, cards
+```

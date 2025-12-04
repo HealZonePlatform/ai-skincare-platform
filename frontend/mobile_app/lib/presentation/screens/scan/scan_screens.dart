@@ -13,6 +13,7 @@ import 'package:ai_skincare_platform/core/error/global_error_notifier.dart';
 import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/core/utils/share_helper.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_stat_chip.dart';
@@ -20,6 +21,8 @@ import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_surface_card
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 import 'package:ai_skincare_platform/utils/error_handler.dart';
 import 'package:ai_skincare_platform/utils/exceptions.dart';
+import 'package:ai_skincare_platform/presentation/widgets/confetti_overlay.dart';
+import 'package:confetti/confetti.dart';
 
 const _scanPlaceholderImageUrl =
     'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800';
@@ -36,6 +39,7 @@ class _ScanPermissionScreenState extends State<ScanPermissionScreen> {
 
   Future<void> _requestPermission() async {
     if (_isRequesting) return;
+    await Haptics.selection();
     setState(() {
       _isRequesting = true;
     });
@@ -72,17 +76,9 @@ class _ScanPermissionScreenState extends State<ScanPermissionScreen> {
           child: Column(
             children: [
               const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.camera_alt_rounded,
-                  size: 96,
-                  color: AppColors.primary,
-                ),
+              const SkincareIllustration(
+                type: IllustrationType.emptyScan,
+                size: 220,
               ),
               const SizedBox(height: AppSpacing.xl),
               Text(
@@ -102,6 +98,8 @@ class _ScanPermissionScreenState extends State<ScanPermissionScreen> {
                     ?.copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: AppSpacing.l),
+              const _PermissionHighlights(),
               const Spacer(),
               HzPrimaryButton(
                 label: 'Allow camera access',
@@ -113,11 +111,92 @@ class _ScanPermissionScreenState extends State<ScanPermissionScreen> {
               HzSecondaryButton(
                 label: 'Not now',
                 icon: Icons.close_rounded,
-                onPressed: () => context.go('/home'),
+                onPressed: () async {
+                  await Haptics.selection();
+                  if (context.mounted) {
+                    context.go('/home');
+                  }
+                },
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _PermissionHighlights extends StatelessWidget {
+  const _PermissionHighlights();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    const items = [
+      (
+        Icons.lock_outline,
+        'Private by design',
+        'Photos are only used for your scan and never shared.',
+      ),
+      (
+        Icons.auto_awesome_rounded,
+        'AI glow check',
+        'Better lighting gives more accurate results.',
+      ),
+      (
+        Icons.shield_moon_outlined,
+        'Comfort mode',
+        'You can stop anytime and retry when ready.',
+      ),
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.m),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: items
+            .map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.s),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.s),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                      ),
+                      child: Icon(item.$1, color: AppColors.primary, size: 18),
+                    ),
+                    const SizedBox(width: AppSpacing.m),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.$2,
+                            style: theme.textTheme.labelLarge
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            item.$3,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -866,18 +945,69 @@ class _ScanProcessingScreenState extends State<ScanProcessingScreen>
                             AnimatedBuilder(
                               animation: _controller,
                               builder: (context, child) {
-                                final size = 120 + (_controller.value * 20);
-                                return SizedBox(
-                                  height: size,
-                                  width: size,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 6,
-                                    valueColor:
-                                        const AlwaysStoppedAnimation<Color>(
-                                      AppColors.primary,
+                                const size = 140.0;
+                                final progress = _controller.value;
+                                final percent = (progress * 100).round();
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // Outer glow
+                                    Container(
+                                      width: size + 20,
+                                      height: size + 20,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.primary.withValues(
+                                                alpha: 0.2 + (progress * 0.1)),
+                                            blurRadius: 30,
+                                            spreadRadius: 5,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    value: _controller.value,
-                                  ),
+                                    // Progress ring
+                                    SizedBox(
+                                      height: size,
+                                      width: size,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 8,
+                                        backgroundColor: AppColors.primary
+                                            .withValues(alpha: 0.15),
+                                        valueColor:
+                                            const AlwaysStoppedAnimation<Color>(
+                                          AppColors.primary,
+                                        ),
+                                        value: progress,
+                                      ),
+                                    ),
+                                    // Percentage text
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '$percent%',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineMedium
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.primary,
+                                              ),
+                                        ),
+                                        Text(
+                                          'Analyzing',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: AppColors.textSecondary,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 );
                               },
                             ),
@@ -891,7 +1021,7 @@ class _ScanProcessingScreenState extends State<ScanProcessingScreen>
                             ),
                             const SizedBox(height: AppSpacing.s),
                             const Text(
-                              'This usually takes 5-10 seconds.\nKeep the app open.',
+                              'Detecting skin conditions...\nThis usually takes 5-10 seconds.',
                               textAlign: TextAlign.center,
                               style: TextStyle(color: AppColors.textSecondary),
                             ),
@@ -935,7 +1065,7 @@ class _ScanProcessingScreenState extends State<ScanProcessingScreen>
   }
 }
 
-class ScanResultScreen extends StatelessWidget {
+class ScanResultScreen extends StatefulWidget {
   const ScanResultScreen({
     super.key,
     this.imagePath,
@@ -944,97 +1074,221 @@ class ScanResultScreen extends StatelessWidget {
   final String? imagePath;
 
   @override
+  State<ScanResultScreen> createState() => _ScanResultScreenState();
+}
+
+class _ScanResultScreenState extends State<ScanResultScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+  late final ConfettiController _confettiController;
+  static const int _score = 86;
+  bool _hasPlayedCelebration = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 3));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutQuad,
+    ));
+
+    _controller.forward();
+  }
+
+  void _onScoreAnimationComplete() {
+    if (_hasPlayedCelebration) return;
+    _hasPlayedCelebration = true;
+    if (_score > 80) {
+      Haptics.success();
+      _confettiController.play();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _confettiController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Latest scan result'),
         actions: [
           IconButton(
-              tooltip: 'Share result',
-              icon: const Icon(Icons.share_outlined),
-              onPressed: () async {
-                await Haptics.selection();
-                AnalyticsService.logEvent(
-                  AnalyticsEvent.scanShared,
-                  parameters: {'surface': 'result_appbar'},
-                );
-                await ShareHelper.shareText(
-                  'Skin score: 86 - Routine is on track! #HealZone',
-                );
-              },
-            )
+            tooltip: 'Share result',
+            icon: const Icon(Icons.share_outlined),
+            onPressed: () async {
+              await Haptics.selection();
+              AnalyticsService.logEvent(
+                AnalyticsEvent.scanShared,
+                parameters: {'surface': 'result_appbar'},
+              );
+              await ShareHelper.shareText(
+                'Skin score: $_score - Routine is on track! #HealZone',
+              );
+            },
+          )
         ],
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          children: [
-            HzSurfaceCard(
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: AppColors.success.withValues(alpha: 0.1),
-                    child: const Text(
-                      '86',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+      body: ConfettiOverlay(
+        controller: _confettiController,
+        child: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOut,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 0.9 + (0.1 * value),
+                    child: Opacity(
+                      opacity: value,
+                      child: HzSurfaceCard(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.success.withValues(alpha: 0.1),
+                                border: Border.all(
+                                  color:
+                                      AppColors.success.withValues(alpha: 0.3),
+                                  width: 2,
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: TweenAnimationBuilder<int>(
+                                tween: IntTween(begin: 0, end: _score),
+                                duration: const Duration(seconds: 2),
+                                curve: Curves.easeOutQuart,
+                                onEnd: _onScoreAnimationComplete,
+                                builder: (context, score, _) {
+                                  return Text(
+                                    '$score',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 28,
+                                      color: AppColors.success,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.l),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Excellent!',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.success,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'Skin barrier is stable. Keep your current routine to improve T-zone balance.',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.4),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.l),
-                  const Expanded(
-                    child: Text(
-                      'Skin barrier is stable. Keep your current routine to improve T-zone balance.',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            const HzSectionHeader(
-              title: 'Key metrics',
-              subtitle: 'Updated from the most recent scan',
-              padding: EdgeInsets.zero,
-            ),
-            const SizedBox(height: AppSpacing.m),
-            const Wrap(
-              spacing: AppSpacing.s,
-              runSpacing: AppSpacing.s,
-              children: [
-                HzStatChip(
-                    label: 'Hydration', value: '72', icon: Icons.water_drop),
-                HzStatChip(
-                    label: 'Elasticity', value: '80', icon: Icons.auto_graph),
-                HzStatChip(label: 'Spots', value: '65', icon: Icons.blur_on),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            const HzSectionHeader(
-              title: 'Reference photo',
-              padding: EdgeInsets.only(bottom: AppSpacing.m),
-            ),
-            _buildResultImage(),
-            const SizedBox(height: AppSpacing.xl),
-            HzPrimaryButton(
-              label: 'View detailed analysis',
-              icon: Icons.analytics_outlined,
-              onPressed: () => context.go('/advice'),
-            ),
-            const SizedBox(height: AppSpacing.s),
-            HzSecondaryButton(
-              label: 'Scan again',
-              icon: Icons.refresh_rounded,
-              onPressed: () => context.go('/scan/prepare'),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.xl),
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const HzSectionHeader(
+                        title: 'Key metrics',
+                        subtitle: 'Updated from the most recent scan',
+                        padding: EdgeInsets.zero,
+                      ),
+                      const SizedBox(height: AppSpacing.m),
+                      const _StaggeredChips(
+                        children: [
+                          HzStatChip(
+                              label: 'Hydration',
+                              value: '72',
+                              icon: Icons.water_drop),
+                          HzStatChip(
+                              label: 'Elasticity',
+                              value: '80',
+                              icon: Icons.auto_graph),
+                          HzStatChip(
+                              label: 'Spots', value: '65', icon: Icons.blur_on),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      const HzSectionHeader(
+                        title: 'Reference photo',
+                        padding: EdgeInsets.only(bottom: AppSpacing.m),
+                      ),
+                      _buildResultImage(),
+                      const SizedBox(height: AppSpacing.xl),
+                      HzPrimaryButton(
+                        label: 'View detailed analysis',
+                        icon: Icons.analytics_outlined,
+                        onPressed: () => context.go('/advice'),
+                      ),
+                      const SizedBox(height: AppSpacing.s),
+                      HzSecondaryButton(
+                        label: 'Scan again',
+                        icon: Icons.refresh_rounded,
+                        onPressed: () => context.go('/scan/prepare'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildResultImage() {
-    final path = imagePath;
+    final path = widget.imagePath;
     if (path == null || path.isEmpty) {
       return const OptimizedNetworkImage(
         imageUrl: _scanPlaceholderImageUrl,
@@ -1063,6 +1317,63 @@ class ScanResultScreen extends StatelessWidget {
       imageUrl: path,
       height: 220,
       borderRadius: AppRadius.l,
+    );
+  }
+}
+
+class _StaggeredChips extends StatefulWidget {
+  const _StaggeredChips({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  State<_StaggeredChips> createState() => _StaggeredChipsState();
+}
+
+class _StaggeredChipsState extends State<_StaggeredChips>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300 + (widget.children.length * 100)),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpacing.s,
+      runSpacing: AppSpacing.s,
+      children: widget.children.asMap().entries.map((entry) {
+        final index = entry.key;
+        final child = entry.value;
+        final delay = index * 0.15;
+        final animation = CurvedAnimation(
+          parent: _controller,
+          curve: Interval(delay, (delay + 0.5).clamp(0.0, 1.0),
+              curve: Curves.easeOutBack),
+        );
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 0.3),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      }).toList(),
     );
   }
 }

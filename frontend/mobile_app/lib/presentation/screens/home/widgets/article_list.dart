@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ai_skincare_platform/core/analytics/analytics_service.dart';
 import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/presentation/screens/home/models/home_models.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class ArticleList extends StatelessWidget {
@@ -14,13 +15,14 @@ class ArticleList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (articles.isEmpty) {
-      return const SliverToBoxAdapter(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Text(
-            'No stories yet. Explore the community tab for more tips.',
-            style: TextStyle(color: AppColors.textSecondary),
-          ),
+      return SliverToBoxAdapter(
+        child: IllustratedMessage(
+          illustration: IllustrationType.emptyArticles,
+          title: 'Fresh stories loading',
+          message: 'We are curating skincare tips for you. Hop into the community while you wait.',
+          actionLabel: 'Open community',
+          onAction: () => context.push('/community'),
+          accent: AppColors.primary,
         ),
       );
     }

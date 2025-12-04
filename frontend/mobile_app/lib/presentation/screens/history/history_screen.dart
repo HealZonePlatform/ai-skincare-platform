@@ -9,6 +9,7 @@ import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
 import 'package:ai_skincare_platform/presentation/providers/user_profile_provider.dart';
 import 'package:ai_skincare_platform/presentation/widgets/error_state.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_skeleton.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
@@ -73,9 +74,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
           if (hasError) {
             return ErrorState(
-              title: 'Không tải được lịch sử',
-              message: provider.errorMessage ?? 'Vui lòng thử lại.',
-              actionLabel: 'Thử lại',
+              title: 'KhÃ´ng táº£i Ä‘Æ°á»£c lá»‹ch sá»­',
+              message: provider.errorMessage ?? 'Vui lÃ²ng thá»­ láº¡i.',
+              actionLabel: 'Thá»­ láº¡i',
               onAction: () => provider.loadSkinAnalysisHistory(),
             );
           }
@@ -83,6 +84,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
           if (items.isEmpty) {
             return const _EmptyHistory();
           }
+
+          final completedCount =
+              items.where((item) => item.status == 'completed').length;
+          final lastScanDate = items.first.createdAt;
 
           return RefreshIndicator(
             onRefresh: _onRefresh,
@@ -92,16 +97,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 parent: BouncingScrollPhysics(),
               ),
               padding: const EdgeInsets.all(AppSpacing.xl),
-              itemCount: items.length + (provider.hasMoreHistory ? 1 : 0),
+              itemCount: items.length + (provider.hasMoreHistory ? 1 : 0) + 1,
               separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.m),
               itemBuilder: (context, index) {
-                if (index >= items.length) {
+                if (index == 0) {
+                  return _HistorySummary(
+                    total: items.length,
+                    completed: completedCount,
+                    lastScan: lastScanDate,
+                  );
+                }
+
+                final adjustedIndex = index - 1;
+
+                if (adjustedIndex >= items.length) {
                   return const Padding(
                     padding: EdgeInsets.symmetric(vertical: AppSpacing.m),
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
-                final item = items[index];
+                final item = items[adjustedIndex];
                 return _HistoryTile(item: item);
               },
             ),
@@ -122,98 +137,111 @@ class _HistoryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final statusColor = _statusColor(item.status);
     final statusLabel = (item.status ?? 'unknown').toUpperCase();
-    return Semantics(
-      button: true,
-      label: 'Open analysis ${item.id}',
-          child: InkWell(
-            onTap: () async {
-              await Haptics.selection();
-              if (context.mounted) {
-                AnalyticsService.logEvent(
-                  AnalyticsEvent.analysisHistoryOpened,
-                  parameters: {'id': item.id},
-                );
-                context.pushNamed(
-                  'analysis-detail',
-                  pathParameters: {'id': item.id},
-              extra: item,
-            );
-          }
-        },
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.l),
-        child: Container(
-          padding: const EdgeInsets.all(AppSpacing.l),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppRadius.l),
-            border: Border.all(
-              color: Theme.of(context).dividerColor,
-            ),
-            boxShadow: AppShadows.mild,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.m),
-                child: SizedBox(
-                  width: 72,
-                  height: 72,
-                  child: OptimizedNetworkImage(
-                    imageUrl: item.imageUrl,
-                    aspectRatio: 1,
-                    borderRadius: AppRadius.m,
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await Haptics.selection();
+            if (context.mounted) {
+              AnalyticsService.logEvent(
+                AnalyticsEvent.analysisHistoryOpened,
+                parameters: {'id': item.id},
+              );
+              context.pushNamed(
+                'analysis-detail',
+                pathParameters: {'id': item.id},
+                extra: item,
+              );
+            }
+          },
+          borderRadius: BorderRadius.circular(AppRadius.l),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.m),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadius.m),
+                  child: SizedBox(
+                    width: 80,
+                    height: 80,
+                    child: OptimizedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      aspectRatio: 1,
+                      borderRadius: AppRadius.m,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.m),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Scan #${item.id}',
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      _formatDate(item.createdAt),
-                      style: theme.textTheme.labelSmall
-                          ?.copyWith(color: AppColors.textSecondary),
-                    ),
-                    if (item.analysisResult != null) ...[
+                const SizedBox(width: AppSpacing.m),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _formatDate(item.createdAt),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: statusColor.withValues(alpha: 0.1),
+                              borderRadius:
+                                  BorderRadius.circular(AppRadius.full),
+                            ),
+                            child: Text(
+                              statusLabel,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Result ready',
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: AppColors.textSecondary),
+                        'Scan #${item.id}',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
+                      if (item.analysisResult != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Analysis complete',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSpacing.m),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.m,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.s),
-              const Icon(Icons.chevron_right_rounded,
-                  color: AppColors.textSecondary),
-            ],
+                const SizedBox(width: AppSpacing.s),
+                const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.textTertiary, size: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -257,29 +285,72 @@ class _EmptyHistory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return SafeArea(
+      child: IllustratedMessage(
+        icon: Icons.history_toggle_off_rounded,
+        title: 'No scan history yet',
+        message:
+            'Start your first scan to unlock progress tracking and tailored tips.',
+        actionLabel: 'Start first scan',
+        onAction: () => context.push('/scan/permission'),
+        accent: AppColors.primary,
+        illustration: IllustrationType.emptyScan,
+      ),
+    );
+  }
+}
+
+class _HistorySummary extends StatelessWidget {
+  const _HistorySummary({
+    required this.total,
+    required this.completed,
+    required this.lastScan,
+  });
+
+  final int total;
+  final int completed;
+  final DateTime lastScan;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.history, size: 48, color: AppColors.textSecondary),
-            const SizedBox(height: AppSpacing.m),
-            Text(
-              'Chưa có phiên quét nào',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.l),
+      decoration: BoxDecoration(
+        gradient: AppColors.dewdropGradient,
+        borderRadius: BorderRadius.circular(AppRadius.l),
+        boxShadow: AppShadows.mild,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.m),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.8),
             ),
-            const SizedBox(height: AppSpacing.s),
-            Text(
-              'Thực hiện quét da để xem lịch sử và tiến trình cải thiện.',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
+            child: const Icon(Icons.insights_outlined),
+          ),
+          const SizedBox(width: AppSpacing.m),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Your scan journey',
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  '$total scans â€¢ $completed completed â€¢ Last scan ${_formatDate(lastScan)}',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: AppColors.textSecondary),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

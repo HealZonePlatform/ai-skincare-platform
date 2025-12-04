@@ -1,10 +1,12 @@
 // lib/presentation/screens/profile/skin_analysis_detail_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:ai_skincare_platform/domain/profile/entities/user_profile.dart';
 import 'package:ai_skincare_platform/presentation/widgets/hz_buttons.dart';
+import 'package:ai_skincare_platform/presentation/widgets/illustrated_message.dart';
 import 'package:ai_skincare_platform/presentation/widgets/optimized_network_image.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_section_header.dart';
 import 'package:ai_skincare_platform/presentation/widgets/ui_kit/hz_stat_chip.dart';
@@ -45,9 +47,9 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
               padding: EdgeInsets.zero,
             ),
             const SizedBox(height: AppSpacing.m),
-            _buildHighlightChips(),
+            _buildHighlightChips(context),
             const SizedBox(height: AppSpacing.xl),
-            _buildAnalysisResultCard(),
+            _buildAnalysisResultCard(context),
             const SizedBox(height: AppSpacing.xl),
             HzPrimaryButton(
               label: 'Chia sẻ (demo)',
@@ -117,12 +119,16 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHighlightChips() {
+  Widget _buildHighlightChips(BuildContext context) {
     final entries = analysisItem.analysisResult?.entries.take(3).toList() ?? [];
     if (entries.isEmpty) {
-      return const Text(
-        'Chúng tôi sẽ hiển thị highlight khi có đủ dữ liệu từ những lần quét tiếp theo.',
-        style: TextStyle(color: AppColors.textSecondary),
+      return IllustratedMessage(
+        illustration: IllustrationType.emptyScan,
+        title: 'No highlights yet',
+        message:
+            'Complete more scans to surface insights and trend your skin changes.',
+        actionLabel: 'Start a scan',
+        onAction: () => context.push('/scan/permission'),
       );
     }
 
@@ -140,14 +146,16 @@ class SkinAnalysisDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnalysisResultCard() {
+  Widget _buildAnalysisResultCard(BuildContext context) {
     if (analysisItem.analysisResult == null ||
         analysisItem.analysisResult!.isEmpty) {
-      return const Card(
-        child: Padding(
-          padding: EdgeInsets.all(AppSpacing.l),
-          child: Text('Chưa có kết quả phân tích chi tiết'),
-        ),
+      return IllustratedMessage(
+        illustration: IllustrationType.emptyScan,
+        title: 'No detailed breakdown yet',
+        message:
+            'We will unlock pore, texture, and tone details once an analysis completes.',
+        actionLabel: 'Scan again',
+        onAction: () => context.push('/scan/permission'),
       );
     }
 

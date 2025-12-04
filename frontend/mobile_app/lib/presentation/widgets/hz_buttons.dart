@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:ai_skincare_platform/core/utils/haptics.dart';
 import 'package:ai_skincare_platform/theme/app_theme.dart';
 
 class HzPrimaryButton extends StatelessWidget {
@@ -9,19 +10,34 @@ class HzPrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.icon,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
   final IconData? icon;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+        style: (backgroundColor != null || foregroundColor != null)
+            ? ElevatedButton.styleFrom(
+                backgroundColor: backgroundColor,
+                foregroundColor: foregroundColor,
+              )
+            : null,
+        onPressed: isLoading
+            ? null
+            : () async {
+                await Haptics.selection();
+                onPressed?.call();
+              },
         child: isLoading
             ? const SizedBox(
                 height: 22,
@@ -63,7 +79,12 @@ class HzSecondaryButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
-        onPressed: onPressed,
+        onPressed: onPressed == null
+            ? null
+            : () async {
+                await Haptics.selection();
+                onPressed?.call();
+              },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
